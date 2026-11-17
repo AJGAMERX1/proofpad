@@ -28,3 +28,61 @@ main[data-mode="calculator"] .calc-output .plot-style-trigger {margin-right:auto
 @media(min-width:901px) {
  #seriesStyleDialog[style*="--picker-left"] { position:fixed; margin:0; inset:var(--picker-top) auto auto var(--picker-left); }
 }
+
+#seriesStyleDialog.surface-style-dialog {
+ width:min(460px,calc(100vw - 24px));padding:22px;border-radius:20px;
+}
+#seriesStyleDialog.surface-style-dialog::backdrop {background:#0d1b2c3d}
+#seriesStyleDialog [hidden] {display:none!important}
+#seriesStyleDialog .surface-style-target {
+ display:flex;align-items:center;gap:8px;margin-bottom:12px;
+}
+#seriesStyleDialog select,#surfaceLookName {
+ min-width:0;border:1px solid var(--pad-line);border-radius:8px;padding:7px 8px;
+ background:var(--pad-field);color:var(--pad-ink);font:inherit;
+}
+#surfaceStyleTarget {flex:1;width:90px}
+#seriesStyleDialog #separateSurfaceColors {font-size:12px;padding:8px}
+.surface-style-preview {overflow:hidden;border:1px solid var(--pad-line);border-radius:12px}
+#surfaceStylePreview {display:block;width:100%;height:auto}
+#seriesStyleDialog #surfaceLooks {grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+#seriesStyleDialog #surfaceLooks button {
+ display:flex;flex-direction:column;gap:0;padding:0 0 7px;border-radius:10px;overflow:hidden;
+}
+#surfaceLooks canvas {display:block;width:100%;height:auto}
+#seriesStyleDialog #surfaceLooks button::before,#seriesStyleDialog #surfaceFinishes button::before,
+#seriesStyleDialog #savedSurfaceLooks button::before {display:none}
+#seriesStyleDialog #surfaceLooks span {font-size:12px}
+#surfaceCustomize {border:1px solid var(--pad-line);border-radius:10px;padding:10px 12px}
+#surfaceCustomize summary {cursor:pointer;font-weight:600;padding:2px 0}
+#seriesStyleDialog .surface-color-inputs {display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.surface-color-inputs label {display:flex;flex-direction:column;gap:5px;color:var(--pad-muted);font-size:12px}
+.surface-color-inputs input {width:100%;height:38px;padding:2px;border:1px solid var(--pad-line);border-radius:8px;background:var(--pad-field);cursor:pointer}
+#seriesStyleDialog #surfaceReverse {display:block;font-size:12px;margin-top:9px}
+#seriesStyleDialog #surfaceFinishes {grid-template-columns:repeat(4,minmax(0,1fr))}
+#seriesStyleDialog #surfaceFinishes button {display:block;text-align:center;padding:7px 3px;font-size:12px}
+.surface-style-row {display:flex;align-items:center;justify-content:space-between;gap:8px;margin:12px 0}
+.surface-opacity-label {display:flex;justify-content:space-between;gap:8px}
+#surfaceOpacity {width:100%;accent-color:var(--pad-accent);margin:9px 0 15px}
+.surface-style-save {display:flex;gap:8px}
+#surfaceLookName {flex:1;width:120px}
+#seriesStyleDialog #saveSurfaceLook {white-space:nowrap}
+#surfaceStyleMessage {margin:7px 0 0;font-size:12px;color:var(--pad-muted)}
+#surfaceStyleMessage:empty {display:none}
+#seriesStyleDialog #surfaceSavedList {display:flex;flex-wrap:wrap;gap:6px}
+#surfaceSavedList>div {display:flex;max-width:100%}
+#surfaceSavedList button:first-child {overflow-wrap:anywhere;border-radius:6px 0 0 6px}
+#surfaceSavedList button:last-child {border-radius:0 6px 6px 0}
+#seriesStyleDialog.surface-style-dialog .extra-surface-colors {margin-top:17px}
+#seriesStyleDialog.surface-style-dialog .series-dialog-footer {position:sticky;bottom:-22px;background:var(--pad-field);padding:12px 0 2px}
+@media(max-width:380px){
+ #seriesStyleDialog.surface-style-dialog {padding:14px}
+ #seriesStyleDialog .surface-style-target {flex-wrap:wrap}
+ #seriesStyleDialog #separateSurfaceColors {padding:6px}
+ #seriesStyleDialog.surface-style-dialog .series-dialog-footer {bottom:-14px}
+}
+
+#seriesMorePalettes {margin-top:14px}
+#seriesMorePalettes summary {cursor:pointer;color:var(--pad-muted)}
+#seriesStyleDialog:not(.surface-style-dialog) #seriesMorePalettes>summary {display:none}
+#seriesStyleDialog.surface-style-dialog .extra-surface-colors>legend {display:none}

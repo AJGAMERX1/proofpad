@@ -361,6 +361,64 @@ main[data-mode="calculator"] .calc-output .plot-style-trigger {margin-right:auto
 @media(min-width:901px) {
  #seriesStyleDialog[style*="--picker-left"] { position:fixed; margin:0; inset:var(--picker-top) auto auto var(--picker-left); }
 }
+
+#seriesStyleDialog.surface-style-dialog {
+ width:min(460px,calc(100vw - 24px));padding:22px;border-radius:20px;
+}
+#seriesStyleDialog.surface-style-dialog::backdrop {background:#0d1b2c3d}
+#seriesStyleDialog [hidden] {display:none!important}
+#seriesStyleDialog .surface-style-target {
+ display:flex;align-items:center;gap:8px;margin-bottom:12px;
+}
+#seriesStyleDialog select,#surfaceLookName {
+ min-width:0;border:1px solid var(--pad-line);border-radius:8px;padding:7px 8px;
+ background:var(--pad-field);color:var(--pad-ink);font:inherit;
+}
+#surfaceStyleTarget {flex:1;width:90px}
+#seriesStyleDialog #separateSurfaceColors {font-size:12px;padding:8px}
+.surface-style-preview {overflow:hidden;border:1px solid var(--pad-line);border-radius:12px}
+#surfaceStylePreview {display:block;width:100%;height:auto}
+#seriesStyleDialog #surfaceLooks {grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+#seriesStyleDialog #surfaceLooks button {
+ display:flex;flex-direction:column;gap:0;padding:0 0 7px;border-radius:10px;overflow:hidden;
+}
+#surfaceLooks canvas {display:block;width:100%;height:auto}
+#seriesStyleDialog #surfaceLooks button::before,#seriesStyleDialog #surfaceFinishes button::before,
+#seriesStyleDialog #savedSurfaceLooks button::before {display:none}
+#seriesStyleDialog #surfaceLooks span {font-size:12px}
+#surfaceCustomize {border:1px solid var(--pad-line);border-radius:10px;padding:10px 12px}
+#surfaceCustomize summary {cursor:pointer;font-weight:600;padding:2px 0}
+#seriesStyleDialog .surface-color-inputs {display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.surface-color-inputs label {display:flex;flex-direction:column;gap:5px;color:var(--pad-muted);font-size:12px}
+.surface-color-inputs input {width:100%;height:38px;padding:2px;border:1px solid var(--pad-line);border-radius:8px;background:var(--pad-field);cursor:pointer}
+#seriesStyleDialog #surfaceReverse {display:block;font-size:12px;margin-top:9px}
+#seriesStyleDialog #surfaceFinishes {grid-template-columns:repeat(4,minmax(0,1fr))}
+#seriesStyleDialog #surfaceFinishes button {display:block;text-align:center;padding:7px 3px;font-size:12px}
+.surface-style-row {display:flex;align-items:center;justify-content:space-between;gap:8px;margin:12px 0}
+.surface-opacity-label {display:flex;justify-content:space-between;gap:8px}
+#surfaceOpacity {width:100%;accent-color:var(--pad-accent);margin:9px 0 15px}
+.surface-style-save {display:flex;gap:8px}
+#surfaceLookName {flex:1;width:120px}
+#seriesStyleDialog #saveSurfaceLook {white-space:nowrap}
+#surfaceStyleMessage {margin:7px 0 0;font-size:12px;color:var(--pad-muted)}
+#surfaceStyleMessage:empty {display:none}
+#seriesStyleDialog #surfaceSavedList {display:flex;flex-wrap:wrap;gap:6px}
+#surfaceSavedList>div {display:flex;max-width:100%}
+#surfaceSavedList button:first-child {overflow-wrap:anywhere;border-radius:6px 0 0 6px}
+#surfaceSavedList button:last-child {border-radius:0 6px 6px 0}
+#seriesStyleDialog.surface-style-dialog .extra-surface-colors {margin-top:17px}
+#seriesStyleDialog.surface-style-dialog .series-dialog-footer {position:sticky;bottom:-22px;background:var(--pad-field);padding:12px 0 2px}
+@media(max-width:380px){
+ #seriesStyleDialog.surface-style-dialog {padding:14px}
+ #seriesStyleDialog .surface-style-target {flex-wrap:wrap}
+ #seriesStyleDialog #separateSurfaceColors {padding:6px}
+ #seriesStyleDialog.surface-style-dialog .series-dialog-footer {bottom:-14px}
+}
+
+#seriesMorePalettes {margin-top:14px}
+#seriesMorePalettes summary {cursor:pointer;color:var(--pad-muted)}
+#seriesStyleDialog:not(.surface-style-dialog) #seriesMorePalettes>summary {display:none}
+#seriesStyleDialog.surface-style-dialog .extra-surface-colors>legend {display:none}
 </style>
 <style>
 #graphPanel .graph-actions #graphExportFormat {
@@ -480,6 +538,7 @@ document.getElementById('themeSwitch').addEventListener('click', () => {
    <button type="button" id="surfaceOrbit" aria-pressed="true">Surface</button>
    <button type="button" id="surfaceHeatmap" aria-pressed="false">Heat map</button>
   </div>
+  <button type="button" id="surfaceStyles" aria-haspopup="dialog" aria-controls="seriesStyleDialog">Styles</button>
   <label class="surface-palette">Gradient <select id="surfacePalette"><option value="aurora">Aurora</option><option value="ember">Ember</option><option value="glacier">Glacier</option><option value="prism">Prism</option><option value="rose">Rose</option><option value="meadow">Meadow</option><option value="twilight">Twilight</option><option value="lava">Lava</option><option value="lagoon">Lagoon</option><option value="copper">Copper</option><option value="orchid">Orchid</option><option value="cividis">Cividis</option></select></label>
   <label class="surface-mesh"><input type="checkbox" id="surfaceMesh" checked><span id="surfaceMeshLabel">Mesh</span></label>
   <button type="button" id="surfaceSlice" aria-expanded="false" aria-controls="slicePanel">Slice</button>
@@ -531,8 +590,41 @@ document.getElementById('themeSwitch').addEventListener('click', () => {
 </main>
 <dialog id="seriesStyleDialog" aria-labelledby="seriesStyleHeading">
  <h2 id="seriesStyleHeading">Plot style</h2>
+<div id="surfaceStyleEditor" hidden>
+ <div class="surface-style-target">
+  <label for="surfaceStyleTarget">Editing</label><select id="surfaceStyleTarget"></select>
+  <button type="button" id="separateSurfaceColors" title="Give each surface a different palette">Distinct colors</button>
+ </div>
+ <div class="surface-style-preview"><canvas id="surfaceStylePreview" width="800" height="330" aria-label="Live preview of your graph"></canvas></div>
+ <fieldset class="surface-look-picker"><legend>Pick a look</legend><div id="surfaceLooks"></div></fieldset>
+ <details id="surfaceCustomize">
+  <summary>Make it yours</summary>
+  <fieldset><legend>Blend your colors</legend>
+   <div class="surface-color-inputs">
+    <label>Low<input type="color" id="surfaceColorLow" value="#174b80"></label>
+    <label>Middle<input type="color" id="surfaceColorMiddle" value="#72c6bf"></label>
+    <label>High<input type="color" id="surfaceColorHigh" value="#e2f1d7"></label>
+   </div>
+   <button type="button" id="surfaceReverse">Reverse colors</button>
+  </fieldset>
+  <fieldset><legend>Finish</legend><div id="surfaceFinishes">
+   <button type="button" data-finish="soft">Soft</button><button type="button" data-finish="gloss">Glossy</button>
+   <button type="button" data-finish="flat">Flat</button><button type="button" data-finish="wire">Lines only</button>
+  </div></fieldset>
+  <label class="surface-style-row" for="surfaceGrid">Surface lines
+   <select id="surfaceGrid"><option value="auto">Follow graph</option><option value="off">None</option><option value="fine">Fine</option><option value="bold">Bold</option></select>
+  </label>
+  <label class="surface-opacity-label" for="surfaceOpacity">See-through <output id="surfaceOpacityValue"></output></label>
+  <input id="surfaceOpacity" type="range" min="0" max="75" step="5" value="0">
+  <div class="surface-style-save"><input id="surfaceLookName" type="text" maxlength="28" placeholder="Name your look" aria-label="Name your look"><button type="button" id="saveSurfaceLook">Save look</button></div>
+  <p id="surfaceStyleMessage" role="status"></p>
+ </details>
+ <fieldset id="savedSurfaceLooks" hidden><legend>Your looks</legend><div id="surfaceSavedList"></div></fieldset>
+</div>
+
+
  <fieldset><legend>Solid color</legend><div id="seriesHues"></div></fieldset>
- <fieldset><legend>Gradient</legend><div id="seriesRamps"></div></fieldset>
+ <details id="seriesMorePalettes" open><summary>More color palettes</summary><fieldset><legend>Gradient</legend><div id="seriesRamps"></div></fieldset></details>
  <fieldset id="seriesStrokeOptions"><legend>Line pattern</legend><div id="seriesStrokes"></div></fieldset>
  <div class="series-dialog-footer"><button type="button" id="seriesResetStyle">Use automatic style</button><button type="button" id="seriesStyleDone">Done</button></div>
 </dialog>
@@ -2097,7 +2189,7 @@ function onSeriesStyleChanged(){
   series.legendButton.dataset.pattern=inSurface()?'solid':look.pattern;
   series.legendButton.title=series.row.querySelector('math-field').value+' · '+look.rampName;
  });
- refreshSeriesStyleControls(graphSeries);updateSurfaceKeys();redrawGraph();
+ updateSurfaceKeys();redrawGraph();refreshSeriesStyleControls(graphSeries);
 }
 function describeGraph(){
  const count=graphSeries.filter(s=>!s.row.plotHidden).length;
@@ -2244,7 +2336,7 @@ function paintGraph({canvas=graphCanvas,pixelRatio=Math.min(3,window.devicePixel
   const palette={ramp:surfaceRamps[surfaceView.palette]};
   for(const key of ['paper','grid','axis','label'])palette[key]=style.getPropertyValue('--graph-'+key).trim();
   const moving=!fullDetail && (isSliderPreview()?'slider':graphTouches.size>0 || spinFrame!==0);
-  const surfaces=shown.map(s=>({run:s.run,cost:s.cost,color:s.look.color,ramp:s.look.ramp}));
+  const surfaces=shown.map(s=>({run:s.run,cost:s.cost,color:s.look.color,ramp:s.look.ramp,finish:s.look.finish,grid:s.look.grid,opacity:s.look.opacity}));
   const drawn=paintSurfacePlot(ctx,w,h,surfaces,surfaceView,palette,moving,sampleScale);
   if(surfaceView.slicing){
    if(canvas===graphCanvas)rememberSliceBackdrop(canvas);
@@ -2709,6 +2801,36 @@ function surfaceColors(stops) {
  });
 }
 
+// Keep appearance validation close to the renderer so saved drafts and exports
+// use the same defaults, including drafts from before surface finishes existed.
+function surfaceRenderStyle(surface, view) {
+ const finish = ['soft', 'gloss', 'flat', 'wire'].includes(surface.finish) ? surface.finish : 'soft';
+ const grid = ['auto', 'off', 'fine', 'bold'].includes(surface.grid) ? surface.grid : 'auto';
+ const opacity = Number.isFinite(surface.opacity) ? Math.min(1, Math.max(.25, surface.opacity)) : 1;
+ const mesh = finish === 'wire' || (grid === 'auto' ? view.mesh : grid !== 'off');
+ const gridWidth = grid === 'fine' ? .55 : grid === 'bold' ? 1.35 : .9;
+ const baseGridAlpha = grid === 'fine' ? .36 : grid === 'bold' ? .88 : .65;
+ const gridAlpha = finish === 'wire' ? Math.max(.72, baseGridAlpha) : baseGridAlpha;
+ const gridCount = grid === 'fine' ? 22 : grid === 'bold' ? 12 : finish === 'wire' ? 20 : 15;
+ return {finish, grid, opacity, mesh, gridWidth, gridAlpha, gridCount};
+}
+
+function surfaceFaceColor(rgb, slopeX, slopeY, finish) {
+ if (finish === 'flat' || finish === 'wire') return 'rgb(' + rgb.join(',') + ')';
+ const normalLength = Math.hypot(slopeX, slopeY, 1);
+ const lighting = (.36 * slopeX + .24 * slopeY + .86) / normalLength;
+ if (finish === 'soft') {
+  const shade = .88 + .14 * lighting;
+  return 'rgb(' + rgb.map(channel => Math.round(Math.min(255, channel * shade))).join(',') + ')';
+ }
+ // A broad diffuse light and a smaller highlight give the surface a satin
+ // sheen. World-space lighting keeps the same appearance when the camera turns.
+ const shade = .67 + .34 * Math.max(0, lighting);
+ const halfVector = (.18 * slopeX + .12 * slopeY + .976) / normalLength;
+ const highlight = .42 * Math.max(0, halfVector) ** 24;
+ return 'rgb(' + rgb.map(channel => Math.round(Math.min(255, channel * shade + (255 - channel * shade) * highlight))).join(',') + ')';
+}
+
 function paintSurfaceHeat(ctx,w,h,series,view,palette,sampleScale=1,moving=false) {
  let drawn=false;
  const g = surfaceHeatGeometry(w,h,view), bottom=g.top+g.height, right=g.left+g.width;
@@ -2716,6 +2838,7 @@ function paintSurfaceHeat(ctx,w,h,series,view,palette,sampleScale=1,moving=false
  if(series.length){
   const area=g.width*g.height;
   const tables=series.map(s=>surfaceColors(s.ramp||palette.ramp));
+  const looks=series.map(surface=>surfaceRenderStyle(surface,view));
   const scale=Math.min(3,Math.max(1,sampleScale));
   // A touch can be just a probe. Keep the same heat-map samples while
   // interacting with the view; reserve the fast preview for equation sliders.
@@ -2726,7 +2849,8 @@ function paintSurfaceHeat(ctx,w,h,series,view,palette,sampleScale=1,moving=false
   const bitmap=typeof OffscreenCanvas==='function'?new OffscreenCanvas(cols,rows):ctx.canvas.ownerDocument.createElement('canvas');
   bitmap.width=cols;bitmap.height=rows;
   const ink=bitmap.getContext('2d'), image=ink.createImageData(cols,rows), bytes=image.data;
-  const heights=view.mesh?new Float32Array(cols*rows):null;
+  const heights=looks.some(look=>look.mesh)?new Float32Array(cols*rows):null;
+  const owners=heights?new Int32Array(cols*rows).fill(-1):null;
   const dx=g.width/cols,dy=g.height/rows,half=view.span/2;
   for(let j=0;j<rows;j++){
    const y=g.y(g.top+(j+.5)*dy);
@@ -2740,8 +2864,10 @@ function paintSurfaceHeat(ctx,w,h,series,view,palette,sampleScale=1,moving=false
     if(z===-Infinity){if(heights)heights[index]=NaN;continue;}
     drawn=true;
     const t=(z-view.cz)/view.span+.5, rgb=tables[topSeries][Math.max(0,Math.min(255,Math.round(255*t)))];
-    if(heights)heights[index]=t;
-    bytes[4*index]=rgb[0];bytes[4*index+1]=rgb[1];bytes[4*index+2]=rgb[2];bytes[4*index+3]=255;
+    if(heights){heights[index]=t;owners[index]=topSeries;}
+    const look=looks[topSeries];
+    bytes[4*index]=rgb[0];bytes[4*index+1]=rgb[1];bytes[4*index+2]=rgb[2];
+    bytes[4*index+3]=look.finish==='wire'?0:Math.round(255*look.opacity);
    }
   }
   ink.putImageData(image,0,0);
@@ -2749,10 +2875,11 @@ function paintSurfaceHeat(ctx,w,h,series,view,palette,sampleScale=1,moving=false
   ctx.drawImage(bitmap,g.left,g.top,g.width,g.height);
   if(heights){
    // Trace constant heights between adjacent samples. A domain hole breaks the contour.
-   ctx.beginPath();
+   const contours=series.map(()=>[]);
    const inc=2;
    for(let j=0;j<rows-inc;j+=inc)for(let i=0;i<cols-inc;i+=inc){
-    const k=j*cols+i;
+    const k=j*cols+i,owner=owners[k];
+    if(owner<0 || !looks[owner].mesh || [k+inc,k+inc+inc*cols,k+inc*cols].some(index=>owners[index]!==owner))continue;
     const a=heights[k],b=heights[k+inc],c=heights[k+inc+inc*cols],d=heights[k+inc*cols];
     const lo=Math.min(a,b,c,d),hi=Math.max(a,b,c,d);
     if(!(hi>lo))continue;
@@ -2766,10 +2893,20 @@ function paintSurfaceHeat(ctx,w,h,series,view,palette,sampleScale=1,moving=false
      cross(a,b,x,y,x+sx,y);cross(b,c,x+sx,y,x+sx,y+sy);
      cross(c,d,x+sx,y+sy,x,y+sy);cross(d,a,x,y+sy,x,y);
      if(points.length===4 && (((a+b+c+d)/4<t)!==(a<t)))points.unshift(points.pop());
-     for(let p=0;p+1<points.length;p+=2){ctx.moveTo(...points[p]);ctx.lineTo(...points[p+1]);}
+     for(let p=0;p+1<points.length;p+=2)contours[owner].push([points[p],points[p+1]]);
     }
    }
-   ctx.lineWidth=.95;ctx.strokeStyle=palette.axis;ctx.globalAlpha=.58;ctx.stroke();ctx.globalAlpha=1;
+   contours.forEach((segments,index)=>{
+    if(!segments.length)return;
+    const look=looks[index];
+    ctx.beginPath();
+    for(const [a,b] of segments){ctx.moveTo(...a);ctx.lineTo(...b);}
+    ctx.lineWidth=look.grid==='auto'?.95:look.gridWidth;
+    ctx.strokeStyle=look.finish==='wire'?series[index].color:palette.axis;
+    ctx.globalAlpha=(look.grid==='auto' && look.finish!=='wire'?.58:look.gridAlpha)*look.opacity;
+    ctx.stroke();
+   });
+   ctx.globalAlpha=1;
   }
  }
  const xt=surfaceTicks(g.x(g.left),g.x(right),Math.max(2,Math.floor(g.width/70)));
@@ -2808,11 +2945,12 @@ function surfaceGridSize(w,h,series,moving=false,sampleScale=1){
 // produce a new evaluator; clipping, zoom, mesh, and palette changes rebuild it.
 const preparedSurfaces=new WeakMap();
 function prepareSurfaceMesh(surface,view,count,ramp){
- const key=[count,view.cx,view.cy,view.cz,view.span,view.mesh,surface.color,...(ramp||[])].join('|');
+ const look=surfaceRenderStyle(surface,view);
+ const key=[count,view.cx,view.cy,view.cz,view.span,look.finish,look.grid,look.opacity,look.mesh,surface.color,...(ramp||[])].join('|');
  const previous=preparedSurfaces.get(surface.run);
  if(previous?.key===key)return previous;
  const vertices=[],faces=[],half=view.span/2,step=2/count;
- const meshInterval=Math.max(1,Math.round(count/15)),lut=surfaceColors(ramp);
+ const meshInterval=Math.max(1,Math.round(count/look.gridCount)),lut=surfaceColors(ramp);
  function cutAt(points,z,keepAbove){
   const inside=p=>keepAbove?p.z>=z:p.z<=z, next=[];
   let a=points.at(-1);
@@ -2894,10 +3032,9 @@ function prepareSurfaceMesh(surface,view,count,ramp){
   const z=poly.reduce((sum,p)=>sum+p.z,0)/poly.length;
   const rgb=lut[Math.max(0,Math.min(255,Math.round((z+1)*127.5)))];
   const dzx=((b.z-a.z)+(c.z-d.z))/(2*step),dzy=((d.z-a.z)+(c.z-b.z))/(2*step);
-  const lighting=(.36*dzx+.24*dzy+.86)/Math.hypot(dzx,dzy,1),shade=.88+.14*lighting;
-  const color='rgb('+rgb.map(channel=>Math.round(Math.min(255,channel*shade))).join(',')+')';
+  const color=surfaceFaceColor(rgb,dzx,dzy,look.finish);
   const mesh=[];
-  if(view.mesh){
+  if(look.mesh){
    for(let e=0;e<poly.length;e++){
     const p=poly[e],q=poly[(e+1)%poly.length];
     const onSlice=Math.abs(p.z)===1&&p.z===q.z;
@@ -2905,7 +3042,8 @@ function prepareSurfaceMesh(surface,view,count,ramp){
        (p.y===q.y && (j%meshInterval===0&&p.y===a.y || p.y===1))||onSlice)mesh.push([p,q]);
    }
   }
-  faces.push({points:poly,color,mesh,wire:surface.color,depth:0});
+  faces.push({points:poly,color,mesh,wire:look.finish==='wire'?color:surface.color,
+   filled:look.finish!=='wire',opacity:look.opacity,gridWidth:look.gridWidth,gridAlpha:look.gridAlpha,depth:0});
  }
  const geometry={key,vertices,faces};
  preparedSurfaces.set(surface.run,geometry);
@@ -2958,10 +3096,12 @@ function paintSurfacePlot(ctx,w,h,series,view,palette,moving=false,sampleScale=1
    const p=face.points;ctx.beginPath();ctx.moveTo(p[0].u,p[0].v);
    for(let i=1;i<p.length;i++)ctx.lineTo(p[i].u,p[i].v);
    ctx.closePath();ctx.fillStyle=ctx.strokeStyle=face.color;
-   ctx.globalAlpha=.95;ctx.fill();ctx.lineWidth=.56;ctx.stroke();
+   if(face.filled){
+    ctx.globalAlpha=.95*face.opacity;ctx.fill();ctx.lineWidth=.56;ctx.stroke();
+   }
    if(face.mesh.length){
     ctx.beginPath();for(const [a,b] of face.mesh){ctx.moveTo(a.u,a.v);ctx.lineTo(b.u,b.v);}
-    ctx.strokeStyle=face.wire;ctx.lineWidth=.9;ctx.globalAlpha=.65;ctx.stroke();
+    ctx.strokeStyle=face.wire;ctx.lineWidth=face.gridWidth;ctx.globalAlpha=face.gridAlpha*face.opacity;ctx.stroke();
    }
   }
   ctx.globalAlpha=1;
@@ -3002,6 +3142,13 @@ function paintSurfacePlot(ctx,w,h,series,view,palette,moving=false,sampleScale=1
  }finally{ctx.restore();}
 }
 const surfaceRamps={
+ coast:['#174b80','#278fac','#72c6bf','#e2f1d7'],
+ peach:['#8e315a','#d96b79','#f5ae91','#fff0ce'],
+ lilac:['#443270','#7e65b3','#b6a1dd','#f2e9ff'],
+ mint:['#12595c','#3e9c90','#99d7bc','#eef4bf'],
+ dusk:['#343d6a','#786196','#bf8daa','#f4c5b8'],
+ citrus:['#286348','#79a85b','#d5d974','#fff0af'],
+
  aurora:['#39266d','#3961ac','#139ca0','#60d49b','#f5ed8c'],
  ember:['#332041','#843463','#d15451','#fa9854','#fff3a0'],
  glacier:['#142648','#224fa1','#277fae','#65cde2','#e1fcff'],
@@ -3418,7 +3565,7 @@ function addSurfaceExample(){
 
 // Appearance is stored on the expression row alongside its slider settings.
 const seriesHueNames=['Blue','Rose','Green','Violet','Amber','Teal'];
-const seriesRampOrder=['aurora','ember','glacier','prism','rose','meadow','twilight','lava','lagoon','copper','orchid','cividis'];
+const seriesRampOrder=['aurora','ember','glacier','prism','rose','meadow','twilight','lava','lagoon','copper','orchid','cividis','coast','peach','lilac','mint','dusk','citrus'];
 const seriesPatterns=['solid','dashed','dotted'];
 
 function normalizeSeriesAppearance(value){
@@ -3428,20 +3575,33 @@ function normalizeSeriesAppearance(value){
  if(value.mode==='solid'||value.mode==='gradient')result.mode=value.mode;
  if(seriesRampOrder.includes(value.ramp))result.ramp=value.ramp;
  if(seriesPatterns.includes(value.pattern))result.pattern=value.pattern;
+ if(Array.isArray(value.colors) && value.colors.length===3 &&
+    value.colors.every(color=>typeof color==='string' && /^#[0-9a-f]{6}$/i.test(color))){
+  result.colors=value.colors.map(color=>color.toLowerCase());
+ }
+ if(['soft','gloss','flat','wire'].includes(value.finish))result.finish=value.finish;
+ if(['auto','off','fine','bold'].includes(value.grid))result.grid=value.grid;
+ if(typeof value.opacity==='number' && Number.isFinite(value.opacity)){
+  result.opacity=Math.min(1,Math.max(.25,value.opacity));
+ }
+ if(typeof value.reverse==='boolean')result.reverse=value.reverse;
  return Object.keys(result).length?result:null;
 }
 function seriesAppearance(series,index,style,is3d){
  const saved=series.row.appearance||{}, sequence=Math.max(0,index);
  const hue=saved.hue??(sequence%seriesHueNames.length),colorVar='--graph-curve'+(hue+1);
- const color=style.getPropertyValue(colorVar).trim();
+ let color=style.getPropertyValue(colorVar).trim();
  const rampKeys=seriesRampOrder,start=Math.max(0,rampKeys.indexOf(surfaceView.palette));
  const rampKey=saved.ramp||rampKeys[((is3d?start:0)+sequence)%rampKeys.length];
- const mode=saved.mode||(is3d?'gradient':'solid'),ramp=mode==='gradient'?surfaceRamps[rampKey]:[color,color];
+ const mode=saved.mode||(is3d?'gradient':'solid');
+ let ramp=mode==='gradient'?(saved.colors||surfaceRamps[rampKey]).slice():[color,color];
+ if(saved.reverse)ramp.reverse();
+ if(mode==='gradient')color=ramp[Math.floor(ramp.length/2)];
  const strictRegion=series.kind==='region'&&['Less','Greater'].includes(series.relation);
  const lineGroup=Math.floor(sequence/seriesHueNames.length)%seriesPatterns.length;
  const pattern=saved.pattern||(is3d?'solid':strictRegion?'dashed':seriesPatterns[lineGroup]);
- const rampName=mode==='gradient'?surfaceRampLabel(rampKey):seriesHueNames[hue];
- return {hue,color,colorVar,mode,ramp,rampKey,rampName,pattern};
+ const rampName=mode==='gradient'?(saved.colors?'Custom blend':surfaceRampLabel(rampKey)):seriesHueNames[hue];
+ return {hue,color,colorVar,mode,ramp,rampKey,rampName,pattern,finish:saved.finish||'soft',grid:saved.grid||'auto',opacity:saved.opacity??1,reverse:saved.reverse===true};
 }
 const seriesStyleDialog=document.querySelector('#seriesStyleDialog');
 let styleTarget=null;
@@ -3452,7 +3612,7 @@ function selectedSeriesStyle(){
 function setSeriesAppearance(partial){
  const target=selectedSeriesStyle();
  if(!target)return;
- beforeEdit();
+ beforeEdit('surface-style');
  const row=target.series.row;
  const value=partial?normalizeSeriesAppearance({...row.appearance,...partial}):null;
  if(value)row.appearance=value;else delete row.appearance;
@@ -3462,20 +3622,24 @@ function syncSeriesDialog(){
  const target=selectedSeriesStyle();
  if(!target||!seriesStyleDialog.open)return;
  const {series,index}=target,look=seriesAppearance(series,index,getComputedStyle(graphPanel),inSurface());
- document.querySelector('#seriesStyleHeading').textContent='Line '+series.line+' style';
+ document.querySelector('#seriesStyleHeading').textContent=(inSurface()?'Surface ':'Line ')+series.line+' style';
+ syncSurfaceStyleEditor(target,look);
  document.querySelector('#seriesStrokeOptions').hidden=inSurface();
  document.querySelector('#seriesResetStyle').disabled=!series.row.appearance;
  document.querySelectorAll('[data-series-hue]').forEach(button=>button.setAttribute('aria-pressed',String(look.mode==='solid'&&Number(button.dataset.seriesHue)===look.hue)));
- document.querySelectorAll('[data-series-ramp]').forEach(button=>button.setAttribute('aria-pressed',String(look.mode==='gradient'&&button.dataset.seriesRamp===look.rampKey)));
+ document.querySelectorAll('[data-series-ramp]').forEach(button=>button.setAttribute('aria-pressed',String(look.mode==='gradient'&&!series.row.appearance?.colors&&button.dataset.seriesRamp===look.rampKey)));
  document.querySelectorAll('[data-series-pattern]').forEach(button=>button.setAttribute('aria-pressed',String(look.pattern===button.dataset.seriesPattern)));
 }
 function openSeriesStyle(series){
  if(!series?.row?.isConnected)return;
  styleTarget=series.row;
+ $('#seriesMorePalettes').open=!inSurface();
+ $('#surfaceStyleMessage').textContent='';
  seriesStyleDialog.style.removeProperty('--picker-left');seriesStyleDialog.style.removeProperty('--picker-top');
  if(!seriesStyleDialog.open)seriesStyleDialog.showModal();
  syncSeriesDialog();
- if(innerWidth>900){
+ if(inSurface())renderSurfaceLookThumbnails();
+ if(!inSurface() && innerWidth>900){
   const anchor=series.row.querySelector('.plot-style-trigger')?.getBoundingClientRect();
   const box=seriesStyleDialog.getBoundingClientRect();
   if(anchor){
@@ -3501,7 +3665,7 @@ for(const key of seriesRampOrder){
  button.type='button';button.dataset.seriesRamp=key;button.textContent=name;
  // These stops are shared with the heat map and the exported PNG renderer.
  button.style.setProperty('--series-sample','linear-gradient(90deg,'+surfaceRamps[key].join(',')+')');
- button.onclick=()=>setSeriesAppearance({mode:'gradient',ramp:key});
+ button.onclick=()=>setSeriesAppearance({mode:'gradient',ramp:key,colors:null,reverse:false});
  document.querySelector('#seriesRamps').append(button);
 }
 for(const key of seriesPatterns){
@@ -3517,6 +3681,7 @@ function refreshSeriesStyleControls(seriesList=graphSeries){
   if(!plotted.has(trigger.closest('.row')))trigger.remove();
  }
  if(seriesStyleDialog.open && !plotted.has(styleTarget))seriesStyleDialog.close();
+ $('#surfaceStyles').disabled=!seriesList.length;
  const style=getComputedStyle(graphPanel);
  seriesList.forEach((series,index)=>{
   const row=series.row, look=seriesAppearance(series,index,style,inSurface());
@@ -3533,6 +3698,202 @@ function refreshSeriesStyleControls(seriesList=graphSeries){
  });
  syncSeriesDialog();
 }
+
+// This editor changes the same per-row appearance used by drafts and exports.
+const surfaceLookPresets = [
+ {id:'sea-glass',name:'Sea glass',ramp:'coast',finish:'gloss',grid:'off'},
+ {id:'peach-silk',name:'Peach silk',ramp:'peach',finish:'soft',grid:'off'},
+ {id:'lilac',name:'Lilac',ramp:'lilac',finish:'gloss',grid:'fine'},
+ {id:'citrus',name:'Citrus',ramp:'citrus',finish:'flat',grid:'fine'},
+ {id:'dusk',name:'Dusk',ramp:'dusk',finish:'soft',grid:'off'},
+ {id:'blueprint',name:'Blueprint',ramp:'glacier',finish:'wire',grid:'fine'}
+];
+const surfaceLookStorageKey='proofpad-surface-looks-v1';
+let personalSurfaceLooks=[];
+let surfacePreviewFrame=0;
+
+function readSurfaceLooks() {
+ try {
+  const stored=JSON.parse(localStorage.getItem(surfaceLookStorageKey));
+  if(!Array.isArray(stored))return [];
+  return stored.slice(0,12).filter(item=>
+   item && typeof item.name==='string' && item.name.trim() && normalizeSeriesAppearance(item.appearance)
+  ).map(item=>({name:item.name.trim().slice(0,28),appearance:normalizeSeriesAppearance(item.appearance)}));
+ } catch { return []; }
+}
+personalSurfaceLooks=readSurfaceLooks();
+
+function resolvedSurfaceAppearance(look) {
+ return normalizeSeriesAppearance({
+  mode:look.mode,hue:look.hue,ramp:look.rampKey,
+  colors:styleTarget?.appearance?.colors,
+  finish:look.finish,grid:look.grid,opacity:look.opacity,reverse:look.reverse
+ });
+}
+
+function scheduleSurfaceStylePreview() {
+ if(surfacePreviewFrame || !seriesStyleDialog.open || !inSurface())return;
+ // redrawGraph is already queued by the style change, so copy the completed frame.
+ surfacePreviewFrame=requestAnimationFrame(()=>{
+  surfacePreviewFrame=0;
+  if(!seriesStyleDialog.open || !inSurface())return;
+  const canvas=$('#surfaceStylePreview');
+  const context=canvas.getContext('2d');
+  const background=getComputedStyle(graphPanel).getPropertyValue('--graph-paper').trim();
+  context.fillStyle=background;
+  context.fillRect(0,0,canvas.width,canvas.height);
+  if(!graphCanvas.width||!graphCanvas.height)return;
+  const scale=Math.min(canvas.width/graphCanvas.width,canvas.height/graphCanvas.height);
+  const width=graphCanvas.width*scale,height=graphCanvas.height*scale;
+  context.drawImage(graphCanvas,(canvas.width-width)/2,(canvas.height-height)/2,width,height);
+ });
+}
+
+function syncSurfaceStyleEditor(target,look) {
+ const surface=inSurface();
+ seriesStyleDialog.classList.toggle('surface-style-dialog',surface);
+ $('#surfaceStyleEditor').hidden=!surface;
+ $('#seriesHues').closest('fieldset').hidden=surface;
+ $('#seriesRamps').closest('fieldset').classList.toggle('extra-surface-colors',surface);
+ if(!surface)return;
+ const select=$('#surfaceStyleTarget');
+ const signature=graphSeries.map(series=>series.line).join(',');
+ if(select.dataset.lines!==signature) {
+  select.replaceChildren(...graphSeries.map(series=>new Option('Surface '+series.line,series.line)));
+  select.dataset.lines=signature;
+ }
+ select.value=target.series.line;
+ $('#separateSurfaceColors').disabled=graphSeries.length<2;
+ const colors=target.series.row.appearance?.colors;
+ const source=look.ramp;
+ const samples=[source[0],source[Math.floor(source.length/2)],source.at(-1)];
+ ['Low','Middle','High'].forEach((part,index)=>{$('#surfaceColor'+part).value=samples[index]});
+ $('#surfaceGrid').value=look.grid;
+ $('#surfaceGrid').querySelector('option[value="off"]').disabled=look.finish==='wire';
+ $('#surfaceOpacity').value=Math.round((1-look.opacity)*100);
+ $('#surfaceOpacityValue').textContent=look.opacity===1?'Solid':Math.round((1-look.opacity)*100)+'%';
+ $('#surfaceReverse').setAttribute('aria-pressed',String(look.reverse));
+ document.querySelectorAll('[data-finish]').forEach(button=>
+  button.setAttribute('aria-pressed',String(button.dataset.finish===look.finish))
+ );
+ document.querySelectorAll('[data-surface-look]').forEach(button=>{
+  const preset=surfaceLookPresets.find(item=>item.id===button.dataset.surfaceLook);
+  const matches=!colors && look.mode==='gradient' && preset.ramp===look.rampKey &&
+   preset.finish===look.finish && preset.grid===look.grid && look.opacity===1 && !look.reverse;
+  button.setAttribute('aria-pressed',String(matches));
+ });
+ scheduleSurfaceStylePreview();
+}
+
+function renderSavedSurfaceLooks() {
+ $('#savedSurfaceLooks').hidden=!personalSurfaceLooks.length;
+ const list=$('#surfaceSavedList');
+ list.replaceChildren();
+ for(const [index,item] of personalSurfaceLooks.entries()) {
+  const wrapper=document.createElement('div');
+  const button=document.createElement('button');
+  button.type='button';button.textContent=item.name;
+  button.onclick=()=>setSeriesAppearance({...item.appearance,colors:item.appearance.colors||null});
+  const remove=document.createElement('button');
+  remove.type='button';remove.textContent='×';
+  remove.setAttribute('aria-label','Remove '+item.name+' from saved looks');
+  remove.onclick=()=>{
+   const next=personalSurfaceLooks.filter((_,position)=>position!==index);
+   try {
+    localStorage.setItem(surfaceLookStorageKey,JSON.stringify(next));
+    personalSurfaceLooks=next;renderSavedSurfaceLooks();
+   } catch { $('#surfaceStyleMessage').textContent='Could not remove this saved look.'; }
+  };
+  wrapper.append(button,remove);list.append(wrapper);
+ }
+}
+
+function renderSurfaceLookThumbnails() {
+ const style=getComputedStyle(graphPanel);
+ const palette={};
+ for(const key of ['paper','grid','axis','label'])palette[key]=style.getPropertyValue('--graph-'+key).trim();
+ for(const preset of surfaceLookPresets) {
+  const canvas=$('[data-surface-look="'+preset.id+'"] canvas');
+  const ramp=surfaceRamps[preset.ramp];
+  const series={...preset,color:ramp[2],ramp,run:(x,y)=>1.3*Math.cos(Math.hypot(x,y))};
+  const view={...surfaceHome,span:8,mesh:true};
+  const context=canvas.getContext('2d');
+  context.save();
+  context.translate(canvas.width/2,canvas.height/2);
+  context.scale(1.7,1.7);
+  context.translate(-canvas.width/2,-canvas.height/2);
+  const thumbnailPalette={...palette,axis:palette.paper,label:palette.paper,grid:palette.paper};
+  paintSurfacePlot(context,canvas.width,canvas.height,[series],view,thumbnailPalette,'slider');
+  context.restore();
+ }
+}
+
+for(const preset of surfaceLookPresets) {
+ const button=document.createElement('button');
+ button.type='button';button.dataset.surfaceLook=preset.id;
+ const canvas=document.createElement('canvas');canvas.width=180;canvas.height=115;
+ canvas.setAttribute('aria-hidden','true');
+ const label=document.createElement('span');label.textContent=preset.name;
+ button.append(canvas,label);
+ button.onclick=()=>setSeriesAppearance({
+  mode:'gradient',ramp:preset.ramp,colors:null,reverse:false,
+  finish:preset.finish,grid:preset.grid,opacity:1
+ });
+ $('#surfaceLooks').append(button);
+}
+$('#surfaceStyles').onclick=()=>{
+ const series=graphSeries.find(item=>item.row.contains(active))||graphSeries.find(item=>!item.row.plotHidden)||graphSeries[0];
+ if(series)openSeriesStyle(series);
+};
+$('#surfaceStyleTarget').onchange=event=>{
+ const series=graphSeries.find(item=>item.line===event.target.value);
+ if(series){styleTarget=series.row;syncSeriesDialog();}
+};
+$('#separateSurfaceColors').onclick=()=>{
+ beforeEdit();
+ const first=['coast','peach','lilac','citrus','dusk','mint'];
+ const palettes=[...first,...seriesRampOrder.filter(key=>!first.includes(key))];
+ graphSeries.forEach((series,index)=>{
+  series.row.appearance=normalizeSeriesAppearance({
+   ...series.row.appearance,mode:'gradient',colors:null,reverse:false,
+   ramp:palettes[index%palettes.length]
+  });
+ });
+ commitHistory();persist();onSeriesStyleChanged();
+};
+for(const part of ['Low','Middle','High']) {
+ $('#surfaceColor'+part).oninput=()=>setSeriesAppearance({
+  mode:'gradient',reverse:false,colors:['Low','Middle','High'].map(name=>$('#surfaceColor'+name).value)
+ });
+}
+$('#surfaceReverse').onclick=()=>{
+ const target=selectedSeriesStyle();
+ if(target)setSeriesAppearance({reverse:!target.series.row.appearance?.reverse});
+};
+document.querySelectorAll('[data-finish]').forEach(button=>{
+ button.onclick=()=>{
+  const partial={finish:button.dataset.finish};
+  if(partial.finish==='wire' && styleTarget?.appearance?.grid==='off')partial.grid='fine';
+  setSeriesAppearance(partial);
+ };
+});
+$('#surfaceGrid').onchange=event=>setSeriesAppearance({grid:event.target.value});
+$('#surfaceOpacity').oninput=event=>setSeriesAppearance({opacity:1-Number(event.target.value)/100});
+$('#saveSurfaceLook').onclick=()=>{
+ const name=$('#surfaceLookName').value.trim(),target=selectedSeriesStyle();
+ if(!name){$('#surfaceStyleMessage').textContent='Give your look a name first.';$('#surfaceLookName').focus();return;}
+ if(!target)return;
+ const look=seriesAppearance(target.series,target.index,getComputedStyle(graphPanel),true);
+ const next=personalSurfaceLooks.filter(item=>item.name.toLowerCase()!==name.toLowerCase());
+ if(next.length>=12){$('#surfaceStyleMessage').textContent='You have 12 saved looks. Remove one to make room.';return;}
+ next.push({name,appearance:resolvedSurfaceAppearance(look)});
+ try {
+  localStorage.setItem(surfaceLookStorageKey,JSON.stringify(next));
+  personalSurfaceLooks=next;renderSavedSurfaceLooks();
+  $('#surfaceStyleMessage').textContent='Saved '+name+'.';
+ } catch { $('#surfaceStyleMessage').textContent='This browser could not save the look. Its colors are still part of your draft.'; }
+};
+renderSavedSurfaceLooks();
 
 function calculateNotebook(ComputeEngine,values,angle='rad',digits=10,compileGraphs=null,dimension='2d'){
  const ce=new ComputeEngine({precision:Math.max(16,digits+4)});ce.angularUnit=angle;

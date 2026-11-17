@@ -1,4 +1,11 @@
 const surfaceRamps={
+ coast:['#174b80','#278fac','#72c6bf','#e2f1d7'],
+ peach:['#8e315a','#d96b79','#f5ae91','#fff0ce'],
+ lilac:['#443270','#7e65b3','#b6a1dd','#f2e9ff'],
+ mint:['#12595c','#3e9c90','#99d7bc','#eef4bf'],
+ dusk:['#343d6a','#786196','#bf8daa','#f4c5b8'],
+ citrus:['#286348','#79a85b','#d5d974','#fff0af'],
+
  aurora:['#39266d','#3961ac','#139ca0','#60d49b','#f5ed8c'],
  ember:['#332041','#843463','#d15451','#fa9854','#fff3a0'],
  glacier:['#142648','#224fa1','#277fae','#65cde2','#e1fcff'],

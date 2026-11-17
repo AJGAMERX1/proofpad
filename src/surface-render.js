@@ -63,6 +63,36 @@ function surfaceColors(stops) {
  });
 }
 
+// Keep appearance validation close to the renderer so saved drafts and exports
+// use the same defaults, including drafts from before surface finishes existed.
+function surfaceRenderStyle(surface, view) {
+ const finish = ['soft', 'gloss', 'flat', 'wire'].includes(surface.finish) ? surface.finish : 'soft';
+ const grid = ['auto', 'off', 'fine', 'bold'].includes(surface.grid) ? surface.grid : 'auto';
+ const opacity = Number.isFinite(surface.opacity) ? Math.min(1, Math.max(.25, surface.opacity)) : 1;
+ const mesh = finish === 'wire' || (grid === 'auto' ? view.mesh : grid !== 'off');
+ const gridWidth = grid === 'fine' ? .55 : grid === 'bold' ? 1.35 : .9;
+ const baseGridAlpha = grid === 'fine' ? .36 : grid === 'bold' ? .88 : .65;
+ const gridAlpha = finish === 'wire' ? Math.max(.72, baseGridAlpha) : baseGridAlpha;
+ const gridCount = grid === 'fine' ? 22 : grid === 'bold' ? 12 : finish === 'wire' ? 20 : 15;
+ return {finish, grid, opacity, mesh, gridWidth, gridAlpha, gridCount};
+}
+
+function surfaceFaceColor(rgb, slopeX, slopeY, finish) {
+ if (finish === 'flat' || finish === 'wire') return 'rgb(' + rgb.join(',') + ')';
+ const normalLength = Math.hypot(slopeX, slopeY, 1);
+ const lighting = (.36 * slopeX + .24 * slopeY + .86) / normalLength;
+ if (finish === 'soft') {
+  const shade = .88 + .14 * lighting;
+  return 'rgb(' + rgb.map(channel => Math.round(Math.min(255, channel * shade))).join(',') + ')';
+ }
+ // A broad diffuse light and a smaller highlight give the surface a satin
+ // sheen. World-space lighting keeps the same appearance when the camera turns.
+ const shade = .67 + .34 * Math.max(0, lighting);
+ const halfVector = (.18 * slopeX + .12 * slopeY + .976) / normalLength;
+ const highlight = .42 * Math.max(0, halfVector) ** 24;
+ return 'rgb(' + rgb.map(channel => Math.round(Math.min(255, channel * shade + (255 - channel * shade) * highlight))).join(',') + ')';
+}
+
 function paintSurfaceHeat(ctx,w,h,series,view,palette,sampleScale=1,moving=false) {
  let drawn=false;
  const g = surfaceHeatGeometry(w,h,view), bottom=g.top+g.height, right=g.left+g.width;
@@ -70,6 +100,7 @@ function paintSurfaceHeat(ctx,w,h,series,view,palette,sampleScale=1,moving=false
  if(series.length){
   const area=g.width*g.height;
   const tables=series.map(s=>surfaceColors(s.ramp||palette.ramp));
+  const looks=series.map(surface=>surfaceRenderStyle(surface,view));
   const scale=Math.min(3,Math.max(1,sampleScale));
   // A touch can be just a probe. Keep the same heat-map samples while
   // interacting with the view; reserve the fast preview for equation sliders.
@@ -80,7 +111,8 @@ function paintSurfaceHeat(ctx,w,h,series,view,palette,sampleScale=1,moving=false
   const bitmap=typeof OffscreenCanvas==='function'?new OffscreenCanvas(cols,rows):ctx.canvas.ownerDocument.createElement('canvas');
   bitmap.width=cols;bitmap.height=rows;
   const ink=bitmap.getContext('2d'), image=ink.createImageData(cols,rows), bytes=image.data;
-  const heights=view.mesh?new Float32Array(cols*rows):null;
+  const heights=looks.some(look=>look.mesh)?new Float32Array(cols*rows):null;
+  const owners=heights?new Int32Array(cols*rows).fill(-1):null;
   const dx=g.width/cols,dy=g.height/rows,half=view.span/2;
   for(let j=0;j<rows;j++){
    const y=g.y(g.top+(j+.5)*dy);
@@ -94,8 +126,10 @@ function paintSurfaceHeat(ctx,w,h,series,view,palette,sampleScale=1,moving=false
     if(z===-Infinity){if(heights)heights[index]=NaN;continue;}
     drawn=true;
     const t=(z-view.cz)/view.span+.5, rgb=tables[topSeries][Math.max(0,Math.min(255,Math.round(255*t)))];
-    if(heights)heights[index]=t;
-    bytes[4*index]=rgb[0];bytes[4*index+1]=rgb[1];bytes[4*index+2]=rgb[2];bytes[4*index+3]=255;
+    if(heights){heights[index]=t;owners[index]=topSeries;}
+    const look=looks[topSeries];
+    bytes[4*index]=rgb[0];bytes[4*index+1]=rgb[1];bytes[4*index+2]=rgb[2];
+    bytes[4*index+3]=look.finish==='wire'?0:Math.round(255*look.opacity);
    }
   }
   ink.putImageData(image,0,0);
@@ -103,10 +137,11 @@ function paintSurfaceHeat(ctx,w,h,series,view,palette,sampleScale=1,moving=false
   ctx.drawImage(bitmap,g.left,g.top,g.width,g.height);
   if(heights){
    // Trace constant heights between adjacent samples. A domain hole breaks the contour.
-   ctx.beginPath();
+   const contours=series.map(()=>[]);
    const inc=2;
    for(let j=0;j<rows-inc;j+=inc)for(let i=0;i<cols-inc;i+=inc){
-    const k=j*cols+i;
+    const k=j*cols+i,owner=owners[k];
+    if(owner<0 || !looks[owner].mesh || [k+inc,k+inc+inc*cols,k+inc*cols].some(index=>owners[index]!==owner))continue;
     const a=heights[k],b=heights[k+inc],c=heights[k+inc+inc*cols],d=heights[k+inc*cols];
     const lo=Math.min(a,b,c,d),hi=Math.max(a,b,c,d);
     if(!(hi>lo))continue;
@@ -120,10 +155,20 @@ function paintSurfaceHeat(ctx,w,h,series,view,palette,sampleScale=1,moving=false
      cross(a,b,x,y,x+sx,y);cross(b,c,x+sx,y,x+sx,y+sy);
      cross(c,d,x+sx,y+sy,x,y+sy);cross(d,a,x,y+sy,x,y);
      if(points.length===4 && (((a+b+c+d)/4<t)!==(a<t)))points.unshift(points.pop());
-     for(let p=0;p+1<points.length;p+=2){ctx.moveTo(...points[p]);ctx.lineTo(...points[p+1]);}
+     for(let p=0;p+1<points.length;p+=2)contours[owner].push([points[p],points[p+1]]);
     }
    }
-   ctx.lineWidth=.95;ctx.strokeStyle=palette.axis;ctx.globalAlpha=.58;ctx.stroke();ctx.globalAlpha=1;
+   contours.forEach((segments,index)=>{
+    if(!segments.length)return;
+    const look=looks[index];
+    ctx.beginPath();
+    for(const [a,b] of segments){ctx.moveTo(...a);ctx.lineTo(...b);}
+    ctx.lineWidth=look.grid==='auto'?.95:look.gridWidth;
+    ctx.strokeStyle=look.finish==='wire'?series[index].color:palette.axis;
+    ctx.globalAlpha=(look.grid==='auto' && look.finish!=='wire'?.58:look.gridAlpha)*look.opacity;
+    ctx.stroke();
+   });
+   ctx.globalAlpha=1;
   }
  }
  const xt=surfaceTicks(g.x(g.left),g.x(right),Math.max(2,Math.floor(g.width/70)));
@@ -162,11 +207,12 @@ function surfaceGridSize(w,h,series,moving=false,sampleScale=1){
 // produce a new evaluator; clipping, zoom, mesh, and palette changes rebuild it.
 const preparedSurfaces=new WeakMap();
 function prepareSurfaceMesh(surface,view,count,ramp){
- const key=[count,view.cx,view.cy,view.cz,view.span,view.mesh,surface.color,...(ramp||[])].join('|');
+ const look=surfaceRenderStyle(surface,view);
+ const key=[count,view.cx,view.cy,view.cz,view.span,look.finish,look.grid,look.opacity,look.mesh,surface.color,...(ramp||[])].join('|');
  const previous=preparedSurfaces.get(surface.run);
  if(previous?.key===key)return previous;
  const vertices=[],faces=[],half=view.span/2,step=2/count;
- const meshInterval=Math.max(1,Math.round(count/15)),lut=surfaceColors(ramp);
+ const meshInterval=Math.max(1,Math.round(count/look.gridCount)),lut=surfaceColors(ramp);
  function cutAt(points,z,keepAbove){
   const inside=p=>keepAbove?p.z>=z:p.z<=z, next=[];
   let a=points.at(-1);
@@ -248,10 +294,9 @@ function prepareSurfaceMesh(surface,view,count,ramp){
   const z=poly.reduce((sum,p)=>sum+p.z,0)/poly.length;
   const rgb=lut[Math.max(0,Math.min(255,Math.round((z+1)*127.5)))];
   const dzx=((b.z-a.z)+(c.z-d.z))/(2*step),dzy=((d.z-a.z)+(c.z-b.z))/(2*step);
-  const lighting=(.36*dzx+.24*dzy+.86)/Math.hypot(dzx,dzy,1),shade=.88+.14*lighting;
-  const color='rgb('+rgb.map(channel=>Math.round(Math.min(255,channel*shade))).join(',')+')';
+  const color=surfaceFaceColor(rgb,dzx,dzy,look.finish);
   const mesh=[];
-  if(view.mesh){
+  if(look.mesh){
    for(let e=0;e<poly.length;e++){
     const p=poly[e],q=poly[(e+1)%poly.length];
     const onSlice=Math.abs(p.z)===1&&p.z===q.z;
@@ -259,7 +304,8 @@ function prepareSurfaceMesh(surface,view,count,ramp){
        (p.y===q.y && (j%meshInterval===0&&p.y===a.y || p.y===1))||onSlice)mesh.push([p,q]);
    }
   }
-  faces.push({points:poly,color,mesh,wire:surface.color,depth:0});
+  faces.push({points:poly,color,mesh,wire:look.finish==='wire'?color:surface.color,
+   filled:look.finish!=='wire',opacity:look.opacity,gridWidth:look.gridWidth,gridAlpha:look.gridAlpha,depth:0});
  }
  const geometry={key,vertices,faces};
  preparedSurfaces.set(surface.run,geometry);
@@ -312,10 +358,12 @@ function paintSurfacePlot(ctx,w,h,series,view,palette,moving=false,sampleScale=1
    const p=face.points;ctx.beginPath();ctx.moveTo(p[0].u,p[0].v);
    for(let i=1;i<p.length;i++)ctx.lineTo(p[i].u,p[i].v);
    ctx.closePath();ctx.fillStyle=ctx.strokeStyle=face.color;
-   ctx.globalAlpha=.95;ctx.fill();ctx.lineWidth=.56;ctx.stroke();
+   if(face.filled){
+    ctx.globalAlpha=.95*face.opacity;ctx.fill();ctx.lineWidth=.56;ctx.stroke();
+   }
    if(face.mesh.length){
     ctx.beginPath();for(const [a,b] of face.mesh){ctx.moveTo(a.u,a.v);ctx.lineTo(b.u,b.v);}
-    ctx.strokeStyle=face.wire;ctx.lineWidth=.9;ctx.globalAlpha=.65;ctx.stroke();
+    ctx.strokeStyle=face.wire;ctx.lineWidth=face.gridWidth;ctx.globalAlpha=face.gridAlpha*face.opacity;ctx.stroke();
    }
   }
   ctx.globalAlpha=1;

@@ -294,7 +294,7 @@ function onSeriesStyleChanged(){
   series.legendButton.dataset.pattern=inSurface()?'solid':look.pattern;
   series.legendButton.title=series.row.querySelector('math-field').value+' · '+look.rampName;
  });
- refreshSeriesStyleControls(graphSeries);updateSurfaceKeys();redrawGraph();
+ updateSurfaceKeys();redrawGraph();refreshSeriesStyleControls(graphSeries);
 }
 function describeGraph(){
  const count=graphSeries.filter(s=>!s.row.plotHidden).length;
@@ -440,7 +440,7 @@ function paintGraph({canvas=graphCanvas,pixelRatio=Math.min(3,window.devicePixel
   const palette={ramp:surfaceRamps[surfaceView.palette]};
   for(const key of ['paper','grid','axis','label'])palette[key]=style.getPropertyValue('--graph-'+key).trim();
   const moving=!fullDetail && (graphTouches.size>0 || spinFrame!==0);
-  const surfaces=shown.map(s=>({run:s.run,cost:s.cost,color:s.look.color,ramp:s.look.ramp}));
+  const surfaces=shown.map(s=>({run:s.run,cost:s.cost,color:s.look.color,ramp:s.look.ramp,finish:s.look.finish,grid:s.look.grid,opacity:s.look.opacity}));
   const drawn=paintSurfacePlot(ctx,w,h,surfaces,surfaceView,palette,moving,sampleScale);
   if(canvas===graphCanvas){
    const empty=surfaces.length>0 && !drawn;

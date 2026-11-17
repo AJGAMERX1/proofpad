@@ -1,0 +1,31 @@
+<div id="surfaceStyleEditor" hidden>
+ <div class="surface-style-target">
+  <label for="surfaceStyleTarget">Editing</label><select id="surfaceStyleTarget"></select>
+  <button type="button" id="separateSurfaceColors" title="Give each surface a different palette">Distinct colors</button>
+ </div>
+ <div class="surface-style-preview"><canvas id="surfaceStylePreview" width="800" height="330" aria-label="Live preview of your graph"></canvas></div>
+ <fieldset class="surface-look-picker"><legend>Pick a look</legend><div id="surfaceLooks"></div></fieldset>
+ <details id="surfaceCustomize">
+  <summary>Make it yours</summary>
+  <fieldset><legend>Blend your colors</legend>
+   <div class="surface-color-inputs">
+    <label>Low<input type="color" id="surfaceColorLow" value="#174b80"></label>
+    <label>Middle<input type="color" id="surfaceColorMiddle" value="#72c6bf"></label>
+    <label>High<input type="color" id="surfaceColorHigh" value="#e2f1d7"></label>
+   </div>
+   <button type="button" id="surfaceReverse">Reverse colors</button>
+  </fieldset>
+  <fieldset><legend>Finish</legend><div id="surfaceFinishes">
+   <button type="button" data-finish="soft">Soft</button><button type="button" data-finish="gloss">Glossy</button>
+   <button type="button" data-finish="flat">Flat</button><button type="button" data-finish="wire">Lines only</button>
+  </div></fieldset>
+  <label class="surface-style-row" for="surfaceGrid">Surface lines
+   <select id="surfaceGrid"><option value="auto">Follow graph</option><option value="off">None</option><option value="fine">Fine</option><option value="bold">Bold</option></select>
+  </label>
+  <label class="surface-opacity-label" for="surfaceOpacity">See-through <output id="surfaceOpacityValue"></output></label>
+  <input id="surfaceOpacity" type="range" min="0" max="75" step="5" value="0">
+  <div class="surface-style-save"><input id="surfaceLookName" type="text" maxlength="28" placeholder="Name your look" aria-label="Name your look"><button type="button" id="saveSurfaceLook">Save look</button></div>
+  <p id="surfaceStyleMessage" role="status"></p>
+ </details>
+ <fieldset id="savedSurfaceLooks" hidden><legend>Your looks</legend><div id="surfaceSavedList"></div></fieldset>
+</div>
