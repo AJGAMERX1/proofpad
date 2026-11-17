@@ -1,0 +1,29 @@
+#graphPanel{container-type:inline-size}
+#graphPanel .slice-layout,.slice-layout>.graph-surface{min-width:0}
+#surfaceSlice,#sliceAxis{
+ border:1px solid var(--pad-line);border-radius:5px;background:var(--pad-field);color:var(--pad-ink);
+ font:inherit;padding:5px 8px;cursor:pointer
+}
+#surfaceSlice[aria-expanded="true"]{background:var(--pad-accent);color:var(--pad-field);border-color:var(--pad-accent)}
+#slicePanel{min-width:0;padding:14px;background:var(--graph-paper);border-block:1px solid var(--pad-line);color:var(--pad-ink);font:12px/1.4 system-ui,sans-serif}
+#slicePanel[hidden],#sliceHandle[hidden]{display:none}
+.slice-heading,.slice-heading label,.slice-position>span{display:flex;align-items:center;justify-content:space-between;gap:6px}
+.slice-heading{flex-wrap:wrap;margin-bottom:12px}
+#slicePanel h3{font:600 16px/1.25 Georgia,serif;margin:0}
+.slice-heading label,.slice-position{color:var(--pad-muted)}
+#sliceAxis{font-size:12px;padding:3px;max-width:100%}
+.slice-position{display:block}
+#sliceAt,#sliceValues{font-variant-numeric:tabular-nums}
+#sliceAt{color:var(--pad-ink)}
+#slicePosition{width:100%;margin:7px 0 0;accent-color:var(--pad-accent)}
+#slicePlot{width:100%;height:175px;display:block;touch-action:pan-y;cursor:crosshair}
+#sliceValues{color:var(--pad-muted);display:flex;gap:4px 12px;align-items:center;flex-wrap:wrap;font-size:11px}
+#sliceValues span{display:inline-flex;align-items:center;gap:5px}
+#sliceValues i{width:12px;height:3px;border-radius:2px}
+#sliceHandle{position:absolute;transform:translate(-50%,-50%);width:28px;height:25px;padding:0;border-radius:7px;display:grid;place-items:center;color:var(--pad-accent);background:var(--pad-field);border:1px solid var(--pad-accent);box-shadow:0 1px 4px #0003;cursor:grab;touch-action:none}
+#sliceHandle:active{cursor:grabbing}
+@container (min-width:640px){
+ #graphPanel[data-slice-open="true"] .slice-layout{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(215px,1fr)}
+ #graphPanel[data-slice-open="true"] #slicePanel{border-top:0;border-left:1px solid var(--pad-line);display:flex;flex-direction:column;justify-content:center}
+ #graphPanel[data-slice-open="true"] #slicePlot{height:clamp(180px,25vh,290px)}
+}

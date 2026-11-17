@@ -1,0 +1,17 @@
+<dialog id="matrixDialog" aria-labelledby="matrixHeading">
+ <form id="matrixForm" novalidate>
+  <h2 id="matrixHeading">Insert matrix</h2>
+  <div class="matrix-fields">
+   <label>Rows<input id="matrixRows" type="number" min="1" max="100" step="1" value="3" inputmode="numeric" required></label>
+   <label>Columns<input id="matrixCols" type="number" min="1" max="100" step="1" value="3" inputmode="numeric" required></label>
+   <label>Delimiters<select id="matrixFence"><option value="bmatrix">[ ] &nbsp; Brackets</option><option value="pmatrix">( ) &nbsp; Parentheses</option><option value="vmatrix">| | &nbsp; Bars</option><option value="matrix">None</option></select></label>
+   <label>Fill with<select id="matrixFill"><option value="blank">Empty cells</option><option value="zero">Zeros</option><option value="identity">Identity</option><option value="paste">Pasted table</option></select></label>
+  </div>
+  <div id="matrixPaste" hidden><label for="matrixData">Table cells</label>
+   <textarea id="matrixData" rows="5" wrap="off" spellcheck="false" aria-describedby="matrixDataHint" placeholder="1&#9;2&#9;3&#10;4&#9;5&#9;6"></textarea>
+   <p id="matrixDataHint">Copy a range from a spreadsheet, or separate columns with tabs and rows with new lines. Cells accept numbers and LaTeX.</p>
+  </div>
+  <p id="matrixMessage" role="status" aria-live="polite"></p>
+  <div class="actions matrix-actions"><button type="button" class="copy" id="matrixCancel">Cancel</button><button type="submit" class="primary" id="matrixConfirm">Insert matrix</button></div>
+ </form>
+</dialog>

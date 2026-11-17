@@ -1,0 +1,7 @@
+<section id="slicePanel" hidden aria-labelledby="sliceHeading">
+ <div class="slice-heading"><h3 id="sliceHeading">Cross-section</h3><label>Hold <select id="sliceAxis" aria-label="Fixed coordinate"><option value="x">x fixed</option><option value="y">y fixed</option></select></label></div>
+ <label class="slice-position"><span>Plane position <output id="sliceAt" for="slicePosition">x = 0</output></span><input id="slicePosition" type="range" min="-500" max="500" step="1" value="0"></label>
+ <canvas id="slicePlot" role="slider" aria-label="Inspect cross-section" aria-describedby="sliceKeys" tabindex="0"></canvas>
+ <div id="sliceValues"></div>
+ <p id="sliceKeys" class="graph-sr">Move across the chart or use the arrow keys to read heights. Home and End move to the ends of the section.</p>
+</section>

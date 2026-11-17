@@ -1,0 +1,35 @@
+.workspace-nav { grid-template-columns:repeat(2,minmax(0,1fr)); min-width: min(365px,100%); }
+.workspace-nav .mode-tab span svg { width:25px;height:25px;display:block; }
+main:not([data-workspace="surface"]) .only-3d,
+main[data-workspace="surface"] :is(#calcExample,#calculatorGuide .tip) { display:none; }
+main[data-workspace="surface"] .graph-header { background:var(--pad-wash); }
+.surface-control-row, .surface-tabs, .surface-palette, .surface-mesh, .surface-legend { display:flex; align-items:center; }
+.surface-control-row { flex-wrap:wrap; gap:9px 14px; padding:10px 15px; border-bottom:1px solid var(--pad-line); background:var(--pad-surface); font:12px/1.4 system-ui,sans-serif; color:var(--pad-muted); }
+.surface-tabs { background:var(--pad-wash); border:1px solid var(--pad-line); border-radius:7px; padding:2px; }
+.surface-tabs button, #surfaceSpin { background:transparent; color:var(--pad-muted); border:0; border-radius:5px; padding:5px 9px; font:inherit; cursor:pointer; }
+.surface-tabs button[aria-pressed=true], #surfaceSpin[aria-pressed=true] { background:var(--pad-accent); color:var(--pad-field); }
+#surfaceSpin { border:1px solid var(--pad-line); }
+.surface-palette,.surface-mesh { gap:5px; }
+.surface-palette select,#surfacePreset { color:var(--pad-ink); background:var(--pad-field); border:1px solid var(--pad-line); border-radius:5px; font:inherit; padding:4px 5px; }
+.surface-mesh input { margin:0; accent-color:var(--pad-accent); }
+#surfaceSpin:disabled,.surface-mesh:has(input:disabled) { opacity:.52; }
+.surface-legend { gap:8px; padding:10px 15px 2px; font:11px/1.4 ui-monospace,monospace; color:var(--pad-muted); }
+.surface-legend span:first-child { font:600 12px/1.4 system-ui,sans-serif; color:var(--pad-ink); }
+#surfaceScale { flex:0 1 160px; height:7px; border-radius:5px; border:1px solid var(--pad-line); }
+main[data-workspace="surface"] #graphCanvas { cursor:grab; }
+main[data-workspace="surface"] #graphCanvas:active { cursor:grabbing; }
+main[data-workspace="surface"] #graphPanel[data-heat=true] #graphCanvas { cursor:crosshair; }
+main[data-workspace="surface"] #graphPanel .graph-actions { align-items:center; }
+@media(max-width:900px) { .workspace-nav {min-width:0;} }
+
+#graphPanel .graph-actions #surfacePreset { width:auto; max-width:100%; font:12px system-ui,sans-serif; }
+#surfaceProbe { position:absolute; width:9px; height:9px; transform:translate(-50%,-50%); border:1.5px solid white; border-radius:50%; box-shadow:0 0 0 1px #24364d; pointer-events:none; }
+
+#graphLegend button::before { width:22px; background:var(--curve-swatch); }
+#graphLegend button[data-pattern="dashed"]::before { mask-image:repeating-linear-gradient(90deg,#000 0 6px,transparent 6px 9px); }
+#graphLegend button[data-pattern="dotted"]::before { mask-image:repeating-linear-gradient(90deg,#000 0 2px,transparent 2px 5px); }
+.surface-legend[hidden] { display:none; }
+#surfaceKeys { max-height:110px; overflow:auto; }
+.surface-key { display:grid;grid-template-columns:minmax(7em,auto) auto minmax(42px,130px) auto;align-items:center;gap:6px;margin:2px 0; }
+.surface-key i { height:7px;border-radius:5px;border:1px solid var(--pad-line); }
+.surface-key span:first-child { font:11px/1.4 system-ui,sans-serif; }

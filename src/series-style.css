@@ -1,0 +1,30 @@
+#seriesStyleDialog {
+ color:var(--pad-ink); background:var(--pad-field); border:1px solid var(--pad-line); border-radius:12px;
+ width:min(420px,calc(100vw - 28px)); max-height:calc(100dvh - 35px); overflow:auto; box-sizing:border-box;
+ padding:20px; box-shadow:0 16px 60px #10274440; font:13px/1.5 system-ui,sans-serif;
+}
+#seriesStyleDialog::backdrop {background:#10264077;}
+#seriesStyleDialog h2 {font:600 22px Georgia,serif;margin:0 0 10px;}
+#seriesStyleDialog fieldset {min-width:0; border:0; padding:0; margin:12px 0;color:var(--pad-ink);}
+#seriesStyleDialog legend {padding:0 0 5px;font-weight:600;}
+#seriesStyleDialog fieldset>div {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;}
+#seriesStyleDialog button, .plot-style-trigger {
+ border:1px solid var(--pad-line);background:var(--pad-field); color:var(--pad-ink);border-radius:6px;
+ cursor:pointer;font:inherit;padding:5px 8px;
+}
+#seriesStyleDialog fieldset button,.plot-style-trigger {display:inline-flex; align-items:center; gap:5px;}
+#seriesStyleDialog fieldset button::before,.plot-style-trigger::before {
+ content:'';flex:0 0 1.35em; height:.6em;border-radius:4px;background:var(--series-sample);
+}
+#seriesStyleDialog [data-series-pattern]::before {height:0;border-top:2px var(--series-stroke) currentColor;border-radius:0;}
+#seriesStyleDialog [aria-pressed=true] {border-color:var(--pad-accent); box-shadow:inset 0 0 0 1px var(--pad-accent);}
+#seriesStyleDialog .series-dialog-footer {display:flex;justify-content:space-between;gap:8px;margin-top:17px;}
+#seriesStyleDialog #seriesStyleDone {background:var(--pad-accent);color:var(--pad-field);padding:6px 15px;}
+#seriesStyleDialog :disabled {opacity:.5;cursor:default;}
+#seriesStyleDialog :focus-visible,.plot-style-trigger:focus-visible {outline:2px solid var(--pad-focus);outline-offset:2px;}
+main[data-mode="calculator"] .calc-output .plot-style-trigger {margin-right:auto; padding:4px 7px; font:11px/1.4 system-ui,sans-serif;}
+@media(max-width:380px){#seriesStyleDialog {padding:14px;} #seriesStyleDialog button {padding:5px;}}
+
+@media(min-width:901px) {
+ #seriesStyleDialog[style*="--picker-left"] { position:fixed; margin:0; inset:var(--picker-top) auto auto var(--picker-left); }
+}

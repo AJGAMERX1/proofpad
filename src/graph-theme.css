@@ -1,0 +1,113 @@
+/* The calculator uses the same translucent paper and blue ink as the notebook. */
+main[data-mode="calculator"], #matrixDialog {
+  --pad-surface: #ffffffd9;
+  --pad-wash: #e7f1f9c9;
+  --pad-line: #c6d9e8;
+  --pad-ink: #243c57;
+  --pad-muted: #475f78;
+  --pad-accent: #2465a2;
+  --pad-field: #fbfdff;
+  --pad-focus: #2779bb;
+}
+html[data-theme="dark"] :is(main[data-mode="calculator"], #matrixDialog) {
+  --pad-surface: #17273bf0;
+  --pad-wash: #20354ec9;
+  --pad-line: #3b526c;
+  --pad-ink: #e0eaf6;
+  --pad-muted: #b3c8dd;
+  --pad-accent: #9dccff;
+  --pad-field: #192b40;
+  --pad-focus: #8cc7ff;
+}
+main[data-mode="calculator"] { max-width: 1440px; }
+main[data-mode="calculator"] .workspace {
+  grid-template-columns: minmax(360px, .82fr) minmax(0, 1.2fr);
+  gap: clamp(14px, 2vw, 28px);
+}
+main[data-mode="calculator"] .workspace > * { min-width: 0; }
+main[data-mode="calculator"] #calculatorGuide { position: static; }
+main[data-mode="calculator"] .row {
+  background: var(--pad-surface); border-color: var(--pad-line);
+}
+main[data-mode="calculator"] .row.selected {
+  box-shadow: inset 3px 0 var(--pad-accent); border-color: var(--pad-focus);
+}
+main[data-mode="calculator"] .calc-result:not(.error) { color: var(--pad-ink); }
+main[data-mode="calculator"] .slider-range { accent-color: var(--pad-accent); }
+:is(main[data-mode="calculator"], #graphPanel) {
+  --graph-curve1: #1868a6; --graph-curve2: #b04358; --graph-curve3: #18734f;
+  --graph-curve4: #784ea5; --graph-curve5: #955908; --graph-curve6: #14727b;
+}
+html[data-theme="dark"] :is(main[data-mode="calculator"], #graphPanel) {
+  --graph-curve1: #85c6ff; --graph-curve2: #ff9ba6; --graph-curve3: #77d5a4;
+  --graph-curve4: #caa7fa; --graph-curve5: #f9c56b; --graph-curve6: #71d7da;
+}
+main[data-mode="calculator"] #rows .row[data-graph-visible="true"] .number {
+  color: var(--row-graph-color); font-weight: 700;
+}
+main[data-mode="calculator"] #rows .row[data-graph-visible="true"] {
+  border-inline-start: 3px solid var(--row-graph-color);
+}
+#graphPanel {
+  --graph-paper: #f9fcff; --graph-grid: #d9e7f2; --graph-axis: #5a7890; --graph-label: #405e77;
+  overflow: hidden; background: var(--pad-surface); border-color: var(--pad-line);
+}
+html[data-theme="dark"] #graphPanel {
+  --graph-paper: #142237; --graph-grid: #2a4057; --graph-axis: #88a3bb; --graph-label: #c0d3e4;
+}
+#graphPanel .graph-header {
+  background: var(--pad-wash); border-bottom: 1px solid var(--pad-line); flex-wrap: wrap; gap: 8px;
+}
+#graphPanel .graph-header h2 { color: var(--pad-ink); }
+#graphPanel .graph-actions { display: flex; flex-wrap: wrap; gap: 6px; }
+#graphPanel .graph-actions button {
+  color: var(--pad-accent); padding: 7px 10px; border-radius: 6px;
+  background: var(--pad-surface); border: 1px solid var(--pad-line);
+}
+#graphPanel .graph-surface { border-bottom: 1px solid var(--pad-line); }
+#graphPanel #graphCanvas { height: clamp(340px, 55vh, 560px); }
+#graphPanel .graph-tools {
+  top: 12px; right: 12px; gap: 0; overflow: hidden;
+  background: var(--pad-surface); border: 1px solid var(--pad-line); border-radius: 8px;
+  box-shadow: 0 2px 8px #182f4814;
+}
+#graphPanel .graph-tools button {
+  min-width: 34px; height: 34px; padding: 0 9px; color: var(--pad-ink);
+  background: transparent; border: 0; border-radius: 0;
+}
+#graphPanel .graph-tools button + button { border-left: 1px solid var(--pad-line); }
+#graphPanel :is(.graph-tools button, .graph-legend button, .graph-actions button):hover { background: var(--pad-wash); }
+#graphPanel .graph-legend { gap: 6px; padding: 12px 15px 0; }
+#graphPanel .graph-legend button {
+  min-height: 29px; border: 1px solid var(--pad-line); border-radius: 6px;
+  background: var(--pad-field); color: var(--pad-ink);
+}
+#graphPanel .graph-legend button[aria-pressed="false"] {
+  color: var(--pad-muted); text-decoration: line-through; opacity: .83;
+}
+#graphPanel .graph-status { padding: 10px 15px 13px; color: var(--pad-muted); }
+#graphPanel #graphCoordinates:not([hidden]) { background: var(--pad-surface); color: var(--pad-ink); }
+#matrixDialog { color: var(--pad-ink); border-color: var(--pad-line); }
+#matrixDialog :is(input, select, textarea) { color: var(--pad-ink); background: var(--pad-field); border-color: var(--pad-line); }
+#matrixDialog .matrix-actions { border-color: var(--pad-line); }
+#graphPanel :focus-visible, #matrixDialog :focus-visible { outline: 2px solid var(--pad-focus); outline-offset: 2px; }
+#graphPanel :is(#graphCanvas, .graph-tools button):focus-visible { outline-offset: -3px; }
+@media screen and (min-width: 901px) {
+  main[data-mode="calculator"] #calculatorGuide {
+    position: sticky; top: 12px; max-height: calc(100vh - 24px);
+    overflow-y: auto; overscroll-behavior: auto; scrollbar-width: thin;
+  }
+}
+@media screen and (max-width: 900px) {
+  main[data-mode="calculator"] .workspace { display: flex; flex-direction: column; align-items: stretch; }
+  main[data-mode="calculator"] #calculatorGuide:not([hidden]) { display: contents; }
+  main[data-mode="calculator"] #graphPanel { order: -1; margin-bottom: 0; }
+  #graphPanel #graphCanvas { height: clamp(240px, 42vh, 420px); }
+}
+
+main[data-mode="calculator"] :is(.spelling-toolbar, .shortcut) { display: none; }
+main[data-mode="calculator"] .toolbar { padding-top: 0; }
+main[data-mode="calculator"] .calc-result[data-display="summary"] {
+  font: 12px/1.4 system-ui, sans-serif;
+  color: var(--pad-muted);
+}

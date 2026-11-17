@@ -1,0 +1,30 @@
+<section id="graphPanel" class="card graph-panel" aria-labelledby="graphHeading">
+ <div class="cardtop graph-header"><h2 id="graphHeading">Graph</h2>
+  <div class="graph-actions"><select class="only-3d" id="surfacePreset" aria-label="Example surface"><option value="ripple">Ripple</option><option value="saddle">Saddle</option><option value="waves">Crossed waves</option><option value="peaks">Twin peaks</option></select><button class="quiet" id="graphExample" type="button">Plot example</button><button class="quiet" id="graphSave" type="button">Save graph PNG</button></div>
+ </div>
+<div class="surface-controls only-3d">
+ <div class="surface-control-row">
+  <div class="surface-tabs" role="group" aria-label="Surface view">
+   <button type="button" id="surfaceOrbit" aria-pressed="true">Surface</button>
+   <button type="button" id="surfaceHeatmap" aria-pressed="false">Heat map</button>
+  </div>
+  <label class="surface-palette">Gradient <select id="surfacePalette"><option value="aurora">Aurora</option><option value="ember">Ember</option><option value="glacier">Glacier</option><option value="prism">Prism</option><option value="rose">Rose</option><option value="meadow">Meadow</option><option value="twilight">Twilight</option><option value="lava">Lava</option><option value="lagoon">Lagoon</option><option value="copper">Copper</option><option value="orchid">Orchid</option><option value="cividis">Cividis</option></select></label>
+  <label class="surface-mesh"><input type="checkbox" id="surfaceMesh" checked><span id="surfaceMeshLabel">Mesh</span></label>
+  <button type="button" class="surface-spin" id="surfaceSpin" aria-pressed="false">Spin</button>
+ </div>
+</div>
+ <div class="graph-surface">
+  <canvas id="graphCanvas" tabindex="0" role="img" aria-label="Coordinate plane" aria-describedby="graphStatus graphKeys">An interactive coordinate plane.</canvas>
+  <div class="graph-tools" aria-label="Graph view">
+   <button type="button" id="graphZoomIn" aria-label="Zoom graph in">+</button>
+   <button type="button" id="graphZoomOut" aria-label="Zoom graph out">−</button>
+   <button type="button" id="graphReset" aria-label="Reset graph view">Reset</button>
+  </div>
+  <span id="surfaceProbe" aria-hidden="true" hidden></span>
+  <output id="graphCoordinates" aria-live="off" hidden></output>
+ </div>
+ <div class="surface-legend only-3d" aria-label="Surface height color scale"><span>Height (z)</span><div id="surfaceKeys"></div></div>
+ <div id="graphLegend" class="graph-legend" aria-label="Plotted expressions"></div>
+ <p id="graphStatus" class="graph-status"></p>
+ <p id="graphKeys" class="graph-sr">Drag or use the arrow keys to pan. Scroll, pinch, or press plus and minus to zoom. Press Home to reset.</p>
+</section>

@@ -1,0 +1,18 @@
+#matrixDialog{width:min(430px,calc(100vw - 24px));max-height:90vh;overflow:auto;padding:22px;border:1px solid var(--border);border-radius:12px;background:#f6faff;color:#314b65}
+#matrixDialog::backdrop{background:#101a2ab3}
+#matrixDialog h2{margin:0 0 18px;font:600 21px Georgia,serif}
+#matrixDialog .matrix-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+#matrixDialog label{display:block;font:500 12px/1.5 system-ui,sans-serif}
+#matrixDialog :is(input,select,textarea){width:100%;min-width:0;margin-top:5px;padding:8px;border:1px solid var(--border);border-radius:6px;background:#fff;color:inherit;font:14px system-ui,sans-serif}
+#matrixDialog input:read-only{opacity:.65}
+#matrixDialog textarea{font:13px/1.6 ui-monospace,monospace;resize:vertical;tab-size:5}
+#matrixPaste{margin-top:14px}
+#matrixDialog p{font:12px/1.5 system-ui,sans-serif;color:inherit}
+#matrixMessage{margin:14px 0}
+#matrixMessage[data-error="true"]{color:#934628}
+#matrixDialog .actions{display:flex;gap:8px;justify-content:flex-end}
+#matrixDialog .actions button{flex:0 1 auto;min-width:80px}
+:root[data-theme=dark] #matrixDialog{background:var(--panel);color:var(--ink)}
+:root[data-theme=dark] #matrixDialog :is(input,select,textarea){background:var(--surface,#1a293f)}
+:root[data-theme=dark] #matrixMessage[data-error="true"]{color:#ffb6a4}
+.row math-field{min-width:0;max-width:100%}

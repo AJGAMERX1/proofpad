@@ -1,0 +1,11 @@
+#intersectionLayer { position:absolute;inset:0;overflow:hidden;pointer-events:none; }
+main:not([data-workspace="calculator"]) :is(#intersectionLayer,#intersectionBar),#intersectionBar[hidden],#intersectionPair[hidden] { display:none; }
+.intersection-point { position:absolute;transform:translate(-50%,-50%);width:22px;height:22px;min-width:0;padding:0;border:0;border-radius:50%;background:transparent;pointer-events:auto;cursor:pointer; }
+.intersection-point::after { content:"";display:block;width:8px;height:8px;margin:auto;border-radius:50%;background:var(--graph-paper);border:2px solid var(--pad-ink);box-sizing:border-box; }
+.intersection-point:is(:hover,[aria-pressed="true"])::after { width:12px;height:12px;background:var(--pad-accent);box-shadow:0 0 0 2px var(--graph-paper); }
+#intersectionBar { display:flex;align-items:center;flex-wrap:wrap;gap:7px;padding:9px 15px;background:var(--pad-wash);border-bottom:1px solid var(--pad-line);color:var(--pad-muted);font:12px/1.5 system-ui,sans-serif; }
+#intersectionBar label,#intersectionPair { display:inline-flex;align-items:center;gap:6px;flex-wrap:wrap;max-width:100%; }
+#intersectionBar :is(button,select) { width:auto;max-width:100%;border-radius:5px;border:1px solid var(--pad-line);background:var(--pad-field);color:var(--pad-ink);font:inherit;min-height:29px;padding:3px 7px; }
+#intersectionBar #intersectionInsert { color:var(--pad-accent);font-weight:600; }
+#intersectionBar #intersectionInsert:disabled { opacity:.55; }
+#intersectionBar [hidden] { display:none; }
