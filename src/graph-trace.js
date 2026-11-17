@@ -41,6 +41,14 @@ function updateGraphTrace(){
   const dot=document.createElement('i');dot.style.left=x+'px';dot.style.top=y+'px';$('#traceMarkers').append(dot);
  }
 }
+// Empty explanation blocks have no glyph for MathLive's hit test.
+// Give a first click a real caret before keyboard input arrives.
+$('#rows').addEventListener('pointerdown',event=>{
+ const field=event.target.closest('math-field');
+ if(!field || hasContent(field.value) || event.button!==0)return;
+ HTMLElement.prototype.focus.call(field,{preventScroll:true});
+ field.focus({preventScroll:true});
+});
 function focusPlot(){
  if(!isCalculatorMode())switchWorkspace('calculator');
  graphCanvas.scrollIntoView({block:'center'});graphCanvas.focus({preventScroll:true});
@@ -55,8 +63,6 @@ function focusWriting(){
   field.focus({preventScroll:true});
  }
 }
-$('#jumpWrite').onclick=focusWriting;
-$('#jumpGraph').onclick=focusPlot;
 document.querySelectorAll('button[data-mode]').forEach(button=>button.addEventListener('click',event=>{
  if(event.detail===0){if(isCalculatorMode())focusPlot();else focusWriting();}
 }));
