@@ -492,6 +492,86 @@ math-field::part(keyboard-sink){min-width:2px;min-height:2px}
 #copiesDialog{max-width:min(36rem,94vw);border:1px solid var(--border);border-radius:12px;padding:1.3rem;background:var(--card,#fff);color:inherit}
 html[data-theme=dark] #copiesDialog{background:#17263a;color:#e0e9f4}
 #copiesDialog h2{margin:0 0 1rem}#copyList{padding:0;max-height:55vh;overflow:auto;list-style:none}#copyList li{display:flex;gap:.5rem;align-items:center;padding:.65rem 0;border-bottom:1px solid var(--border)}#copyList li>div{flex:1;min-width:0;overflow-wrap:anywhere}#copyList small{display:block}#storedCopies[hidden]{display:none}
+</style><style>
+/* MathLive's keyboard is rendered on body, outside the editor card. */
+body {
+ --mobile-keyboard-surface:#edf4fb;
+ --mobile-keyboard-wash:#dceaf6;
+ --mobile-keyboard-line:#b8cee2;
+ --mobile-keyboard-ink:#243c57;
+ --mobile-keyboard-muted:#526f8b;
+ --mobile-keyboard-accent:#2465a2;
+ --mobile-keyboard-field:#fbfdff;
+ --keyboard-background:var(--mobile-keyboard-surface);
+ --keyboard-toolbar-background:var(--mobile-keyboard-surface);
+ --keyboard-toolbar-background-hover:var(--mobile-keyboard-wash);
+ --keyboard-toolbar-background-selected:var(--mobile-keyboard-wash);
+ --keyboard-toolbar-text:var(--mobile-keyboard-muted);
+ --keyboard-toolbar-text-active:var(--mobile-keyboard-ink);
+ --keyboard-accent-color:var(--mobile-keyboard-accent);
+ --keyboard-border:var(--mobile-keyboard-line);
+ --keycap-background:var(--mobile-keyboard-field);
+ --keycap-background-hover:var(--mobile-keyboard-wash);
+ --keycap-background-pressed:var(--mobile-keyboard-accent);
+ --keycap-text:var(--mobile-keyboard-ink);
+ --keycap-text-hover:var(--mobile-keyboard-ink);
+ --keycap-text-pressed:var(--mobile-keyboard-surface);
+ --keycap-border:var(--mobile-keyboard-line);
+ --keycap-secondary-background:var(--mobile-keyboard-wash);
+ --keycap-secondary-text:var(--mobile-keyboard-ink);
+ --keycap-primary-background:var(--mobile-keyboard-accent);
+ --keycap-primary-text:var(--mobile-keyboard-field);
+ --keyboard-padding-bottom:max(8px,env(safe-area-inset-bottom));
+}
+html[data-theme="dark"] body {
+ --mobile-keyboard-surface:#17273b;
+ --mobile-keyboard-wash:#263e59;
+ --mobile-keyboard-line:#47617e;
+ --mobile-keyboard-ink:#e0eaf6;
+ --mobile-keyboard-muted:#b3c8dd;
+ --mobile-keyboard-accent:#9dccff;
+ --mobile-keyboard-field:#21354e;
+}
+#showKeyboard[aria-pressed=true]{background:var(--mobile-keyboard-wash);border-color:var(--mobile-keyboard-accent);color:var(--mobile-keyboard-ink)}
+@media(pointer:coarse){
+ math-field::part(virtual-keyboard-toggle){display:block;min-width:40px;min-height:40px;color:var(--mobile-keyboard-accent)}
+ body{--keycap-height:44px;--keycap-gap:4px}
+}
+@media(pointer:coarse) and (max-height:500px){body{--keycap-height:34px;--keycap-gap:3px;--keyboard-padding-top:3px;--keyboard-padding-bottom:3px}}
+
+/* Keep touch controls usable without taking width away from equations. */
+@media screen and (max-width:900px) and (pointer:coarse) {
+  #rows .row { padding-right:12px; padding-bottom:8px; }
+  #rows .rowtools {
+    position:static; display:flex; flex-direction:row; justify-content:flex-end;
+    gap:4px; margin:4px -4px -4px 0;
+  }
+  #rows .rowtools button {
+    min-width:44px; min-height:44px; padding:8px; font-size:17px;
+    border-radius:6px; touch-action:manipulation;
+  }
+  #rows .rowtools .remove { font-size:21px; margin-left:8px; }
+  .toolbar button, .tabs .tab, .navkeys button, #toggleLatex,
+  .clipboardtools button, .keyboard .key {
+    min-height:44px; min-width:44px; touch-action:manipulation;
+  }
+  .tabs { gap:4px; }
+  .keyboardfooter { align-items:center; flex-wrap:wrap; gap:10px; }
+  .navkeys { margin-left:auto; gap:6px; }
+  .keyboard .keys:not(.units) { grid-template-columns:repeat(auto-fit,minmax(44px,1fr)); }
+  #graphPanel .graph-tools button { min-width:44px; height:44px; }
+  #graphPanel :is(.surface-controls button,.graph-legend button),
+  .plot-style-trigger, .calc-use { min-height:44px; }
+  .slider-play { width:44px; height:44px; flex:0 0 44px; }
+  /* Safari zooms the page when a text control is smaller than 16 px. */
+  dialog :is(input,select,textarea), .slider-bounds input { font-size:16px!important; }
+  dialog :is(button,input,select) { min-height:44px; }
+  #matrixDialog, #seriesStyleDialog { max-height:calc(100dvh - 24px); }
+}
+@media screen and (max-width:440px) and (pointer:coarse) {
+  #matrixDialog .matrix-fields > label:nth-child(n+3) { grid-column:1 / -1; }
+}
+
 </style><link rel="stylesheet" href="assets/fonts.77f0e774f13d.css"></head><body>
 <header><div class="brand"><div class="logo">∴</div>proofpad</div><div class="header-actions"><div class="local"><span class="dot"></span><span id="saveState" role="status">Saved on this device</span></div>
 <button type="button" id="themeSwitch" aria-pressed="false"><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M20 14A8.4 8.4 0 0 1 10 4a8.6 8.6 0 1 0 10 10Z"/></svg>Dark mode</button></div></header>
@@ -511,7 +591,7 @@ document.getElementById('themeSwitch').addEventListener('click', () => {
 <div class="spelling-toolbar"><label><input type="checkbox" id="spellEnabled" checked> Spelling checks</label><button class="copy" id="spellReview">Check spelling</button><span>English · checked on your device</span></div>
 <div class="paperheading"><label class="label" for="title">TITLE · OPTIONAL</label><input id="title" placeholder="What are you proving?" maxlength="160"></div>
 <div id="proofSetup" class="proof-setup"><div class="proof-options"><label for="proofStyle">Proof format<select id="proofStyle"><option value="paper">Written proof · paper style</option><option value="steps">Step-by-step notes</option></select></label><label for="statementKind">Statement type<select id="statementKind"><option>Theorem</option><option>Proposition</option><option>Lemma</option><option>Claim</option><option>Corollary</option><option>Definition</option><option>Remark</option><option>Example</option><option>Exercise</option></select></label></div><label class="label" for="statement">Statement · assumptions and what you will prove</label><textarea id="statement" rows="2" placeholder="For every integer n, if n is even then n² is even."></textarea><small>Optional. Use $n^2$ for inline math in the statement.</small><div class="proof-body-label">Proof.<span>Write in paragraphs; display the equations that carry the argument.</span></div></div>
-<div class="toolbar" aria-label="Quick math tools"><button class="tool featured" data-command="moveToSubscript"><span class="symbol">xᵢ</span>Subscript</button><button class="tool" data-command="moveToSuperscript"><span class="symbol">xⁿ</span>Power</button><button class="tool" data-insert="\;" aria-label="Insert space"><span class="symbol" aria-hidden="true">↔</span>Space</button><button class="tool" id="textMode" aria-label="Toggle text entry" aria-pressed="false"><span class="symbol">Aa</span><span id="entryModeLabel">Text</span></button><button type="button" class="tool" id="matrixTool" aria-haspopup="dialog" aria-controls="matrixDialog"><span class="symbol" aria-hidden="true">▦</span>Matrix…</button><button class="tool" data-command="moveAfterParent" aria-label="Return to baseline">Back to baseline →</button></div>
+<div class="toolbar" aria-label="Quick math tools"><button class="tool featured" data-command="moveToSubscript"><span class="symbol">xᵢ</span>Subscript</button><button class="tool" data-command="moveToSuperscript"><span class="symbol">xⁿ</span>Power</button><button class="tool" data-insert="\;" aria-label="Insert space"><span class="symbol" aria-hidden="true">↔</span>Space</button><button class="tool" id="textMode" aria-label="Toggle text entry" aria-pressed="false"><span class="symbol">Aa</span><span id="entryModeLabel">Text</span></button><button type="button" class="tool" id="showKeyboard" aria-label="Show on-screen keyboard" aria-pressed="false"><span class="symbol" aria-hidden="true">⌨</span>Keyboard</button><button type="button" class="tool" id="matrixTool" aria-haspopup="dialog" aria-controls="matrixDialog"><span class="symbol" aria-hidden="true">▦</span>Matrix…</button><button class="tool" data-command="moveAfterParent" aria-label="Return to baseline">Back to baseline →</button></div>
 <div class="shortcut">Type <kbd>x_i</kbd> for xᵢ · <kbd>theta</kbd> for θ · <kbd>Space</kbd> adds a gap.<br><kbd>/</kbd> makes a fraction after a variable or number. Use the mode button to switch between words and math.</div>
 <div id="rows"></div><div class="addrow"><button class="add" id="add">+ Math step</button><button class="add" id="addText">+ Explanation</button></div>
 <div class="clipboardtools"><button id="copyLine" type="button">Copy line</button><button id="pasteOpen" type="button">Paste…</button><span id="clipboardHint">Text and LaTeX · Cmd/Ctrl+C or V also work</span></div><div id="pastePanel" hidden><label class="label" for="pasteInput">Paste text or LaTeX here</label><textarea id="pasteInput" rows="4" spellcheck="false" placeholder="Use Cmd/Ctrl+V, or type here…"></textarea><div class="pasteactions"><select id="pasteType" aria-label="Paste as"><option value="math">Math / LaTeX</option><option value="text">Text explanation</option></select><button id="pasteInsert">Insert in selected line</button><button id="pasteLines">Add as new lines</button><button id="pasteClose" aria-label="Close paste panel">×</button></div></div><div class="editorfoot"><span id="linecount">1 step</span><span class="stepguide"><kbd>Enter</kbd> next step · <kbd>Shift + Enter</kbd> line break</span><button class="latexbtn" id="toggleLatex" aria-expanded="false">&lt;/&gt; Edit LaTeX</button></div><div id="latexbox" hidden><label class="label" for="latex">LaTeX for the selected line</label><textarea id="latex" spellcheck="false" placeholder="Paste LaTeX here…"></textarea></div>
@@ -881,7 +961,7 @@ function showStoredCopies(){
     beforeEdit();openStoredWorkspace(mode,head.key);
     // An explicitly opened copy becomes the one reopened next time.
     writeWorkspaceDraft(mode,snapshotDraft(),true);
-    commitHistory();$('#copiesDialog').close();active?.focus();
+    commitHistory();$('#copiesDialog').close();focusMathField(active);
    };
    const download=document.createElement('button');download.type='button';download.className='quiet';download.textContent='Download';
    download.onclick=()=>saveDownload(new Blob([JSON.stringify({app:'proofpad',version:1,workspace:workspaceMode,draft},null,2)],{type:'application/json'}),'proofpad-'+workspaceMode+'.proofpad.json');
@@ -1063,7 +1143,7 @@ function addRow(value='',focus=true,type='math',format='plain',slider=null,refre
  const num=document.createElement('span');num.className='number';
  const field=document.createElement('math-field');field.defaultMode='math';field.maxMatrixCols=MATRIX_MAX_SIDE;field.value=type==='text'?explanationSource(value,format):value;field.classList.toggle('explanation-field',type==='text');
  {
-  field.mathVirtualKeyboardPolicy='manual';field.smartFence=true;
+  field.mathVirtualKeyboardPolicy='auto';field.smartFence=true;
   field.inlineShortcutTimeout=0;
   
   field.addEventListener('mode-change',syncEntryMode);
@@ -1075,7 +1155,7 @@ function addRow(value='',focus=true,type='math',format='plain',slider=null,refre
    if(type==='text'&&e.key==='_'&&field.mode==='text'&&!e.ctrlKey&&!e.metaKey&&!e.altKey){e.preventDefault();e.stopImmediatePropagation();choose(field);command('moveToSubscript');return}
    if((e.code==='Space'||e.key===' ')&&!e.ctrlKey&&!e.metaKey&&!e.altKey&&field.mode!=='text'){e.preventDefault();e.stopImmediatePropagation();field.insert(String.raw`\;`);choose(field);schedule();return}
    if(e.key==='Enter'&&e.shiftKey&&!e.altKey&&!e.ctrlKey&&!e.metaKey&&type==='text'){e.preventDefault();e.stopImmediatePropagation();field.executeCommand(['switchMode','math']);field.insert(String.raw`\\`);field.executeCommand(['switchMode','text']);schedule();return}
-   if(e.key==='Enter'&&!e.shiftKey&&!e.altKey&&!e.ctrlKey&&!e.metaKey){e.preventDefault();e.stopImmediatePropagation();const next=addRow('',true,type);row.after(next.closest('.row'));next.focus();renumber();schedule()}
+   if(e.key==='Enter'&&!e.shiftKey&&!e.altKey&&!e.ctrlKey&&!e.metaKey){e.preventDefault();e.stopImmediatePropagation();const next=addRow('',true,type);row.after(next.closest('.row'));focusMathField(next);renumber();schedule()}
   },true);
  }
  const controls=document.createElement('div');controls.className='rowtools';
@@ -1089,7 +1169,7 @@ function addRow(value='',focus=true,type='math',format='plain',slider=null,refre
     else if (wasActive) {
      const nextField = neighbor.querySelector('math-field');
      choose(nextField);
-     nextField.focus();
+     focusMathField(nextField);
     }
    }else if(dir==='up'&&row.previousElementSibling)row.previousElementSibling.before(row);else if(dir==='down'&&row.nextElementSibling)row.nextElementSibling.after(row);renumber();schedule()};controls.append(b)
  }
@@ -1101,18 +1181,138 @@ function addRow(value='',focus=true,type='math',format='plain',slider=null,refre
   field.shadowRoot.append(style);
  }
 
- applyGreekShortcuts(field);configureMathMenu(field);
+ applyGreekShortcuts(field);configureMathMenu(field);configureTouchKeyboard(field);
  field.position=field.lastOffset;
  if(type==='text'&&field.mode!=='text')field.executeCommand(['switchMode','text']);
  field.addEventListener('focus',()=>{resetEmptyExplanation(field);choose(field)});field.addEventListener('input',()=>{resetEmptyExplanation(field);queueMicrotask(()=>resetEmptyExplanation(field));const state=scriptReturns.get(field);if(state){state.typed=true;state.depth=Math.max(state.depth,field.getElementInfo(field.position)?.depth??0)}choose(field);schedule()});
  if (refreshList) { choose(field); renumber(); }
- if (focus) field.focus();
+ if (focus) focusMathField(field);
  return field;
 }
+let touchKeyboardReady=false, touchKeyboardMode='';
+let keyboardScrollFrame=0;
+function focusMathField(field){
+ if(!field?.isConnected)return;
+ HTMLElement.prototype.focus.call(field,{preventScroll:true});
+ field.focus();
+}
+function keepKeyboardCaretVisible(){
+ cancelAnimationFrame(keyboardScrollFrame);
+ keyboardScrollFrame=requestAnimationFrame(()=>{
+  // MathLive lays out the edited expression on the next animation frame.
+  // Read the caret after that render, rather than its previous line's bounds.
+  keyboardScrollFrame=requestAnimationFrame(()=>{
+  const keyboard=window.mathVirtualKeyboard,field=document.activeElement;
+  if(!keyboard?.visible || field?.tagName!=='MATH-FIELD')return;
+  const rect=field.shadowRoot.querySelector('.ML__caret,.ML__text-caret,.ML__latex-caret')?.getBoundingClientRect()||field.getElementInfo(field.position)?.bounds||field.getBoundingClientRect();
+  const top=window.visualViewport?.offsetTop||0;
+  const bottom=Math.min(keyboard.boundingRect.top,top+(window.visualViewport?.height||innerHeight))-16;
+  if(rect.bottom>bottom)window.scrollBy({top:Math.min(rect.top-top-16,rect.bottom-bottom),behavior:'instant'});
+  else if(rect.top<top+12)window.scrollBy({top:rect.top-top-16,behavior:'instant'});
+  });
+ });
+}
+function prepareTouchKeyboard(field){
+ const keyboard=window.mathVirtualKeyboard;
+ if(!keyboard)return;
+ if(!touchKeyboardReady){
+  touchKeyboardReady=true;
+  // MathLive 0.111.1 connects a new field to its keyboard after a 60 ms
+  // focus delay. Route the pinned keyboard protocol through the public field
+  // command API so a fast tap after Return/Undo cannot be lost or sent to
+  // the previous block. Only same-window commands for our focused editor
+  // are handled; stop propagation avoids executing them a second time.
+  window.addEventListener('message',event=>{
+   const field=document.activeElement;
+   if(event.source!==window||event.data?.type!=='mathlive#virtual-keyboard-message'||event.data.action!=='execute-command'||!keyboard.visible||field?.tagName!=='MATH-FIELD'||!field.closest('#rows'))return;
+   event.stopImmediatePropagation();
+   field.executeCommand(event.data.command);
+  },true);
+  keyboard.addEventListener('geometrychange',keepKeyboardCaretVisible);
+  keyboard.addEventListener('virtual-keyboard-toggle',()=>{
+   $('#showKeyboard').setAttribute('aria-pressed',String(keyboard.visible));
+   $('#showKeyboard').setAttribute('aria-label',keyboard.visible?'Hide on-screen keyboard':'Show on-screen keyboard');
+   keepKeyboardCaretVisible();
+  });
+  window.visualViewport?.addEventListener('resize',keepKeyboardCaretVisible);
+ }
+ const mode=field.mode==='text'?'text':'math';
+ if(mode!==touchKeyboardMode){
+  touchKeyboardMode=mode;
+  keyboard.layouts=mode==='text'?['alphabetic','numeric','symbols','greek']:['numeric','alphabetic','symbols','greek'];
+ }
+}
+function configureTouchKeyboard(field){
+ field.addEventListener('pointerdown',event=>{
+  const toggle=event.composedPath().some(node=>node.getAttribute?.('part')==='virtual-keyboard-toggle');
+  if(toggle){
+   // Handle this entire gesture here. Safari otherwise refocuses the field
+   // after hiding the keyboard and auto-opens it again.
+   event.preventDefault();event.stopImmediatePropagation();
+   setTouchKeyboardVisible(field,!window.mathVirtualKeyboard.visible);
+  }else{
+   field.mathVirtualKeyboardPolicy='auto';
+   if(event.pointerType==='touch'||event.pointerType==='pen')queueMicrotask(()=>{
+    if(document.activeElement===field){prepareTouchKeyboard(field);window.mathVirtualKeyboard.show();}
+   });
+  }
+ },true);
+ for(const name of ['input','selection-change'])field.addEventListener(name,()=>{
+  if(document.activeElement===field&&window.mathVirtualKeyboard?.visible)keepKeyboardCaretVisible();
+ });
+ field.addEventListener('focus',()=>{
+  if(matchMedia('(any-pointer:coarse)').matches||window.mathVirtualKeyboard?.visible){
+   prepareTouchKeyboard(field);keepKeyboardCaretVisible();
+  }
+ });
+ field.addEventListener('mode-change',()=>{
+  if(document.activeElement===field&&(matchMedia('(any-pointer:coarse)').matches||window.mathVirtualKeyboard?.visible))prepareTouchKeyboard(field);
+ });
+ // MathLive's Return key emits beforeinput, not a physical keydown.
+ // Use the same next-block behavior for touch and hardware keyboards.
+ field.addEventListener('beforeinput',event=>{
+  if(event.inputType!=='insertLineBreak')return;
+  event.preventDefault();
+  // Finish the old field's commit before moving the virtual keyboard target.
+  queueMicrotask(()=>{
+   if(!field.isConnected)return;
+   field.dispatchEvent(new KeyboardEvent('keydown',{key:'Enter',code:'Enter',bubbles:true,cancelable:true}));
+   if(active?.isConnected&&active!==field){
+    HTMLElement.prototype.focus.call(active,{preventScroll:true});
+    active.focus({preventScroll:true});keepKeyboardCaretVisible();
+   }
+  });
+ });
+}
+function setTouchKeyboardVisible(field,visible){
+ const keyboard=window.mathVirtualKeyboard;
+ if(!visible){
+  if(field)field.mathVirtualKeyboardPolicy='manual';
+  keyboard.hide();return;
+ }
+ if(!field?.isConnected)field=ensureMath();
+ field.mathVirtualKeyboardPolicy='auto';
+ prepareTouchKeyboard(field);
+ focusMathField(field);
+ keyboard.show();
+ keepKeyboardCaretVisible();
+}
+let keyboardToggleIntent=null;
+$('#showKeyboard').onpointerdown=event=>{
+ keyboardToggleIntent=!window.mathVirtualKeyboard.visible;
+ if(event.pointerType==='mouse')event.preventDefault();
+};
+$('#showKeyboard').onpointercancel=()=>{keyboardToggleIntent=null};
+$('#showKeyboard').onclick=()=>{
+ const visible=keyboardToggleIntent??!window.mathVirtualKeyboard.visible;
+ keyboardToggleIntent=null;
+ setTouchKeyboardVisible(active,visible);
+};
+
 function syncEntryMode(){const text=active?.mode==='text';$('#textMode').setAttribute('aria-pressed',text);$('#entryModeLabel').textContent=text?'Text mode':'Math mode';$('#textMode').title=text?'Switch to math mode':'Switch to text mode';$('#textMode').setAttribute('aria-label',text?'Switch to math mode':'Switch to text mode')}
-$('#textMode').onpointerdown=e=>e.preventDefault();
+$('#textMode').onpointerdown=e=>{if(e.pointerType==='mouse')e.preventDefault();};
 $('#textMode').onclick=()=>{const f=ensureMath();f.executeCommand(['switchMode',f.mode==='text'?'math':'text']);syncEntryMode();schedule()};
-function ensureMath(){if(!active||!active.isConnected)active=addRow('',false);active.focus();return active}
+function ensureMath(){if(!active||!active.isConnected)active=addRow('',false);focusMathField(active);return active}
 function insert(latex){
  const f=ensureMath(),prose=f.mode==='text'&&f.closest('.row').dataset.type==='text';
  if(f.mode==='text')f.executeCommand(['switchMode','math']);
@@ -1127,7 +1327,7 @@ function showKeys(tab){
  const units=tab==='units';$('#unitOptions').hidden=$('#unitHelp').hidden=!units;
  $('#keys').classList.toggle('units',units);$('#keys').setAttribute('aria-label',units?'Unit keys':'Math keys');$('#keys').replaceChildren();
  const keys=units?unitGroups[$('#unitGroup').value].map(([symbol,title])=>[symbol,null,title]):keyboards[tab];
- keys.forEach(([label,latex,title])=>{const b=document.createElement('button');b.className='key';b.textContent=label;b.title=title;b.setAttribute('aria-label',title);if(label.length>3)b.style.fontSize='14px';b.onpointerdown=e=>e.preventDefault();b.onclick=()=>units?insertUnit(label):title==='Subscript'?command('moveToSubscript'):insert(latex);$('#keys').append(b)});
+ keys.forEach(([label,latex,title])=>{const b=document.createElement('button');b.className='key';b.textContent=label;b.title=title;b.setAttribute('aria-label',title);if(label.length>3)b.style.fontSize='14px';b.onpointerdown=e=>{if(e.pointerType==='mouse')e.preventDefault();};b.onclick=()=>units?insertUnit(label):title==='Subscript'?command('moveToSubscript'):insert(latex);$('#keys').append(b)});
 }
 $('#unitGroup').addEventListener('change',()=>showKeys('units'));
 function schedule(){queueHistory();scheduleSpelling();if(isCalculatorMode()){persist();scheduleCalculator();return}document.body.classList.remove('print-ready');revision++;pngBlob=null;setJpegSheet(null);$('#download').disabled=$('#copy').disabled=true;status('');persist();clearTimeout(timer);timer=setTimeout(()=>{const rev=revision;renderQueue=renderQueue.catch(()=>{}).then(()=>render(rev))},180)}
@@ -1490,13 +1690,13 @@ $('#jpegDownload').onclick=async()=>{
 $('#download').onclick=()=>{if(!pngBlob)return;const a=document.createElement('a');a.href=previewUrl;a.download='proofpad.png';a.click();status('PNG downloaded. Ready to share.')};
 $('#copy').onclick=async()=>{if(!pngBlob)return;try{if(!navigator.clipboard?.write||!window.ClipboardItem)throw new Error();await navigator.clipboard.write([new ClipboardItem({'image/png':pngBlob})]);status('Image copied. Paste it into your message.')}catch{status('Use Download PNG if your browser does not allow image copying.',true)}};
 $('#add').onclick=()=>{addRow();schedule()};$('#addText').onclick=()=>{addRow('',true,'text');schedule()};
-$('#clear').onclick=()=>{if(workspaceMode==='proofs'){if(startNewAssignment('proofs',blankDraft('proofs')))active?.focus();return;}stopSliders();$('#title').value='';$('#statement').value='';$('#qed').checked=workspaceMode==='proofs';replaceEntries([{type:workspaceMode==='proofs'?'text':'math',value:''}]);active.focus()};
+$('#clear').onclick=()=>{if(workspaceMode==='proofs'){if(startNewAssignment('proofs',blankDraft('proofs')))focusMathField(active);return;}stopSliders();$('#title').value='';$('#statement').value='';$('#qed').checked=workspaceMode==='proofs';replaceEntries([{type:workspaceMode==='proofs'?'text':'math',value:''}]);focusMathField(active)};
 $('#statement').oninput=schedule;$('#statementKind').onchange=schedule;$('#exportNumbering').onchange=()=>{$('#numbered').checked=$('#exportNumbering').value==='steps';schedule()};$('#proofStyle').onchange=()=>{if($('#proofStyle').value==='paper'){$('#exportNumbering').value='none';$('#numbered').checked=false;$('#dividers').checked=false;$('#qed').checked=true}updateModeUI();savePrintSettings();schedule()};
 $('#title').oninput=schedule;$('#qed').onchange=schedule;$('#numbered').onchange=schedule;$('#dividers').onchange=schedule;
 $('#toggleLatex').onclick=()=>{const visible=$('#latexbox').hidden;$('#latexbox').hidden=!visible;$('#toggleLatex').setAttribute('aria-expanded',visible);if(visible){$('#latex').value=active?.value||'';$('#latex').focus()}};
 $('#latex').oninput=()=>{if(!active||!active.isConnected)active=addRow('',false);active.setValue($('#latex').value.replace(/^\s*\$\$?|\$\$?\s*$/g,''),{mode:'math',format:'latex',silenceNotifications:true});resetEmptyExplanation(active);schedule()};
-document.querySelectorAll('[data-command]').forEach(b=>{b.onpointerdown=e=>e.preventDefault();b.onclick=()=>command(b.dataset.command)});
-document.querySelectorAll('[data-insert]').forEach(b=>{b.onpointerdown=e=>e.preventDefault();b.onclick=()=>insert(b.dataset.insert)});
+document.querySelectorAll('[data-command]').forEach(b=>{b.onpointerdown=e=>{if(e.pointerType==='mouse')e.preventDefault();};b.onclick=()=>command(b.dataset.command)});
+document.querySelectorAll('[data-insert]').forEach(b=>{b.onpointerdown=e=>{if(e.pointerType==='mouse')e.preventDefault();};b.onclick=()=>insert(b.dataset.insert)});
 document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{document.querySelectorAll('[data-tab]').forEach(t=>t.setAttribute('aria-selected',t===b));showKeys(b.dataset.tab)});
 document.querySelectorAll('[data-bg]').forEach(b=>b.onclick=()=>{background=b.dataset.bg;document.querySelectorAll('[data-bg]').forEach(t=>t.setAttribute('aria-pressed',t===b));schedule()});
 document.querySelectorAll('.settinggrid select').forEach(s=>s.onchange=schedule);
@@ -1515,21 +1715,21 @@ async function copyText(value) {
   return true;
  } catch { return plainCopy(value); }
 }
-$('#copyLine').onpointerdown=e=>e.preventDefault();
+$('#copyLine').onpointerdown=e=>{if(e.pointerType==='mouse')e.preventDefault();};
 $('#copyLine').onclick=async()=>{
  if(!active?.isConnected){status('Select a line to copy.',true);return}
  const field=active, value=field.getValue(field.selection)||field.value;
- if(await copyText(value)){if(field.isConnected)field.focus();status('Line copied as LaTeX.');return}
+ if(await copyText(value)){if(field.isConnected)focusMathField(field);status('Line copied as LaTeX.');return}
  $('#pastePanel').hidden=false;$('#pasteInput').value=value;$('#pasteInput').focus();$('#pasteInput').select();
  status('Press Cmd/Ctrl+C to copy the selected text.');
 };
 let pasteSelection=null,pasteTarget=null;
-$('#pasteOpen').onpointerdown=e=>e.preventDefault();
+$('#pasteOpen').onpointerdown=e=>{if(e.pointerType==='mouse')e.preventDefault();};
 $('#pasteOpen').onclick=()=>{pasteTarget=active?.isConnected?active:null;pasteSelection=pasteTarget?structuredClone(pasteTarget.selection):null;$('#pastePanel').hidden=false;$('#pasteInput').value='';$('#pasteType').value=pasteTarget?.closest('.row').dataset.type==='text'?'text':'math';$('#pasteInput').focus()};
-$('#pasteClose').onclick=()=>{$('#pastePanel').hidden=true;pasteTarget?.focus()};
+$('#pasteClose').onclick=()=>{$('#pastePanel').hidden=true;focusMathField(pasteTarget)};
 function cleanPastedMath(value){return value.trim().replace(/^\$\$?([\s\S]*?)\$\$?$/,'$1').replace(/^\\\(([\s\S]*?)\\\)$/,'$1').replace(/^\\\[([\s\S]*?)\\\]$/,'$1')}
-$('#pasteInsert').onclick=()=>{const value=$('#pasteInput').value;if(!value)return;const type=$('#pasteType').value;const f=pasteTarget?.isConnected?pasteTarget:ensureMath();active=f;if(pasteSelection&&f===pasteTarget)f.selection=pasteSelection;f.focus();f.executeCommand(['switchMode','math']);f.insert(type==='text'?textLatex(value):cleanPastedMath(value),{insertionMode:'replaceSelection',selectionMode:'after'});if(type==='text'||f.closest('.row').dataset.type==='text')f.executeCommand(['switchMode','text']);$('#pastePanel').hidden=true;choose(f);schedule();status('Pasted into the selected line.')};
-$('#pasteLines').onclick=()=>{const value=$('#pasteInput').value;if(!value.trim())return;const type=$('#pasteType').value;const lines=type==='math'&&/\\begin\{/.test(value)?[value]:value.split(/\r?\n/).filter(line=>line.trim());for(const line of lines)addRow(type==='math'?cleanPastedMath(line):line,false,type);$('#pastePanel').hidden=true;active?.focus();schedule();status('Added '+lines.length+' '+(lines.length===1?'line.':'lines.'))};
+$('#pasteInsert').onclick=()=>{const value=$('#pasteInput').value;if(!value)return;const type=$('#pasteType').value;const f=pasteTarget?.isConnected?pasteTarget:ensureMath();active=f;if(pasteSelection&&f===pasteTarget)f.selection=pasteSelection;focusMathField(f);f.executeCommand(['switchMode','math']);f.insert(type==='text'?textLatex(value):cleanPastedMath(value),{insertionMode:'replaceSelection',selectionMode:'after'});if(type==='text'||f.closest('.row').dataset.type==='text')f.executeCommand(['switchMode','text']);$('#pastePanel').hidden=true;choose(f);schedule();status('Pasted into the selected line.')};
+$('#pasteLines').onclick=()=>{const value=$('#pasteInput').value;if(!value.trim())return;const type=$('#pasteType').value;const lines=type==='math'&&/\\begin\{/.test(value)?[value]:value.split(/\r?\n/).filter(line=>line.trim());for(const line of lines)addRow(type==='math'?cleanPastedMath(line):line,false,type);$('#pastePanel').hidden=true;focusMathField(active);schedule();status('Added '+lines.length+' '+(lines.length===1?'line.':'lines.'))};
 
 Object.assign(examples.telescoping,{proofStyle:'paper',statement:'For every positive integer $n$ and sequence $(a_k)$, the sum of $a_{k+1}-a_k$ from $k=1$ to $n$ equals $a_{n+1}-a_1$.',exportNumbering:'none',dividers:false});
 examples.telescoping.entries=[{type:'text',value:'Expanding the sum gives'},{type:'math',value:String.raw`\sum_{k=1}^{n}(a_{k+1}-a_k)=(a_2-a_1)+\cdots+(a_{n+1}-a_n).`},{type:'text',value:'Every intermediate term appears once with each sign, so they cancel. Hence'},{type:'math',value:String.raw`\sum_{k=1}^{n}(a_{k+1}-a_k)=a_{n+1}-a_1,`},{type:'text',value:'as claimed.'}];
@@ -2132,7 +2332,7 @@ function insertIntersection(newProof){
  switchWorkspace('proofs');
  beforeEdit();
  const prior=entries();
- if(prior.length===1&&!hasContent(prior[0].value)){replaceEntries([{type:'math',value}]);active.focus();}
+ if(prior.length===1&&!hasContent(prior[0].value)){replaceEntries([{type:'math',value}]);focusMathField(active);}
  else{addRow(value,true,'math');schedule();}
  commitHistory();persist();
 }
@@ -4370,9 +4570,9 @@ function sendCalculation(row){
 $('#calcAngle').onchange=$('#calcDigits').onchange=saveCalculatorPreferences;
 $('#calcRetry').onclick=()=>{scheduleCalculator()};
 $('#calcExample').onclick=()=>{stopSliders();const demo=[String.raw`\frac{F}{M}`,'F=6','M=2'];if(entries().every(e=>!hasContent(e.value)))replaceEntries(demo.map(value=>({type:'math',value})));else{demo.forEach(value=>addRow(value,false));schedule()}};
-$('#calcCopyResult').onpointerdown=event=>event.preventDefault();
+$('#calcCopyResult').onpointerdown=event=>{if(event.pointerType==='mouse')event.preventDefault();};
 $('#calcCopyResult').onclick=async()=>{const result=active?.closest('.row')?.calcResult;if(!result?.latex){$('#calcStatus').textContent='Select a line with a result first.';return}$('#calcStatus').textContent=await copyText(result.matrix&&result.approx?'\\approx '+result.latex:result.latex)?'Result copied as LaTeX.':'Could not copy. Select the result and use Cmd/Ctrl+C.'};
-document.querySelectorAll('[data-calc-key]').forEach(b=>{b.onpointerdown=e=>e.preventDefault();b.onclick=()=>{const f=ensureMath();f.executeCommand(['switchMode','math']);if(b.dataset.calcKey==='fraction')f.executeCommand(['insert',String.raw`\frac{#@}{#?}`]);else f.insert(b.dataset.calcKey,{selectionMode:b.dataset.calcKey.includes('#?')?'placeholder':'after'});choose(f);schedule()}});
+document.querySelectorAll('[data-calc-key]').forEach(b=>{b.onpointerdown=e=>{if(e.pointerType==='mouse')e.preventDefault();};b.onclick=()=>{const f=ensureMath();f.executeCommand(['switchMode','math']);if(b.dataset.calcKey==='fraction')f.executeCommand(['insert',String.raw`\frac{#@}{#?}`]);else f.insert(b.dataset.calcKey,{selectionMode:b.dataset.calcKey.includes('#?')?'placeholder':'after'});choose(f);schedule()}});
 try{const prefs=JSON.parse(localStorage.getItem('proofpad-calculator-settings'));if(prefs){if(['rad','deg'].includes(prefs.angle))$('#calcAngle').value=prefs.angle;if([6,10,15].includes(prefs.digits))$('#calcDigits').value=prefs.digits}}catch{}
 document.addEventListener('visibilitychange',()=>{if(document.hidden)stopSliders()});
 
@@ -4654,7 +4854,7 @@ function restoreHistoryCursor(cursor) {
  if (!cursor) return;
  const field = rows()[cursor.row]?.querySelector('math-field');
  if (field) {
-  choose(field); field.focus();
+  choose(field); focusMathField(field);
   if (cursor.selection) field.selection = cursor.selection;
   if (cursor.mode) field.executeCommand(['switchMode',cursor.mode]);
   resetEmptyExplanation(field); syncEntryMode();
@@ -4683,7 +4883,7 @@ function travelHistory(direction) {
 }
 $('#undoEdit').onclick = () => travelHistory(-1);
 $('#redoEdit').onclick = () => travelHistory(1);
-for (const id of ['undoEdit','redoEdit']) $('#'+id).onpointerdown = e => e.preventDefault();
+for (const id of ['undoEdit','redoEdit']) $('#'+id).onpointerdown=e=>{if(e.pointerType==='mouse')e.preventDefault();};
 function hasDraftFocus(event) {
  return !document.querySelector('dialog[open]') && !['pasteInput'].includes(event.target?.id);
 }
@@ -4987,7 +5187,7 @@ function openMatrixDialog(field) {
  const input=$('#matrixFill').value==='paste'?$('#matrixData'):$('#matrixRows');
  input.focus();input.select();
 }
-$('#matrixTool').onpointerdown=e=>e.preventDefault();
+$('#matrixTool').onpointerdown=e=>{if(e.pointerType==='mouse')e.preventDefault();};
 $('#matrixTool').onclick=()=>openMatrixDialog(active);
 $('#matrixForm').addEventListener('input',updateMatrixForm);
 $('#matrixFill').addEventListener('change',()=>{
@@ -5002,7 +5202,7 @@ $('#matrixForm').addEventListener('submit',event=>{
  const {latex}=readMatrixForm();
  const {field,selection,mode}=matrixTarget;
  matrixDialog.close();
- field.focus();field.selection=selection;choose(field);beforeEdit();
+ focusMathField(field);field.selection=selection;choose(field);beforeEdit();
  const fromProse=mode==='text'&&field.classList.contains('explanation-field');
  const hasBlanks=latex.includes('#?');
  scriptReturns.delete(field);

@@ -1,0 +1,45 @@
+/* MathLive's keyboard is rendered on body, outside the editor card. */
+body {
+ --mobile-keyboard-surface:#edf4fb;
+ --mobile-keyboard-wash:#dceaf6;
+ --mobile-keyboard-line:#b8cee2;
+ --mobile-keyboard-ink:#243c57;
+ --mobile-keyboard-muted:#526f8b;
+ --mobile-keyboard-accent:#2465a2;
+ --mobile-keyboard-field:#fbfdff;
+ --keyboard-background:var(--mobile-keyboard-surface);
+ --keyboard-toolbar-background:var(--mobile-keyboard-surface);
+ --keyboard-toolbar-background-hover:var(--mobile-keyboard-wash);
+ --keyboard-toolbar-background-selected:var(--mobile-keyboard-wash);
+ --keyboard-toolbar-text:var(--mobile-keyboard-muted);
+ --keyboard-toolbar-text-active:var(--mobile-keyboard-ink);
+ --keyboard-accent-color:var(--mobile-keyboard-accent);
+ --keyboard-border:var(--mobile-keyboard-line);
+ --keycap-background:var(--mobile-keyboard-field);
+ --keycap-background-hover:var(--mobile-keyboard-wash);
+ --keycap-background-pressed:var(--mobile-keyboard-accent);
+ --keycap-text:var(--mobile-keyboard-ink);
+ --keycap-text-hover:var(--mobile-keyboard-ink);
+ --keycap-text-pressed:var(--mobile-keyboard-surface);
+ --keycap-border:var(--mobile-keyboard-line);
+ --keycap-secondary-background:var(--mobile-keyboard-wash);
+ --keycap-secondary-text:var(--mobile-keyboard-ink);
+ --keycap-primary-background:var(--mobile-keyboard-accent);
+ --keycap-primary-text:var(--mobile-keyboard-field);
+ --keyboard-padding-bottom:max(8px,env(safe-area-inset-bottom));
+}
+html[data-theme="dark"] body {
+ --mobile-keyboard-surface:#17273b;
+ --mobile-keyboard-wash:#263e59;
+ --mobile-keyboard-line:#47617e;
+ --mobile-keyboard-ink:#e0eaf6;
+ --mobile-keyboard-muted:#b3c8dd;
+ --mobile-keyboard-accent:#9dccff;
+ --mobile-keyboard-field:#21354e;
+}
+#showKeyboard[aria-pressed=true]{background:var(--mobile-keyboard-wash);border-color:var(--mobile-keyboard-accent);color:var(--mobile-keyboard-ink)}
+@media(pointer:coarse){
+ math-field::part(virtual-keyboard-toggle){display:block;min-width:40px;min-height:40px;color:var(--mobile-keyboard-accent)}
+ body{--keycap-height:44px;--keycap-gap:4px}
+}
+@media(pointer:coarse) and (max-height:500px){body{--keycap-height:34px;--keycap-gap:3px;--keyboard-padding-top:3px;--keyboard-padding-bottom:3px}}

@@ -10,4 +10,17 @@ Run `python3 -B src/build_release.py` to rebuild the website from source. All de
 
 GitHub Pages serves the `docs/` directory on the `main` branch. To preview the published files locally, run `python3 -m http.server --directory docs` and open [localhost:8000](http://localhost:8000/).
 
+On a phone, tap a block to open the on-screen keyboard. **Keyboard** opens or hides it manually. Explanation blocks start with letters; equations start with the numeric keyboard.
+
+With Playwright and its Chromium/WebKit browsers installed, run the touch regressions against that local server:
+
+```sh
+node tests/mobile-touch-controls.cjs webkit http://localhost:8000/
+node tests/mobile-touch-controls.cjs chromium http://localhost:8000/
+node tests/mobile-layout.cjs webkit http://localhost:8000/
+node tests/mobile-layout.cjs chromium http://localhost:8000/
+```
+
+These simulate phone taps, keyboard entry, block focus, undo, matrices, and portrait/landscape layouts. Set `PROOFPAD_PLAYWRIGHT` if Playwright is installed outside the project.
+
 [Third-party software and font notices](docs/THIRD-PARTY-NOTICES.txt)

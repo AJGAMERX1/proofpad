@@ -1,0 +1,32 @@
+/* Keep touch controls usable without taking width away from equations. */
+@media screen and (max-width:900px) and (pointer:coarse) {
+  #rows .row { padding-right:12px; padding-bottom:8px; }
+  #rows .rowtools {
+    position:static; display:flex; flex-direction:row; justify-content:flex-end;
+    gap:4px; margin:4px -4px -4px 0;
+  }
+  #rows .rowtools button {
+    min-width:44px; min-height:44px; padding:8px; font-size:17px;
+    border-radius:6px; touch-action:manipulation;
+  }
+  #rows .rowtools .remove { font-size:21px; margin-left:8px; }
+  .toolbar button, .tabs .tab, .navkeys button, #toggleLatex,
+  .clipboardtools button, .keyboard .key {
+    min-height:44px; min-width:44px; touch-action:manipulation;
+  }
+  .tabs { gap:4px; }
+  .keyboardfooter { align-items:center; flex-wrap:wrap; gap:10px; }
+  .navkeys { margin-left:auto; gap:6px; }
+  .keyboard .keys:not(.units) { grid-template-columns:repeat(auto-fit,minmax(44px,1fr)); }
+  #graphPanel .graph-tools button { min-width:44px; height:44px; }
+  #graphPanel :is(.surface-controls button,.graph-legend button),
+  .plot-style-trigger, .calc-use { min-height:44px; }
+  .slider-play { width:44px; height:44px; flex:0 0 44px; }
+  /* Safari zooms the page when a text control is smaller than 16 px. */
+  dialog :is(input,select,textarea), .slider-bounds input { font-size:16px!important; }
+  dialog :is(button,input,select) { min-height:44px; }
+  #matrixDialog, #seriesStyleDialog { max-height:calc(100dvh - 24px); }
+}
+@media screen and (max-width:440px) and (pointer:coarse) {
+  #matrixDialog .matrix-fields > label:nth-child(n+3) { grid-column:1 / -1; }
+}
