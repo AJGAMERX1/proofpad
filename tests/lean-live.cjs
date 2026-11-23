@@ -8,15 +8,18 @@ async function main() {
   const browser = await playwright.chromium.launch();
   try {
     const page = await browser.newPage();
-    const source = [
-      'theorem proofpad_identity (n : Nat) : n = n := by rfl',
-      '#check proofpad_identity',
-      'example : 1 = 2 := by rfl',
-      'example : True := by sorry',
-    ].join('\n');
     await page.goto(url);
     await page.waitForFunction(() => !document.querySelector('main').inert);
     await page.locator('#leanPanel summary').click();
+    await page.locator('#leanExample').selectOption('algebra');
+    const source = [
+      await page.locator('#leanSource').inputValue(),
+      '#check isolate_x',
+      'theorem proofpad_identity (n : Nat) : n = n := by rfl',
+      'example : 1 = 2 := by rfl',
+      'example : True := by sorry',
+      '#check proofpad_identity',
+    ].join('\n');
     await page.locator('#leanSource').fill(source);
     await page.locator('#leanCheck').click();
     const editor = page.frameLocator('#leanFrameHost iframe');
@@ -29,13 +32,17 @@ async function main() {
       await allMessages.click();
     }
     await info.getByText(/Tactic .rfl. failed/).first().waitFor({ timeout: 90000 });
-    const feedback = (await info.locator('body').innerText()).replace(/\s+/g, ' ');
-    assert.match(feedback, /proofpad_identity\s*\(n\s*:\s*Nat\)\s*:\s*n\s*=\s*n/);
+    const messages = allMessages.locator('..');
+    await messages.getByText(/proofpad_identity\s*\(n/).first().waitFor({ timeout: 90000 });
+    const feedback = (await messages.innerText()).replace(/\s+/g, ' ');
+    assert.match(feedback, /isolate_x\s*\(x y\s*:\s*ℝ\)/);
+    assert.doesNotMatch(feedback, /deprecated/i);
+    assert.match(feedback, /proofpad_identity\s*\(n\s*:\s*(?:Nat|ℕ)\)\s*:\s*n\s*=\s*n/);
     assert.match(feedback, /declaration uses .sorry./i);
     await page.locator('#leanClose').click();
     await page.locator('#leanFrameHost iframe').waitFor({ state: 'detached' });
     assert.equal(await page.locator('#leanSource').inputValue(), source);
-    console.log('PASS live Lean editor reports a checked theorem, an invalid proof, and an unfinished proof.');
+    console.log('PASS live Lean editor checks the algebra example without deprecation warnings and distinguishes valid, invalid and unfinished proofs.');
   } finally {
     await browser.close();
   }

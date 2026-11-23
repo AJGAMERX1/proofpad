@@ -1,3 +1,5 @@
+<div class="lean-tools">
+<button id="leanFromPaper" class="copy lean-from-paper" type="button" aria-haspopup="dialog">Use written proof…</button>
 <details id="leanPanel" class="lean-panel">
   <summary><span class="lean-mark" aria-hidden="true">⊢</span> Lean proof</summary>
   <div class="lean-body">
@@ -9,8 +11,9 @@
         <option value="algebra">Solve for x</option>
       </select>
     </div>
-    <textarea id="leanSource" rows="7" dir="ltr" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off" aria-describedby="leanHint" placeholder="Write a theorem here, or start with an example."></textarea>
-    <p id="leanHint">Checking sends this source to the Lean playground. Lean checks the formal statement and proof you write here.</p>
+    <textarea id="leanSource" rows="7" dir="ltr" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off" aria-describedby="leanHint" placeholder="Start from your written proof, insert an example, or write Lean here."></textarea>
+    <div id="leanLegacyImport" hidden><span>This source uses an old Mathlib import.</span> <button type="button" class="copy" id="leanUpdateImport">Update import</button></div>
+    <p id="leanHint">Checking sends this source to the online Lean playground. After changing equations on the page, choose <strong>Use written proof…</strong> for a fresh check.</p>
     <div class="lean-actions">
       <button type="button" class="primary" id="leanCheck" disabled>Check with Lean</button>
       <button type="button" class="copy" id="leanImport">Import .lean…</button>
@@ -20,3 +23,4 @@
     <p id="leanStatus" role="status" aria-live="polite"></p>
   </div>
 </details>
+</div>

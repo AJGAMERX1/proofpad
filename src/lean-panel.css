@@ -1,13 +1,14 @@
-main:not([data-mode="proofs"]) #leanPanel {display:none}
-#leanPanel, #leanDialog {
+main:not([data-mode="proofs"]) .lean-tools {display:none}
+.lean-tools, #leanDialog, #leanReview {
   --lean-ink:#243d58; --lean-muted:#556d84; --lean-paper:#fbfdff; --lean-tint:#eff5fb;
   color:var(--lean-ink);
 }
-html[data-theme=dark] :is(#leanPanel,#leanDialog) {
+html[data-theme=dark] :is(.lean-tools,#leanDialog,#leanReview) {
   --lean-ink:#ddeafa; --lean-muted:#acbfd5; --lean-paper:#101d2f; --lean-tint:#1a2c42;
 }
-#leanPanel {margin:4px 22px 16px; border:1px solid var(--border); border-radius:8px; background:var(--lean-tint)}
-#leanPanel summary {cursor:pointer; padding:11px 13px; font:600 15px/1.3 Georgia,serif}
+.lean-tools {position:relative; margin:4px 22px 16px; border:1px solid var(--border); border-radius:8px; background:var(--lean-tint)}
+.lean-from-paper {position:absolute; top:5px; right:8px; z-index:1}
+#leanPanel summary {cursor:pointer; display:list-item; padding:14px 8px 14px 13px; width:calc(100% - 150px); font:600 15px/1.3 Georgia,serif}
 .lean-mark {margin:0 6px; color:var(--green); font:600 17px/1 Georgia,serif}
 .lean-body {padding:0 13px 14px}
 .lean-source-head, .lean-actions, .lean-dialog-head, .lean-dialog-actions {display:flex; gap:8px; align-items:center; flex-wrap:wrap}
@@ -36,12 +37,39 @@ html[data-theme=dark] :is(#leanPanel,#leanDialog) {
 #leanReturnSource {margin:5px 0}
 #leanFrameHost {flex:1; min-height:0}
 #leanFrameHost iframe {display:block; height:100%; width:100%; border:none}
+#leanLegacyImport:not([hidden]) {display:flex; gap:8px; align-items:center; flex-wrap:wrap; padding:8px 0; font:13px/1.5 system-ui,sans-serif}
+#leanReview {padding:0; box-sizing:border-box; width:min(560px,calc(100vw - 24px)); max-height:90vh; max-height:90dvh; color:var(--lean-ink); background:var(--lean-paper); border:1px solid var(--border); border-radius:12px; overflow:auto}
+#leanReview::backdrop {background:rgb(11 23 40 / 65%)}
+#leanReview .lean-review-head, #leanReview .lean-review-footer {width:auto; height:auto; margin:0; padding:14px 18px; position:static; background:var(--lean-tint); color:var(--lean-ink)}
+.lean-review-head {display:flex; justify-content:space-between; align-items:center; gap:8px; border-bottom:1px solid var(--border)}
+.lean-review-head h2 {font:600 20px/1.3 Georgia,serif; margin:0}
+.lean-review-content {padding:14px 18px}
+#leanReview p {margin:0 0 12px; font:13px/1.55 system-ui,sans-serif; color:var(--lean-muted)}
+#leanReview select {display:block; width:100%; min-height:36px; text-overflow:ellipsis}
+#leanReview [hidden] {display:none!important}
+.lean-review-label, #leanReview legend {display:block; margin-bottom:5px; font:600 14px/1.45 system-ui,sans-serif}
+#leanGivens {margin:16px 0 0; padding:0; min-width:0; border:0}
+#leanGivens p {margin-bottom:5px}
+#leanGivenChoices {display:grid; gap:4px; max-height:32vh; overflow:auto}
+#leanGivenChoices label {display:flex; gap:10px; align-items:baseline; padding:8px 10px; border:1px solid var(--border); border-radius:6px; background:var(--lean-tint); color:var(--lean-ink); cursor:pointer; font:14px/1.5 system-ui,sans-serif; overflow-wrap:anywhere}
+#leanGivenChoices input {accent-color:var(--green); width:1em; flex:none}
+#leanReviewSummary:not(:empty) {margin:14px 0 8px}
+#leanPreviewSource summary, #leanReviewNotes summary {cursor:pointer; padding:5px 0; font:600 13px/1.5 system-ui,sans-serif}
+#leanNotesList {padding-inline-start:20px; max-height:24vh; overflow:auto; overflow-wrap:anywhere; font:13px/1.5 system-ui,sans-serif}
+#leanPreviewCode {overflow:auto; max-height:30vh; white-space:pre-wrap; overflow-wrap:anywhere; padding:10px; background:var(--lean-tint); font:13px/1.55 ui-monospace,monospace}
+#leanReview .lean-review-footer {display:block; text-align:left; border-top:1px solid var(--border)}
+#leanReview .primary {width:auto; flex:none; padding:8px 14px}
 @media (max-width:600px) {
-  #leanPanel {margin:5px 14px 14px}
+  .lean-tools {margin:5px 14px 14px}
+  #leanPanel summary {padding-left:7px; width:calc(100% - 130px)}
+  .lean-mark {margin:0 2px}
+  .lean-from-paper {top:1px; right:4px; min-height:44px; padding-inline:6px}
   #leanSource, #leanReturnSource, #leanExample {font-size:16px}
+  #leanReview select {font-size:16px}
+  #leanReview :is(button,select) {min-height:44px}
   #leanDialog {width:100%; height:100dvh; border:0; border-radius:0}
   .lean-dialog-head {padding:10px 12px; gap:5px}
   .lean-dialog-actions {gap:6px}
   #leanPanel :is(button,select), .lean-dialog-actions :is(button,a) {min-height:44px}
 }
-@media print {#leanPanel,#leanDialog {display:none!important}}
+@media print {.lean-tools,#leanReview,#leanDialog {display:none!important}}

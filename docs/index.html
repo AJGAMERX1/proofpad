@@ -573,16 +573,17 @@ html[data-theme="dark"] body {
 }
 
 </style><style>
-main:not([data-mode="proofs"]) #leanPanel {display:none}
-#leanPanel, #leanDialog {
+main:not([data-mode="proofs"]) .lean-tools {display:none}
+.lean-tools, #leanDialog, #leanReview {
   --lean-ink:#243d58; --lean-muted:#556d84; --lean-paper:#fbfdff; --lean-tint:#eff5fb;
   color:var(--lean-ink);
 }
-html[data-theme=dark] :is(#leanPanel,#leanDialog) {
+html[data-theme=dark] :is(.lean-tools,#leanDialog,#leanReview) {
   --lean-ink:#ddeafa; --lean-muted:#acbfd5; --lean-paper:#101d2f; --lean-tint:#1a2c42;
 }
-#leanPanel {margin:4px 22px 16px; border:1px solid var(--border); border-radius:8px; background:var(--lean-tint)}
-#leanPanel summary {cursor:pointer; padding:11px 13px; font:600 15px/1.3 Georgia,serif}
+.lean-tools {position:relative; margin:4px 22px 16px; border:1px solid var(--border); border-radius:8px; background:var(--lean-tint)}
+.lean-from-paper {position:absolute; top:5px; right:8px; z-index:1}
+#leanPanel summary {cursor:pointer; display:list-item; padding:14px 8px 14px 13px; width:calc(100% - 150px); font:600 15px/1.3 Georgia,serif}
 .lean-mark {margin:0 6px; color:var(--green); font:600 17px/1 Georgia,serif}
 .lean-body {padding:0 13px 14px}
 .lean-source-head, .lean-actions, .lean-dialog-head, .lean-dialog-actions {display:flex; gap:8px; align-items:center; flex-wrap:wrap}
@@ -611,15 +612,42 @@ html[data-theme=dark] :is(#leanPanel,#leanDialog) {
 #leanReturnSource {margin:5px 0}
 #leanFrameHost {flex:1; min-height:0}
 #leanFrameHost iframe {display:block; height:100%; width:100%; border:none}
+#leanLegacyImport:not([hidden]) {display:flex; gap:8px; align-items:center; flex-wrap:wrap; padding:8px 0; font:13px/1.5 system-ui,sans-serif}
+#leanReview {padding:0; box-sizing:border-box; width:min(560px,calc(100vw - 24px)); max-height:90vh; max-height:90dvh; color:var(--lean-ink); background:var(--lean-paper); border:1px solid var(--border); border-radius:12px; overflow:auto}
+#leanReview::backdrop {background:rgb(11 23 40 / 65%)}
+#leanReview .lean-review-head, #leanReview .lean-review-footer {width:auto; height:auto; margin:0; padding:14px 18px; position:static; background:var(--lean-tint); color:var(--lean-ink)}
+.lean-review-head {display:flex; justify-content:space-between; align-items:center; gap:8px; border-bottom:1px solid var(--border)}
+.lean-review-head h2 {font:600 20px/1.3 Georgia,serif; margin:0}
+.lean-review-content {padding:14px 18px}
+#leanReview p {margin:0 0 12px; font:13px/1.55 system-ui,sans-serif; color:var(--lean-muted)}
+#leanReview select {display:block; width:100%; min-height:36px; text-overflow:ellipsis}
+#leanReview [hidden] {display:none!important}
+.lean-review-label, #leanReview legend {display:block; margin-bottom:5px; font:600 14px/1.45 system-ui,sans-serif}
+#leanGivens {margin:16px 0 0; padding:0; min-width:0; border:0}
+#leanGivens p {margin-bottom:5px}
+#leanGivenChoices {display:grid; gap:4px; max-height:32vh; overflow:auto}
+#leanGivenChoices label {display:flex; gap:10px; align-items:baseline; padding:8px 10px; border:1px solid var(--border); border-radius:6px; background:var(--lean-tint); color:var(--lean-ink); cursor:pointer; font:14px/1.5 system-ui,sans-serif; overflow-wrap:anywhere}
+#leanGivenChoices input {accent-color:var(--green); width:1em; flex:none}
+#leanReviewSummary:not(:empty) {margin:14px 0 8px}
+#leanPreviewSource summary, #leanReviewNotes summary {cursor:pointer; padding:5px 0; font:600 13px/1.5 system-ui,sans-serif}
+#leanNotesList {padding-inline-start:20px; max-height:24vh; overflow:auto; overflow-wrap:anywhere; font:13px/1.5 system-ui,sans-serif}
+#leanPreviewCode {overflow:auto; max-height:30vh; white-space:pre-wrap; overflow-wrap:anywhere; padding:10px; background:var(--lean-tint); font:13px/1.55 ui-monospace,monospace}
+#leanReview .lean-review-footer {display:block; text-align:left; border-top:1px solid var(--border)}
+#leanReview .primary {width:auto; flex:none; padding:8px 14px}
 @media (max-width:600px) {
-  #leanPanel {margin:5px 14px 14px}
+  .lean-tools {margin:5px 14px 14px}
+  #leanPanel summary {padding-left:7px; width:calc(100% - 130px)}
+  .lean-mark {margin:0 2px}
+  .lean-from-paper {top:1px; right:4px; min-height:44px; padding-inline:6px}
   #leanSource, #leanReturnSource, #leanExample {font-size:16px}
+  #leanReview select {font-size:16px}
+  #leanReview :is(button,select) {min-height:44px}
   #leanDialog {width:100%; height:100dvh; border:0; border-radius:0}
   .lean-dialog-head {padding:10px 12px; gap:5px}
   .lean-dialog-actions {gap:6px}
   #leanPanel :is(button,select), .lean-dialog-actions :is(button,a) {min-height:44px}
 }
-@media print {#leanPanel,#leanDialog {display:none!important}}
+@media print {.lean-tools,#leanReview,#leanDialog {display:none!important}}
 </style>
 <link rel="stylesheet" href="assets/fonts.77f0e774f13d.css"></head><body>
 <header><div class="brand"><div class="logo">∴</div>proofpad</div><div class="header-actions"><div class="local"><span class="dot"></span><span id="saveState" role="status">Saved on this device</span></div>
@@ -651,6 +679,31 @@ document.getElementById('themeSwitch').addEventListener('click', () => {
   <p id="leanLoading" role="status" aria-live="polite"></p>
   <div id="leanFrameHost"></div>
 </dialog>
+<dialog id="leanReview" aria-labelledby="leanReviewTitle">
+  <header class="lean-review-head">
+    <h2 id="leanReviewTitle">Use your written proof</h2>
+    <button class="quiet" type="button" id="leanReviewClose">Close</button>
+  </header>
+  <div class="lean-review-content">
+    <p id="leanReviewHint"></p>
+    <label class="lean-review-label" for="leanGoal" id="leanGoalLabel">What are you proving?</label>
+    <select id="leanGoal" aria-labelledby="leanGoalLabel"></select>
+    <fieldset id="leanGivens"><legend>Which lines are givens?</legend>
+      <p>Mark the assumptions you started with. Lean will try to prove the intervening algebra steps and your conclusion.</p>
+      <div id="leanGivenChoices"></div>
+    </fieldset>
+    <p id="leanReviewSummary" role="status"></p>
+    <details id="leanReviewNotes" hidden><summary id="leanNotesLabel">Reference notes</summary><ul id="leanNotesList"></ul></details>
+    <details id="leanPreviewSource"><summary>Preview Lean source</summary><pre id="leanPreviewCode" tabindex="0"></pre></details>
+  </div>
+  <footer class="lean-review-footer">
+    <p>Checking sends this Lean source, including any copied notes, to the online Lean playground.</p>
+    <div class="lean-actions">
+      <button class="primary" type="button" id="leanReviewCheck">Check with Lean</button>
+      <button class="copy" type="button" id="leanReviewSave">Save Lean source</button>
+    </div>
+  </footer>
+</dialog>
 <dialog id="copiesDialog" aria-labelledby="copiesTitle"><h2 id="copiesTitle">Saved copies</h2><ul id="copyList"></ul><button type="button" class="copy" id="closeCopies">Close</button></dialog>
 <main inert>
 <section class="intro"><div class="hero-copy"><div class="eyebrow">THE MATHEMATICAL NOTEBOOK</div><h1>Proofpad<span class="brand-stop">.</span></h1><p>Give your reasoning room to unfold.</p><div class="hero-caption" id="modeCaption">PROOFS · WRITTEN WITH CARE</div></div><div class="workspace-nav" aria-label="Workspace"><button class="mode-tab" data-mode="proofs" aria-label="Proofs workspace" aria-pressed="true"><span aria-hidden="true">□</span><b>Proofs</b><small>Develop an argument</small></button><button class="mode-tab" data-mode="formulas" aria-label="Formulas workspace" aria-pressed="false"><span aria-hidden="true">=</span><b>Formulas</b><small>Collect your equations</small></button><button class="mode-tab" id="graph2D" data-mode="calculator" aria-label="Calculator workspace" aria-pressed="false"><span aria-hidden="true">±</span><b>Calculator</b><small>2D graphs &amp; values</small></button><button class="mode-tab" id="graph3D" data-mode="surface" aria-label="3D Graph workspace" aria-pressed="false"><span aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"><path d="m12 2 9 5v10l-9 5-9-5V7Zm0 10L3 7m9 5 9-5m-9 5v10"/></svg></span><b>3D Graph</b><small>Surfaces &amp; heat maps</small></button><p>Separate drafts, saved as you write.</p></div></section>
@@ -658,6 +711,8 @@ document.getElementById('themeSwitch').addEventListener('click', () => {
 <div class="document-tools" aria-label="Document tools"><div><button class="copy" id="undoEdit" disabled title="Undo · Cmd/Ctrl+Z">↶ Undo</button><button class="copy" id="redoEdit" disabled title="Redo · Shift+Cmd/Ctrl+Z">↷ Redo</button></div><div><button class="copy" id="saveDraft" title="Download an editable backup of this workspace">Save draft</button><button class="copy" type="button" id="storedCopies" hidden>Saved copies</button><button class="copy" id="openDraft" title="Restore a saved Proofpad draft from a file">Open draft</button><input type="file" id="draftFile" accept=".json,.proofpad" hidden></div></div>
 <div class="spelling-toolbar"><label><input type="checkbox" id="spellEnabled" checked> Spelling checks</label><button class="copy" id="spellReview">Check spelling</button><span>English · checked on your device</span></div>
 <div class="paperheading"><label class="label" for="title">TITLE · OPTIONAL</label><input id="title" placeholder="What are you proving?" maxlength="160"></div>
+<div class="lean-tools">
+<button id="leanFromPaper" class="copy lean-from-paper" type="button" aria-haspopup="dialog">Use written proof…</button>
 <details id="leanPanel" class="lean-panel">
   <summary><span class="lean-mark" aria-hidden="true">⊢</span> Lean proof</summary>
   <div class="lean-body">
@@ -669,8 +724,9 @@ document.getElementById('themeSwitch').addEventListener('click', () => {
         <option value="algebra">Solve for x</option>
       </select>
     </div>
-    <textarea id="leanSource" rows="7" dir="ltr" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off" aria-describedby="leanHint" placeholder="Write a theorem here, or start with an example."></textarea>
-    <p id="leanHint">Checking sends this source to the Lean playground. Lean checks the formal statement and proof you write here.</p>
+    <textarea id="leanSource" rows="7" dir="ltr" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off" aria-describedby="leanHint" placeholder="Start from your written proof, insert an example, or write Lean here."></textarea>
+    <div id="leanLegacyImport" hidden><span>This source uses an old Mathlib import.</span> <button type="button" class="copy" id="leanUpdateImport">Update import</button></div>
+    <p id="leanHint">Checking sends this source to the online Lean playground. After changing equations on the page, choose <strong>Use written proof…</strong> for a fresh check.</p>
     <div class="lean-actions">
       <button type="button" class="primary" id="leanCheck" disabled>Check with Lean</button>
       <button type="button" class="copy" id="leanImport">Import .lean…</button>
@@ -680,6 +736,7 @@ document.getElementById('themeSwitch').addEventListener('click', () => {
     <p id="leanStatus" role="status" aria-live="polite"></p>
   </div>
 </details>
+</div>
 <div id="proofSetup" class="proof-setup"><div class="proof-options"><label for="proofStyle">Proof format<select id="proofStyle"><option value="paper">Written proof · paper style</option><option value="steps">Step-by-step notes</option></select></label><label for="statementKind">Statement type<select id="statementKind"><option>Theorem</option><option>Proposition</option><option>Lemma</option><option>Claim</option><option>Corollary</option><option>Definition</option><option>Remark</option><option>Example</option><option>Exercise</option></select></label></div><label class="label" for="statement">Statement · assumptions and what you will prove</label><textarea id="statement" rows="2" placeholder="For every integer n, if n is even then n² is even."></textarea><small>Optional. Use $n^2$ for inline math in the statement.</small><div class="proof-body-label">Proof.<span>Write in paragraphs; display the equations that carry the argument.</span></div></div>
 <div class="toolbar" aria-label="Quick math tools"><button class="tool featured" data-command="moveToSubscript"><span class="symbol">xᵢ</span>Subscript</button><button class="tool" data-command="moveToSuperscript"><span class="symbol">xⁿ</span>Power</button><button class="tool" data-insert="\;" aria-label="Insert space"><span class="symbol" aria-hidden="true">↔</span>Space</button><button class="tool" id="textMode" aria-label="Toggle text entry" aria-pressed="false"><span class="symbol">Aa</span><span id="entryModeLabel">Text</span></button><button type="button" class="tool" id="showKeyboard" aria-label="Show on-screen keyboard" aria-pressed="false"><span class="symbol" aria-hidden="true">⌨</span>Keyboard</button><button type="button" class="tool" id="matrixTool" aria-haspopup="dialog" aria-controls="matrixDialog"><span class="symbol" aria-hidden="true">▦</span>Matrix…</button><button class="tool" data-command="moveAfterParent" aria-label="Return to baseline">Back to baseline →</button></div>
 <div class="shortcut">Type <kbd>x_i</kbd> for xᵢ · <kbd>theta</kbd> for θ · <kbd>Space</kbd> adds a gap.<br><kbd>/</kbd> makes a fraction after a variable or number. Use the mode button to switch between words and math.</div>
@@ -755,7 +812,7 @@ document.getElementById('themeSwitch').addEventListener('click', () => {
 </section>
 <div class="card"><div class="cardtop"><h2>Calculator tools</h2></div><div class="calc-panel"><p>Define a variable on any line, then drag its slider to update the graph and results.</p><div class="calc-options"><label>Angles<select id="calcAngle"><option value="rad">Radians</option><option value="deg">Degrees</option></select></label><label>Result precision<select id="calcDigits"><option value="6">6 digits</option><option value="10" selected>10 digits</option><option value="15">15 digits</option></select></label></div><div class="calc-keypad" aria-label="Calculator keypad"><button data-calc-key="7">7</button><button data-calc-key="8">8</button><button data-calc-key="9">9</button><button data-calc-key="fraction" aria-label="Divide as fraction">÷</button><button data-calc-key="4">4</button><button data-calc-key="5">5</button><button data-calc-key="6">6</button><button data-calc-key="\times" aria-label="Multiply">×</button><button data-calc-key="1">1</button><button data-calc-key="2">2</button><button data-calc-key="3">3</button><button data-calc-key="-" aria-label="Subtract">−</button><button data-calc-key="0">0</button><button data-calc-key=".">.</button><button data-calc-key="=" aria-label="Define variable">=</button><button data-calc-key="+" aria-label="Add">+</button><button data-calc-key="\sqrt{#?}" aria-label="Square root">√</button><button data-calc-key="^{#?}" aria-label="Power">xⁿ</button><button data-calc-key="\pi" aria-label="Pi">π</button><button data-command="deleteBackward" aria-label="Calculator backspace">⌫</button></div><button id="calcCopyResult" class="copy">Copy selected result</button><button id="calcExample" class="quiet">Add F/M example</button><p class="calc-status" id="calcStatus" role="status">Ready to calculate</p><button id="calcRetry" class="copy" hidden>Try again</button></div></div><div class="tip"><b>Try it:</b> type <kbd>F/M</kbd>, <kbd>F=6</kbd>, and <kbd>M=2</kbd>. The result is 3. Press Enter for another expression; Tab moves through fraction or matrix boxes.<br><br>Use <b>Save to Formulas</b> beside a result to export it as a PNG or PDF.</div></aside></div>
 <details class="writing-guide"><summary>How to back up or move your work</summary><p>Proofpad saves each workspace in this browser. Use <b>Save draft</b> to download an editable copy, then <b>Open draft</b> to restore it on another device or on the website. Clearing browser data also clears local drafts.</p><p>If two tabs edit the same workspace, use <b>Saved copies</b> to open or download either version.</p></details>
-<details class="writing-guide"><summary>A short guide to writing a proof</summary><p>State the claim and its assumptions. Introduce each symbol before using it. Explain why each important equation follows, using full sentences and punctuation. Keep related ideas in paragraphs, then conclude the original claim.</p><p>For induction, include a base case, the induction hypothesis, and the inductive step. For contradiction, state the negated claim and identify the contradiction.</p><p>Based on <a href="https://math.hmc.edu/su/wp-content/uploads/sites/10/2019/11/good-math-writing.pdf" target="_blank" rel="noopener">Francis Su’s writing guide</a> and <a href="https://ctan.math.illinois.edu/macros/latex/required/amscls/doc/amsthdoc.pdf" target="_blank" rel="noopener">AMS proof conventions</a>.</p></details><footer><span>A writing tool for proofs and derivations. Does not check correctness.</span><span>Math · reasoning · QED</span></footer>
+<details class="writing-guide"><summary>A short guide to writing a proof</summary><p>State the claim and its assumptions. Introduce each symbol before using it. Explain why each important equation follows, using full sentences and punctuation. Keep related ideas in paragraphs, then conclude the original claim.</p><p>For induction, include a base case, the induction hypothesis, and the inductive step. For contradiction, state the negated claim and identify the contradiction.</p><p>Based on <a href="https://math.hmc.edu/su/wp-content/uploads/sites/10/2019/11/good-math-writing.pdf" target="_blank" rel="noopener">Francis Su’s writing guide</a> and <a href="https://ctan.math.illinois.edu/macros/latex/required/amscls/doc/amsthdoc.pdf" target="_blank" rel="noopener">AMS proof conventions</a>.</p></details><footer><span>Write proofs and derivations. Check formal proofs with Lean.</span><span>Math · reasoning · QED</span></footer>
 </main>
 <dialog id="seriesStyleDialog" aria-labelledby="seriesStyleHeading">
  <h2 id="seriesStyleHeading">Plot style</h2>
@@ -5345,8 +5402,7 @@ theorem substitute_in_sum (x y : Nat) (h : x = y + 1) :
     x + 2 = (y + 1) + 2 := by
   rw [h]
 `,
-  algebra: `import Mathlib.Data.Real.Basic
-import Mathlib.Tactic.Linarith
+  algebra: `import Mathlib
 
 -- Rearrange a linear equation to solve for x over the real numbers.
 theorem isolate_x (x y : ℝ) (h : 2 * x - 3 * y = 6) :
@@ -5423,16 +5479,24 @@ const leanStatus = document.getElementById('leanStatus');
 const leanReturnSource = document.getElementById('leanReturnSource');
 let leanSourceRevision = 0;
 
+function updatedLeanImports(source) {
+  // Only adjust the first import, allowing leading blank lines and line comments.
+  const legacy = /^((?:[ \t]*(?:--[^\n]*)?\n)*[ \t]*)import[ \t]+Mathlib\.Data\.Real\.Basic[ \t]*(?:\nimport[ \t]+Mathlib\.Tactic\.Linarith[ \t]*)?(?=\n|$)/;
+  return source.replace(legacy, '$1import Mathlib');
+}
+
 function updateLeanEditor() {
   leanSourceRevision++;
   const empty = !leanEditor.value.trim();
   $('#leanCheck').disabled = empty;
   $('#leanDownload').disabled = !leanEditor.value;
+  $('#leanLegacyImport').hidden = updatedLeanImports(leanEditor.value) === leanEditor.value;
   leanStatus.textContent = '';
 }
 
 function restoreLeanSource(value) {
   closeLeanChecker();
+  if ($('#leanReview').open) $('#leanReview').close();
   leanEditor.value = value;
   updateLeanEditor();
 }
@@ -5448,6 +5512,11 @@ function insertLeanFile(source) {
 }
 
 leanEditor.addEventListener('input', updateLeanEditor);
+$('#leanUpdateImport').addEventListener('click', () => {
+  replaceLeanSource(updatedLeanImports(leanEditor.value));
+  leanStatus.textContent = 'Updated the Mathlib import. You can check this source again.';
+  $('#leanCheck').focus();
+});
 leanEditor.addEventListener('keydown', event => {
   if (event.key === 'Enter' && (event.ctrlKey || event.metaKey)) {
     event.preventDefault();
@@ -5530,6 +5599,443 @@ $('#leanReturnApply').addEventListener('click', () => {
 $('#leanDialog').addEventListener('close', () => {
   if (!$('#leanDialog').open) showLeanReturn(false);
 });
+// Convert only notation whose meaning can be preserved as a real-number relation.
+// Every piece of Lean syntax comes from this grammar. Unknown notation stays for review.
+// Callers must prove the returned domain conditions for ordinary real division.
+function parseLeanRelation(latex) {
+  if (typeof latex !== 'string' || latex.length > 4096) return null;
+  const unsupported = Symbol('unsupported');
+  const reject = () => { throw unsupported; };
+  const relations = new Set(['=', '≠', '<', '>', '≤', '≥']);
+  const greek = {
+    alpha: 'α', beta: 'β', gamma: 'γ', delta: 'δ', epsilon: 'ε', zeta: 'ζ',
+    eta: 'η', theta: 'θ', iota: 'ι', kappa: 'κ', lambda: 'λ', mu: 'μ',
+    nu: 'ν', xi: 'ξ', rho: 'ρ', sigma: 'σ', tau: 'τ', phi: 'φ',
+    chi: 'χ', psi: 'ψ', omega: 'ω'
+  };
+  const commands = {
+    cdot: '*', times: '*', div: '/', leq: '≤', le: '≤', geq: '≥', ge: '≥',
+    neq: '≠', ne: '≠', lt: '<', gt: '>', frac: 'frac', dfrac: 'frac', tfrac: 'frac'
+  };
+  const identifiers = new Set('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ');
+  const greekSymbols = new Map(Object.entries(greek).map(([name, glyph]) => [glyph, 'v_' + name]));
+  const tokens = [];
+  const variables = new Set();
+  const conditions = new Set();
+  const number = value => typeof value === 'string' && /^\d/.test(value);
+  const variable = value => identifiers.has(value) || (typeof value === 'string' && value.startsWith('v_'));
+
+  function tokenize() {
+    const source = latex.trim()
+      .replace(/[₀-₉]+/g, digits => '_{' + Array.from(digits, d => '₀₁₂₃₄₅₆₇₈₉'.indexOf(d)).join('') + '}')
+      .replace(/[⁰¹²³⁴⁵⁶⁷⁸⁹]+/g, digits => '^{' + Array.from(digits, d => '⁰¹²³⁴⁵⁶⁷⁸⁹'.indexOf(d)).join('') + '}');
+    const lex = /\s+|\\left\s*\(|\\right\s*\)|\\[A-Za-z]+|\\[,;:! ]|\d+(?:\.\d+)?|\.\d+|[A-Za-z]+|<=|>=|!=|./gyu;
+    for (const match of source.matchAll(lex)) {
+      const t = match[0];
+      if (/^\s|^\\[,;:! ]$/.test(t)) continue;
+      if (tokens.length > 400) reject();
+      if (t.startsWith('\\left') && t.endsWith('(')) tokens.push('(');
+      else if (t.startsWith('\\right') && t.endsWith(')')) tokens.push(')');
+      else if (t[0] === '\\') {
+        const name = t.slice(1);
+        if (Object.hasOwn(commands, name)) tokens.push(commands[name]);
+        else if (Object.hasOwn(greek, name)) tokens.push('v_' + name);
+        else reject();
+      } else if (/^[A-Za-z]+$/.test(t)) {
+        // Common classroom products like MA and xy; leave names and functions for review.
+        if (t.length > 2 || /^(ln|lg|if|by|of|in|or)$/i.test(t) || /^d[a-z]$/.test(t)) reject();
+        tokens.push(...t);
+      } else if (greekSymbols.has(t)) tokens.push(greekSymbols.get(t));
+      else if (/^[.\d]/.test(t)) {
+        if (t === '.' || t.length > 30) reject();
+        tokens.push(t[0] === '.' ? '0' + t : t);
+      } else {
+        const aliases = { '<=': '≤', '>=': '≥', '!=': '≠', '−': '-', '·': '*', '×': '*', '÷': '/' };
+        const token = aliases[t] || t;
+        if (!relations.has(token) && !'+-*/^_(){}'.includes(token)) reject();
+        tokens.push(token);
+      }
+    }
+  }
+
+  let at = 0;
+  function take(expected) {
+    if (tokens[at] !== expected) return false;
+    at++;
+    return true;
+  }
+  function group(open, close) {
+    if (!take(open)) reject();
+    const result = sum();
+    if (!take(close)) reject();
+    return result;
+  }
+  function binary(left, op, right) {
+    if (op === '/') {
+      if (right.literal === 0) reject();
+      if (right.literal === undefined) conditions.add('(' + right.code + ' : ℝ) ≠ 0');
+    }
+    return { code: '(' + left.code + ' ' + op + ' ' + right.code + ')' };
+  }
+  function scriptInteger() {
+    const braced = take('{');
+    const value = tokens[at++];
+    if (!number(value) || !/^\d+$/.test(value) || (!braced && value.length !== 1)) reject();
+    if (braced && !take('}')) reject();
+    return value;
+  }
+  function atom() {
+    const t = tokens[at];
+    if (number(t)) {
+      at++;
+      return { code: t.replace(/^0+(?=\d)/, ''), literal: Number(t), tail: 'number' };
+    }
+    if (variable(t)) {
+      at++;
+      const name = take('_') ? t + '_' + scriptInteger() : t;
+      variables.add(name);
+      return { code: name, tail: 'variable' };
+    }
+    if (t === '(') return { ...group('(', ')'), tail: 'group' };
+    if (take('frac')) {
+      const top = group('{', '}');
+      const bottom = group('{', '}');
+      return binary(top, '/', bottom);
+    }
+    reject();
+  }
+  function power() {
+    const base = atom();
+    if (!take('^')) return base;
+    const exponent = scriptInteger().replace(/^0+(?=\d)/, '');
+    if (Number(exponent) > 128) reject();
+    return { code: '(' + base.code + ' ^ ' + exponent + ')', tail: base.tail };
+  }
+  function signed() {
+    if (take('+')) return signed();
+    if (!take('-')) return power();
+    const term = signed();
+    return {
+      code: '(-' + term.code + ')',
+      literal: term.literal === undefined ? undefined : -term.literal,
+      tail: term.tail
+    };
+  }
+  function product() {
+    let value = signed();
+    let last = value;
+    let afterSlash = false;
+    for (;;) {
+      const next = tokens[at];
+      let op = '*';
+      if (next === '*' || next === '/') {
+        op = next;
+        at++;
+      } else {
+        if (!variable(next) && next !== '(' && next !== 'frac') break;
+        // f(x), 1/2x and 3 followed by a stacked fraction are ambiguous.
+        if (afterSlash || (last.tail === 'variable' && next === '(') ||
+            (last.tail === 'number' && next === 'frac')) reject();
+      }
+      last = signed();
+      value = binary(value, op, last);
+      afterSlash = op === '/';
+    }
+    return value;
+  }
+  function sum() {
+    let value = product();
+    while (tokens[at] === '+' || tokens[at] === '-') {
+      const op = tokens[at++];
+      value = binary(value, op, product());
+    }
+    return value;
+  }
+
+  try {
+    tokenize();
+    let lhs = sum();
+    const parts = [];
+    while (relations.has(tokens[at])) {
+      const relation = tokens[at++];
+      const rhs = sum();
+      // Both annotations also force scalar divisions in closed arithmetic to use ℝ.
+      parts.push('(' + lhs.code + ' : ℝ) ' + relation + ' (' + rhs.code + ' : ℝ)');
+      lhs = rhs;
+    }
+    if (!parts.length || at !== tokens.length) return null;
+    const result = { proposition: parts[0], variables: [...variables], conditions: [...conditions] };
+    if (parts.length > 1) {
+      result.parts = parts;
+      result.proposition = parts.map(part => '(' + part + ')').join(' ∧ ');
+    }
+    return result;
+  } catch (error) {
+    if (error === unsupported) return null;
+    throw error;
+  }
+}
+// Turn the writer's selected arithmetic claims into ordinary, editable Lean.
+function analyzeLeanProof(draft) {
+  const items = [];
+  function add(id, kind, label, value) {
+    const raw = typeof value === 'string' ? value.trim() : '';
+    if (!hasContent(raw)) return;
+    const text = kind === 'text' ? raw.replace(/\\text\{([^{}]*)\}/g, '$1') : raw;
+    const singleTextRun = /^\\text\{([^{}]*)\}$/.exec(raw);
+    const formula = singleTextRun ? singleTextRun[1].trim() : raw;
+    const wrapper = /^\$\$([^$]+)\$\$\.?$/.exec(formula)
+      || /^\$([^$]+)\$\.?$/.exec(formula)
+      || /^\\\(([\s\S]+)\\\)\.?$/.exec(formula)
+      || /^\\\[([\s\S]+)\\\]\.?$/.exec(formula);
+    // A sentence such as "Let a = b" is not a product of single-letter variables.
+    // Fully delimited math and display equations use normal algebraic notation.
+    const bareWords = /\p{L}{2,}/u.test(formula.replace(/\\[a-zA-Z]+/g, ' '));
+    const canParse = wrapper || !bareWords || (kind === 'math' && !singleTextRun);
+    const relation = canParse ? parseLeanRelation(wrapper ? wrapper[1] : formula) : null;
+    items.push({id, kind, label, text, relation});
+  }
+  add('statement', 'statement', 'Statement', draft.statement);
+  (draft.entries || []).forEach((entry, index) => {
+    if (entry) add('step-' + (index + 1), entry.type, 'Step ' + (index + 1), entry.value);
+  });
+  const claims = items.filter(item => item.relation);
+  const goal = claims.find(item => item.kind === 'statement') || claims[claims.length - 1];
+  return {title: typeof draft.title === 'string' ? draft.title.trim() : '', items, defaultGoal: goal?.id || null};
+}
+
+function leanGivenCandidates(analysis, goalId) {
+  const target = analysis.items.findIndex(item => item.id === goalId && item.relation);
+  if (target < 0) return [];
+  const goal = analysis.items[target];
+  const goalParts = goal.relation.parts || [goal.relation.proposition];
+  return analysis.items.filter((item, index) => {
+    if (!item.relation || item.id === goalId || (goal.kind !== 'statement' && index >= target)) return false;
+    const parts = item.relation.parts || [item.relation.proposition];
+    return !goalParts.every(part => parts.includes(part));
+  });
+}
+
+function buildLeanProof(analysis, options = {}) {
+  const goalId = options.goalId === undefined ? analysis.defaultGoal : options.goalId;
+  const goal = analysis.items.find(item => item.id === goalId && item.relation);
+  if (goalId != null && !goal) throw new Error('Choose a recognized equation or inequality as the goal.');
+  const givenIds = new Set(options.givenIds || []);
+  const givens = leanGivenCandidates(analysis, goalId).filter(item => givenIds.has(item.id));
+  if (givenIds.size !== givens.length) throw new Error('Choose givens that precede the goal and differ from it.');
+
+  const beforeGoal = goal?.kind === 'statement' ? analysis.items.length : analysis.items.indexOf(goal);
+  const steps = analysis.items.filter((item, index) => index < beforeGoal && item.kind !== 'statement'
+    && item.relation && !givenIds.has(item.id));
+  const checked = steps.length + (goal ? 1 : 0);
+  const notes = analysis.items.length - checked - givens.length;
+  const lines = ['import Mathlib', ''];
+  function comment(prefix, value, indent = '') {
+    const safe = value.replace(/\r\n?|[\u0085\u2028\u2029]/g, '\n')
+      .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F\u202A-\u202E\u2066-\u2069]/g, ' ');
+    // Prefix every physical line; even pasted Lean commands remain comments.
+    for (const line of (prefix + safe).split('\n')) lines.push(indent + '-- ' + line);
+  }
+  if (analysis.title) comment('', analysis.title);
+  if (!goal) {
+    for (const item of analysis.items) comment(item.label + ' (reference only): ', item.text);
+    lines.push('-- Replace the underscore with the proposition expressed by your statement.',
+      'theorem proofpad_result : _ := by',
+      '  fail "Enter the formal statement and proof here."', '');
+    return {source: lines.join('\n'), checked, givens: 0, notes, noteItems: analysis.items,
+      summary: 'Outline only. Write a formal goal and proof in the marked places.'};
+  }
+
+  comment('Goal: ', goal.label + ' over the real numbers.');
+  if (givens.length) comment('Assumed as given: ', givens.map(item => item.label).join(', ') + '.');
+  if (notes) comment('', 'Reference notes appear as comments and are outside this check.');
+  const checkedIds = new Set(steps.map(step => step.id));
+  const noteItems = analysis.items.filter(item => item.id !== goal.id && !givenIds.has(item.id) && !checkedIds.has(item.id));
+  for (const item of noteItems) comment(item.label + ' (reference only): ', item.text);
+  lines.push('', '-- Each tactic must close its goal. You can replace proofpad_step with your own proof.',
+    'local macro "proofpad_step" : tactic =>',
+    '  `(tactic| first',
+    '    | assumption',
+    '    | rfl',
+    '    | (norm_num <;> done)',
+    '    | ring1',
+    '    | linarith',
+    '    | nlinarith',
+    '    | (positivity <;> done)',
+    '    | (field_simp [*] <;> ring1)',
+    '    | fail "This step needs a proof from the selected givens and earlier steps.")', '');
+
+  const facts = [...givens, ...steps, goal];
+  const vars = [...new Set(facts.flatMap(item => item.relation.variables))];
+  const binder = vars.length ? ' (' + vars.join(' ') + ' : ℝ)' : '';
+  lines.push('theorem proofpad_result' + binder);
+  for (const [index, item] of givens.entries()) {
+    comment(item.label + ' (given): ', item.text, '    ');
+    lines.push('    (proofpadGiven' + (index + 1) + ' : ' + item.relation.proposition + ')');
+  }
+  lines.push('    : ' + goal.relation.proposition + ' := by');
+  // A chained given has one hypothesis per adjacent comparison inside its conjunction.
+  for (const [index, item] of givens.entries()) {
+    const parts = item.relation.parts || [];
+    if (parts.length > 1) {
+      const names = parts.map((_, part) => 'proofpadGiven' + (index + 1) + 'Part' + (part + 1));
+      lines.push('  obtain ⟨' + names.join(', ') + '⟩ := proofpadGiven' + (index + 1));
+    }
+  }
+  const provenConditions = new Set();
+  function denominatorChecks(item) {
+    for (const condition of item.relation.conditions || []) {
+      if (provenConditions.has(condition)) continue;
+      provenConditions.add(condition);
+      comment(item.label + ': ', 'justify division by a nonzero denominator.', '  ');
+      lines.push('  have proofpadNonzero' + provenConditions.size + ' : ' + condition + ' := by proofpad_step');
+    }
+  }
+  givens.forEach(denominatorChecks);
+  for (const [index, item] of steps.entries()) {
+    denominatorChecks(item);
+    comment(item.label + ': ', item.text, '  ');
+    const parts = item.relation.parts || [item.relation.proposition];
+    for (const [part, claim] of parts.entries()) {
+      const suffix = parts.length > 1 ? 'Part' + (part + 1) : '';
+      lines.push('  have proofpadStep' + (index + 1) + suffix + ' : ' + claim + ' := by proofpad_step');
+    }
+  }
+  denominatorChecks(goal);
+  comment(goal.label + ' (goal): ', goal.text, '  ');
+  if (goal.relation.parts?.length > 1) {
+    lines.push('  refine ⟨' + goal.relation.parts.map(() => '?_').join(', ') + '⟩ <;> proofpad_step', '');
+  } else lines.push('  proofpad_step', '');
+  const plural = (count, name) => count + ' ' + name + (count === 1 ? '' : 's');
+  const summary = [plural(checked, 'claim') + ' for Lean', plural(givens.length, 'given'),
+    plural(notes, 'reference note')].join(' · ');
+  return {source: lines.join('\n'), summary, checked, givens: givens.length, notes, noteItems};
+}
+const leanReview = $('#leanReview');
+let leanAnalysis;
+let leanPrepared;
+
+function currentWrittenProof() {
+  return {title: $('#title').value, statement: $('#statement').value, entries: entries()};
+}
+
+function leanItemLabel(item) {
+  let text = item.text;
+  if (item.relation && /[\\${]/.test(text) && window.MathLive?.convertLatexToAsciiMath) {
+    const math = text.replace(/^\$+|\$+\.?$/g, '');
+    try { text = MathLive.convertLatexToAsciiMath(math) || text; } catch { /* Use the original notation. */ }
+  }
+  return item.label + ' · ' + text;
+}
+
+function leanReviewSelection() {
+  const givenIds = Array.from($('#leanGivenChoices').querySelectorAll('input:checked'), input => input.value);
+  return {goalId: $('#leanGoal').value || null, givenIds};
+}
+
+function updateLeanPreview() {
+  const selection = leanReviewSelection();
+  leanPrepared = null;
+  let message;
+  try {
+    if (leanAnalysis.items.length) {
+      const result = buildLeanProof(leanAnalysis, selection);
+      validateLeanSource(result.source);
+      leanPrepared = result;
+      message = result.summary;
+    }
+  } catch (error) {
+    message = error.message;
+  }
+  $('#leanPreviewCode').textContent = leanPrepared?.source || '';
+  $('#leanPreviewSource').hidden = !leanPrepared;
+  const notes = leanPrepared?.noteItems || [];
+  $('#leanNotesLabel').textContent = 'Reference notes (' + notes.length + ')';
+  $('#leanReviewNotes').hidden = !notes.length;
+  $('#leanNotesList').replaceChildren(...notes.map(item => {
+    const line = document.createElement('li');
+    line.textContent = leanItemLabel(item);
+    return line;
+  }));
+  $('#leanReviewSummary').textContent = message || '';
+  $('#leanReviewSave').disabled = !leanPrepared;
+  $('#leanReviewCheck').hidden = !selection.goalId;
+  $('#leanReviewCheck').disabled = !leanPrepared;
+  $('#leanReviewSave').textContent = selection.goalId ? 'Save Lean source' : 'Open editable outline';
+}
+
+function updateLeanGivenChoices() {
+  const selected = new Set(leanReviewSelection().givenIds);
+  const candidates = leanGivenCandidates(leanAnalysis, $('#leanGoal').value || null);
+  const container = $('#leanGivenChoices');
+  container.replaceChildren();
+  for (const item of candidates) {
+    const label = document.createElement('label');
+    const input = document.createElement('input');
+    input.type = 'checkbox';
+    input.value = item.id;
+    input.checked = selected.has(item.id);
+    const caption = document.createElement('span');
+    caption.textContent = leanItemLabel(item);
+    label.append(input, caption);
+    container.append(label);
+  }
+  $('#leanGivens').hidden = !candidates.length;
+  updateLeanPreview();
+}
+
+function readWrittenProof() {
+  leanAnalysis = analyzeLeanProof(currentWrittenProof());
+  const goal = $('#leanGoal');
+  goal.replaceChildren();
+  $('#leanGivenChoices').replaceChildren();
+  for (const item of leanAnalysis.items.filter(item => item.relation)) {
+    goal.add(new Option(leanItemLabel(item), item.id));
+  }
+  if (leanAnalysis.defaultGoal) goal.value = leanAnalysis.defaultGoal;
+  goal.hidden = !goal.options.length;
+  $('#leanGoalLabel').hidden = goal.hidden;
+  const hint = $('#leanReviewHint');
+  if (goal.options.length) {
+    hint.textContent = 'Choose the conclusion. Proofpad translates supported algebra over the real numbers (ℝ) and keeps explanations as comments.';
+  } else if (leanAnalysis.items.length) {
+    hint.textContent = 'Your writing is ready to copy into a Lean outline. To check it, formalize the statement and reasoning in that outline, or add an algebraic equation on its own line here in Proofpad.';
+  } else {
+    hint.textContent = 'Write a statement or add an equation to your proof, then reopen this window.';
+  }
+  $('#leanPreviewSource').open = false;
+  $('#leanReviewNotes').open = false;
+  updateLeanGivenChoices();
+}
+
+function applyWrittenProof(check) {
+  if (!leanPrepared || workspaceMode !== 'proofs') return;
+  const {source, summary} = leanPrepared;
+  const panel = $('#leanPanel');
+  if (!insertLeanFile(source)) return;
+  leanReview.close();
+  panel.open = true;
+  leanStatus.textContent = summary;
+  if (check) {
+    $('#leanCheck').focus();
+    $('#leanCheck').click();
+  } else {
+    leanEditor.focus();
+    leanEditor.setSelectionRange(0, 0);
+  }
+}
+
+$('#leanFromPaper').addEventListener('click', () => {
+  if (workspaceMode !== 'proofs' || leanReview.open) return;
+  readWrittenProof();
+  leanReview.showModal();
+  ($('#leanGoal').hidden ? $('#leanReviewClose') : $('#leanGoal')).focus();
+});
+$('#leanGoal').addEventListener('change', updateLeanGivenChoices);
+$('#leanGivenChoices').addEventListener('change', updateLeanPreview);
+$('#leanReviewSave').addEventListener('click', () => applyWrittenProof(false));
+$('#leanReviewCheck').addEventListener('click', () => applyWrittenProof(true));
+$('#leanReviewClose').addEventListener('click', () => leanReview.close());
 showKeys('proof');
 window.addEventListener('load',async()=>{
  try{

@@ -21,10 +21,9 @@ def local_worker(html,new_blob):
     html=replace_once(html,'self.postMessage({ready:true})}).catch(()=>self.postMessage({loadError:true}));','self.postMessage({ready:true});')
     html=replace_once(html,"const url=URL.createObjectURL(new Blob([source],{type:'text/javascript'}));",new_blob)
     return replace_once(html,"new Worker(url,{type:'module'})",'new Worker(url)')
-def bundle(source,destination):
+def bundle_html(html,destination):
     verify()
-    if source.resolve()==destination.resolve(): raise ValueError('Separate output required.')
-    html=local_math(source.read_text(),'.')
+    html=local_math(html,'.')
     for name,url in PACKAGES.items():
         html=replace_once(html,'src="'+CDN+url+'"','src="data:text/javascript;base64,'+b64((VENDOR/(name+'.js')).read_bytes())+'"')
     css=re.sub(r'url\((fonts/[\w-]+\.woff2)\)',lambda m:'url(data:font/woff2;base64,'+b64((VENDOR/m[1]).read_bytes())+')',(VENDOR/'fonts.css').read_text())
@@ -37,7 +36,16 @@ def bundle(source,destination):
     html=html.replace('Calculator could not load. Check your connection and try again.','Calculator could not start. Reload this file and try again.').replace('The math libraries could not load. Check your internet connection and reload.','The embedded math libraries could not start. Reload this file to retry.')
     destination.write_text(html)
     return destination.stat().st_size
+def bundle(source,destination):
+    if source.resolve()==destination.resolve(): raise ValueError('Separate output required.')
+    return bundle_html(source.read_text(), destination)
 if __name__=='__main__':
     parser=argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('source',type=Path);parser.add_argument('destination',type=Path)
-    a=parser.parse_args();print(bundle(a.source,a.destination))
+    parser.add_argument('source',type=Path,nargs='?',help='Optional preassembled HTML. Defaults to the current Proofpad source.')
+    parser.add_argument('destination',type=Path,help='Output standalone .html file')
+    a=parser.parse_args()
+    if a.source is None:
+        from build_graphing import s as assembled_html
+        print(bundle_html(assembled_html,a.destination))
+    else:
+        print(bundle(a.source,a.destination))

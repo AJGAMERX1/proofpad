@@ -3,16 +3,24 @@ const leanStatus = document.getElementById('leanStatus');
 const leanReturnSource = document.getElementById('leanReturnSource');
 let leanSourceRevision = 0;
 
+function updatedLeanImports(source) {
+  // Only adjust the first import, allowing leading blank lines and line comments.
+  const legacy = /^((?:[ \t]*(?:--[^\n]*)?\n)*[ \t]*)import[ \t]+Mathlib\.Data\.Real\.Basic[ \t]*(?:\nimport[ \t]+Mathlib\.Tactic\.Linarith[ \t]*)?(?=\n|$)/;
+  return source.replace(legacy, '$1import Mathlib');
+}
+
 function updateLeanEditor() {
   leanSourceRevision++;
   const empty = !leanEditor.value.trim();
   $('#leanCheck').disabled = empty;
   $('#leanDownload').disabled = !leanEditor.value;
+  $('#leanLegacyImport').hidden = updatedLeanImports(leanEditor.value) === leanEditor.value;
   leanStatus.textContent = '';
 }
 
 function restoreLeanSource(value) {
   closeLeanChecker();
+  if ($('#leanReview').open) $('#leanReview').close();
   leanEditor.value = value;
   updateLeanEditor();
 }
@@ -28,6 +36,11 @@ function insertLeanFile(source) {
 }
 
 leanEditor.addEventListener('input', updateLeanEditor);
+$('#leanUpdateImport').addEventListener('click', () => {
+  replaceLeanSource(updatedLeanImports(leanEditor.value));
+  leanStatus.textContent = 'Updated the Mathlib import. You can check this source again.';
+  $('#leanCheck').focus();
+});
 leanEditor.addEventListener('keydown', event => {
   if (event.key === 'Enter' && (event.ctrlKey || event.metaKey)) {
     event.preventDefault();

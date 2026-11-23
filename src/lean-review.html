@@ -1,0 +1,25 @@
+<dialog id="leanReview" aria-labelledby="leanReviewTitle">
+  <header class="lean-review-head">
+    <h2 id="leanReviewTitle">Use your written proof</h2>
+    <button class="quiet" type="button" id="leanReviewClose">Close</button>
+  </header>
+  <div class="lean-review-content">
+    <p id="leanReviewHint"></p>
+    <label class="lean-review-label" for="leanGoal" id="leanGoalLabel">What are you proving?</label>
+    <select id="leanGoal" aria-labelledby="leanGoalLabel"></select>
+    <fieldset id="leanGivens"><legend>Which lines are givens?</legend>
+      <p>Mark the assumptions you started with. Lean will try to prove the intervening algebra steps and your conclusion.</p>
+      <div id="leanGivenChoices"></div>
+    </fieldset>
+    <p id="leanReviewSummary" role="status"></p>
+    <details id="leanReviewNotes" hidden><summary id="leanNotesLabel">Reference notes</summary><ul id="leanNotesList"></ul></details>
+    <details id="leanPreviewSource"><summary>Preview Lean source</summary><pre id="leanPreviewCode" tabindex="0"></pre></details>
+  </div>
+  <footer class="lean-review-footer">
+    <p>Checking sends this Lean source, including any copied notes, to the online Lean playground.</p>
+    <div class="lean-actions">
+      <button class="primary" type="button" id="leanReviewCheck">Check with Lean</button>
+      <button class="copy" type="button" id="leanReviewSave">Save Lean source</button>
+    </div>
+  </footer>
+</dialog>
