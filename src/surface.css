@@ -8,7 +8,8 @@ main[data-workspace="surface"] .graph-header { background:var(--pad-wash); }
 .surface-tabs { background:var(--pad-wash); border:1px solid var(--pad-line); border-radius:7px; padding:2px; }
 .surface-tabs button, #surfaceSpin { background:transparent; color:var(--pad-muted); border:0; border-radius:5px; padding:5px 9px; font:inherit; cursor:pointer; }
 .surface-tabs button[aria-pressed=true], #surfaceSpin[aria-pressed=true] { background:var(--pad-accent); color:var(--pad-field); }
-#surfaceSpin { border:1px solid var(--pad-line); }
+#surfaceSpin, #surfaceViewX { border:1px solid var(--pad-line); }
+#surfaceViewX {padding:5px 9px; border-radius:5px; background:transparent; color:var(--pad-muted); font:inherit}
 .surface-palette,.surface-mesh { gap:5px; }
 .surface-palette select,#surfacePreset { color:var(--pad-ink); background:var(--pad-field); border:1px solid var(--pad-line); border-radius:5px; font:inherit; padding:4px 5px; }
 .surface-mesh input { margin:0; accent-color:var(--pad-accent); }

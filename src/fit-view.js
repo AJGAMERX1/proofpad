@@ -4,7 +4,7 @@ function estimateGraphFrame(plots, camera, aspect, surface) {
  const xLimits=[Infinity,-Infinity], yLimits=[Infinity,-Infinity], zLimits=[Infinity,-Infinity];
  const include=(range,n)=>{range[0]=Math.min(range[0],n);range[1]=Math.max(range[1],n);};
  const radius=6, maxSpan=1e7;
- const cost=plots.reduce((total,s)=>total+Math.max(1,s.cost||1),0);
+ const cost=plots.reduce((total,s)=>s.kind==='curve'?total:total+Math.max(1,s.cost||1),0);
  const gridSteps=2*Math.max(4,Math.min(16,Math.floor(Math.sqrt(140000/Math.max(1,cost))/2)));
  // Plain numbers in a shifted coordinate often locate the interesting part
  // of the graph, even when the user has panned far from it.
@@ -89,6 +89,17 @@ function estimateGraphFrame(plots, camera, aspect, surface) {
  const sampleAt=[1,4,16,64,256,1024];
  let fitted=0;
  for(const s of plots){
+  if(surface&&s.kind==='curve'){
+   const range=graphCurveRange(s);
+   if(!range)continue;
+   let hasPoint=false;
+   for(const p of sampleParametricCurve(s.run,...range)){
+    if(!p)continue;
+    include(xLimits,p[0]);include(yLimits,p[1]);include(zLimits,p[2]);hasPoint=true;
+   }
+   if(hasPoint)fitted++;
+   continue;
+  }
   const xd=domain(s.expr,'x'),yd=domain(s.expr,'y');
   const currentX=surface?camera.cx:camera.x,currentY=surface?camera.cy:camera.y;
   const nearbyX=[currentX-radius,currentX+radius],nearbyY=[currentY-radius,currentY+radius];
@@ -120,7 +131,8 @@ function estimateGraphFrame(plots, camera, aspect, surface) {
  return {x:centers[0],y:centers[1],z:centers[2],span,fitted};
 }
 function fitGraphView(){
- const plots=graphSeries.filter(s=>!s.row.plotHidden);
+ const heatmap=inSurface()&&surfaceView.heatmap;
+ const plots=graphSeries.filter(s=>!s.row.plotHidden&&(!heatmap||s.kind!=='curve'));
  if(!plots.length){describeGraph();return;}
  const surface=inSurface(),frame=estimateGraphFrame(plots,surface?surfaceView:graphView,graphCanvas.clientWidth/Math.max(1,graphCanvas.clientHeight),surface);
  if(frame.error){$('#graphStatus').textContent=frame.error;return;}

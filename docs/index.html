@@ -304,7 +304,8 @@ main[data-workspace="surface"] .graph-header { background:var(--pad-wash); }
 .surface-tabs { background:var(--pad-wash); border:1px solid var(--pad-line); border-radius:7px; padding:2px; }
 .surface-tabs button, #surfaceSpin { background:transparent; color:var(--pad-muted); border:0; border-radius:5px; padding:5px 9px; font:inherit; cursor:pointer; }
 .surface-tabs button[aria-pressed=true], #surfaceSpin[aria-pressed=true] { background:var(--pad-accent); color:var(--pad-field); }
-#surfaceSpin { border:1px solid var(--pad-line); }
+#surfaceSpin, #surfaceViewX { border:1px solid var(--pad-line); }
+#surfaceViewX {padding:5px 9px; border-radius:5px; background:transparent; color:var(--pad-muted); font:inherit}
 .surface-palette,.surface-mesh { gap:5px; }
 .surface-palette select,#surfacePreset { color:var(--pad-ink); background:var(--pad-field); border:1px solid var(--pad-line); border-radius:5px; font:inherit; padding:4px 5px; }
 .surface-mesh input { margin:0; accent-color:var(--pad-accent); }
@@ -649,7 +650,26 @@ html[data-theme=dark] :is(.lean-tools,#leanDialog,#leanReview) {
 }
 @media print {.lean-tools,#leanReview,#leanDialog {display:none!important}}
 </style>
-<link rel="stylesheet" href="assets/fonts.77f0e774f13d.css"></head><body>
+<style>
+.curve-domain {
+ display:flex; flex-wrap:wrap; align-items:center; gap:6px;
+ margin-top:10px; padding-top:10px; border-top:1px solid var(--pad-line);
+ color:var(--pad-muted); font:italic 15px/1.4 Georgia,serif;
+}
+.curve-domain input {
+ min-width:0; width:6.25em; max-width:32%; min-height:30px; padding:5px 8px;
+ background:var(--pad-field); color:var(--pad-ink); border:1px solid var(--pad-line);
+ border-radius:5px; font:13px/1.4 system-ui,sans-serif;
+}
+.curve-domain input[aria-invalid=true] {border-color:var(--error,#c05a50)}
+.curve-range-error {font:12px/1.45 system-ui,sans-serif; color:var(--error,#b24a42)}
+.curve-range-error:not(:empty) {flex-basis:100%}
+html[data-theme=dark] .curve-range-error {color:#ffad9e}
+main[data-workspace=surface] #graphPanel[data-curves=true][data-heat=false] :is(#graphTrace,#traceMarkers) {display:block}
+@media (max-width:650px) {
+ .curve-domain input, #graphTrace #traceCoordinate {font-size:16px; min-height:40px}
+}
+</style><link rel="stylesheet" href="assets/fonts.77f0e774f13d.css"></head><body>
 <header><div class="brand"><div class="logo">∴</div>proofpad</div><div class="header-actions"><div class="local"><span class="dot"></span><span id="saveState" role="status">Saved on this device</span></div>
 <button type="button" id="themeSwitch" aria-pressed="false"><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M20 14A8.4 8.4 0 0 1 10 4a8.6 8.6 0 1 0 10 10Z"/></svg>Dark mode</button></div></header>
 <script>
@@ -706,7 +726,7 @@ document.getElementById('themeSwitch').addEventListener('click', () => {
 </dialog>
 <dialog id="copiesDialog" aria-labelledby="copiesTitle"><h2 id="copiesTitle">Saved copies</h2><ul id="copyList"></ul><button type="button" class="copy" id="closeCopies">Close</button></dialog>
 <main inert>
-<section class="intro"><div class="hero-copy"><div class="eyebrow">THE MATHEMATICAL NOTEBOOK</div><h1>Proofpad<span class="brand-stop">.</span></h1><p>Give your reasoning room to unfold.</p><div class="hero-caption" id="modeCaption">PROOFS · WRITTEN WITH CARE</div></div><div class="workspace-nav" aria-label="Workspace"><button class="mode-tab" data-mode="proofs" aria-label="Proofs workspace" aria-pressed="true"><span aria-hidden="true">□</span><b>Proofs</b><small>Develop an argument</small></button><button class="mode-tab" data-mode="formulas" aria-label="Formulas workspace" aria-pressed="false"><span aria-hidden="true">=</span><b>Formulas</b><small>Collect your equations</small></button><button class="mode-tab" id="graph2D" data-mode="calculator" aria-label="Calculator workspace" aria-pressed="false"><span aria-hidden="true">±</span><b>Calculator</b><small>2D graphs &amp; values</small></button><button class="mode-tab" id="graph3D" data-mode="surface" aria-label="3D Graph workspace" aria-pressed="false"><span aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"><path d="m12 2 9 5v10l-9 5-9-5V7Zm0 10L3 7m9 5 9-5m-9 5v10"/></svg></span><b>3D Graph</b><small>Surfaces &amp; heat maps</small></button><p>Separate drafts, saved as you write.</p></div></section>
+<section class="intro"><div class="hero-copy"><div class="eyebrow">THE MATHEMATICAL NOTEBOOK</div><h1>Proofpad<span class="brand-stop">.</span></h1><p>Give your reasoning room to unfold.</p><div class="hero-caption" id="modeCaption">PROOFS · WRITTEN WITH CARE</div></div><div class="workspace-nav" aria-label="Workspace"><button class="mode-tab" data-mode="proofs" aria-label="Proofs workspace" aria-pressed="true"><span aria-hidden="true">□</span><b>Proofs</b><small>Develop an argument</small></button><button class="mode-tab" data-mode="formulas" aria-label="Formulas workspace" aria-pressed="false"><span aria-hidden="true">=</span><b>Formulas</b><small>Collect your equations</small></button><button class="mode-tab" id="graph2D" data-mode="calculator" aria-label="Calculator workspace" aria-pressed="false"><span aria-hidden="true">±</span><b>Calculator</b><small>2D graphs &amp; values</small></button><button class="mode-tab" id="graph3D" data-mode="surface" aria-label="3D Graph workspace" aria-pressed="false"><span aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"><path d="m12 2 9 5v10l-9 5-9-5V7Zm0 10L3 7m9 5 9-5m-9 5v10"/></svg></span><b>3D Graph</b><small>Surfaces &amp; curves</small></button><p>Separate drafts, saved as you write.</p></div></section>
 <div class="workspace"><section><div class="card"><div class="cardtop"><h2><span class="sectionnum">01</span><span id="workspaceTitle">Your proof</span></h2><div><button type="button" class="copy" id="texOpen">Import .tex…</button> <button class="quiet" id="clear">Clear page</button></div></div>
 <div class="document-tools" aria-label="Document tools"><div><button class="copy" id="undoEdit" disabled title="Undo · Cmd/Ctrl+Z">↶ Undo</button><button class="copy" id="redoEdit" disabled title="Redo · Shift+Cmd/Ctrl+Z">↷ Redo</button></div><div><button class="copy" id="saveDraft" title="Download an editable backup of this workspace">Save draft</button><button class="copy" type="button" id="storedCopies" hidden>Saved copies</button><button class="copy" id="openDraft" title="Restore a saved Proofpad draft from a file">Open draft</button><input type="file" id="draftFile" accept=".json,.proofpad" hidden></div></div>
 <div class="spelling-toolbar"><label><input type="checkbox" id="spellEnabled" checked> Spelling checks</label><button class="copy" id="spellReview">Check spelling</button><span>English · checked on your device</span></div>
@@ -756,7 +776,7 @@ document.getElementById('themeSwitch').addEventListener('click', () => {
 <div class="tip" id="workspaceTip"><b>1. Set it up. 2. Show why. 3. Conclude.</b> Mix math and explanations in one numbered list. New steps and reordering update the numbers automatically, including in your PNG.</div></section><aside id="calculatorGuide" class="calculator-guide" hidden>
 <section id="graphPanel" class="card graph-panel" aria-labelledby="graphHeading">
  <div class="cardtop graph-header"><h2 id="graphHeading">Graph</h2>
-  <div class="graph-actions"><select class="only-3d" id="surfacePreset" aria-label="Example surface"><option value="ripple">Ripple</option><option value="saddle">Saddle</option><option value="waves">Crossed waves</option><option value="peaks">Twin peaks</option></select><button class="quiet" id="graphExample" type="button">Plot example</button><select id="graphExportFormat" aria-label="Graph export format"><option value="png">PNG</option><option value="jpeg-sharp">Sharp JPEG · 4×</option><option value="jpeg-compact">Compact JPEG · 1×</option></select><button class="quiet" id="graphSave" type="button">Save graph PNG</button></div>
+  <div class="graph-actions"><select class="only-3d" id="surfacePreset" aria-label="3D graph example"><option value="ripple">Ripple</option><option value="saddle">Saddle</option><option value="waves">Crossed waves</option><option value="peaks">Twin peaks</option><option value="helix">Helix</option></select><button class="quiet" id="graphExample" type="button">Plot example</button><select id="graphExportFormat" aria-label="Graph export format"><option value="png">PNG</option><option value="jpeg-sharp">Sharp JPEG · 4×</option><option value="jpeg-compact">Compact JPEG · 1×</option></select><button class="quiet" id="graphSave" type="button">Save graph PNG</button></div>
  </div>
 <div class="surface-controls only-3d">
  <div class="surface-control-row">
@@ -769,6 +789,7 @@ document.getElementById('themeSwitch').addEventListener('click', () => {
   <label class="surface-mesh"><input type="checkbox" id="surfaceMesh" checked><span id="surfaceMeshLabel">Mesh</span></label>
   <button type="button" id="surfaceSlice" aria-expanded="false" aria-controls="slicePanel">Slice</button>
   <button type="button" class="surface-spin" id="surfaceSpin" aria-pressed="false">Spin</button>
+  <button type="button" id="surfaceViewX" title="Look straight down the x-axis" hidden>View along x</button>
  </div>
 </div>
  <details id="graphTrace"><summary>Trace coordinates</summary>
@@ -923,7 +944,7 @@ const examples={
 let workspaceMode='proofs',drafts={},restoring=false,active,background='white',pngBlob=null,previewUrl=null,revision=0,timer,renderQueue=Promise.resolve();
 function status(s,error=false){$('#status').textContent=s;$('#status').classList.toggle('error',error)}
 const rows=()=>[...document.querySelectorAll('.row')];
-const entries=()=>rows().map(r=>({type:r.dataset.type,value:sliderFields.get(r)??r.querySelector('math-field,textarea').value,format:'math-latex',...(r.sliderConfig?{slider:r.sliderConfig}:{}),...(r.appearance?{appearance:r.appearance}:{}),...(r.plotHidden?{plotHidden:true}:{})}));
+const entries=()=>rows().map(r=>({type:r.dataset.type,value:sliderFields.get(r)??r.querySelector('math-field,textarea').value,format:'math-latex',...(r.sliderConfig?{slider:r.sliderConfig}:{}),...(r.appearance?{appearance:r.appearance}:{}),...(r.plotHidden?{plotHidden:true}:{}),...(r.curveRange?{curveRange:r.curveRange}:{})}));
 
 const exportStyles = {
  classic: {name:'Classic', surface:'white', ink:'#20251f', heading:'#30362d', muted:'#777', rule:'#a8b2bc'},
@@ -1134,11 +1155,11 @@ function selectKeyboard(tab){document.querySelectorAll('[data-tab]').forEach(t=>
 function updateModeUI(){
  const calculator=isCalculatorMode();$('.exportcolumn').hidden=calculator;$('#calculatorGuide').hidden=!calculator;const proof=workspaceMode==='proofs',paper=proof&&$('#proofStyle').value==='paper';$('main').dataset.mode=calculator?'calculator':workspaceMode;$('main').dataset.workspace=workspaceMode;$('#proofSetup').hidden=!proof;
  document.querySelectorAll('button[data-mode]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.mode===workspaceMode));
- $('#clear').textContent=proof?'New proof':'Clear page';$('#workspaceTitle').textContent=inSurface()?'Surface expressions':calculator?'Expressions':proof?'Your proof':'Your formulas';$('#title').placeholder=proof?'What are you proving?':'Name your formulas (optional)';
- $('#modeCaption').textContent=inSurface()?'3D GRAPH · SURFACE EXPLORER':calculator?'CALCULATOR · GRAPH & EVALUATE':proof?(paper?'PROOFS · WRITTEN WITH CARE':'PROOFS · STEP BY STEP'):'FORMULAS · READY TO SHARE';
+ $('#clear').textContent=proof?'New proof':'Clear page';$('#workspaceTitle').textContent=inSurface()?'3D expressions':calculator?'Expressions':proof?'Your proof':'Your formulas';$('#title').placeholder=proof?'What are you proving?':'Name your formulas (optional)';
+ $('#modeCaption').textContent=inSurface()?'3D GRAPH · SURFACES & CURVES':calculator?'CALCULATOR · GRAPH & EVALUATE':proof?(paper?'PROOFS · WRITTEN WITH CARE':'PROOFS · STEP BY STEP'):'FORMULAS · READY TO SHARE';
  $('#add').textContent=calculator?'+ Expression':proof?'+ Display equation':'+ Formula';$('#addText').textContent=proof?'+ Paragraph':'+ Text note';
  $('#qedOption').hidden=!proof;$('#numberLabel').textContent=proof?'Number proof steps':'Number formulas';
- $('#workspaceTip').textContent=inSurface()?'Define a parameter such as a=2 on its own line to get a slider. Use it in a surface such as z=a(x²−y²).':proof?'State your claim, explain each inference, and conclude. Paragraphs and equations stay in order; export numbers are optional. Your Formulas draft stays separate.':'A space for standalone equations. Type theta for θ, use x_i for subscripts, and add text notes when needed. Your Proofs draft stays separate.';
+ $('#workspaceTip').textContent=inSurface()?'Enter a surface or an (x, y, z) tuple in t. Define a parameter such as a=2 on its own line to get a slider.':proof?'State your claim, explain each inference, and conclude. Paragraphs and equations stay in order; export numbers are optional. Your Formulas draft stays separate.':'A space for standalone equations. Type theta for θ, use x_i for subscripts, and add text notes when needed. Your Proofs draft stays separate.';
  document.querySelectorAll('[data-example-mode]').forEach(b=>b.hidden=b.dataset.exampleMode!==workspaceMode);
  $('[data-tab="proof"]').hidden=!proof;selectKeyboard(proof?'proof':'basics');
  $('#preview').alt=proof?'Preview of your proof export':'Preview of your formula export';
@@ -1286,9 +1307,10 @@ function configureMathMenu(field){
  menu.splice(picker+1,0,{id:'proofpad-custom-matrix',label:'Custom matrix…',onMenuSelect:()=>openMatrixDialog(field)});
  field.menuItems=menu;
 }
-function addRow(value='',focus=true,type='math',format='plain',slider=null,refreshList=true,appearance=null,plotHidden=false){
+function addRow(value='',focus=true,type='math',format='plain',slider=null,refreshList=true,appearance=null,plotHidden=false,curveRange=null){
  const row=document.createElement('div');row.className='row'+(type==='text'?' textrow':'');row.dataset.type=type;
  row.plotHidden=plotHidden===true;
+ if(inSurface() && validSavedCurveRange(curveRange))row.curveRange={min:curveRange.min,max:curveRange.max};
  const savedAppearance=normalizeSeriesAppearance(appearance);if(savedAppearance)row.appearance=savedAppearance;
  const num=document.createElement('span');num.className='number';
  const field=document.createElement('math-field');field.defaultMode='math';field.maxMatrixCols=MATRIX_MAX_SIDE;field.value=type==='text'?explanationSource(value,format):value;field.classList.toggle('explanation-field',type==='text');
@@ -1785,7 +1807,7 @@ function replaceEntries(data) {
  $('#rows').replaceChildren();
  active = null;
  let last;
- for (const entry of data) last = addRow(entry.value, false, entry.type, entry.format, entry.slider, false, entry.appearance, entry.plotHidden);
+ for (const entry of data) last = addRow(entry.value, false, entry.type, entry.format, entry.slider, false, entry.appearance, entry.plotHidden, entry.curveRange);
  if (!last) last = addRow('', false, workspaceMode === 'proofs' ? 'text' : 'math', 'plain', null, false);
  choose(last);
  renumber();
@@ -2050,8 +2072,28 @@ function compileGraphRows(nodes, angle='rad', dimension='2d', onNumericCall=null
   const n=typeof lhs==='string'?sliderNumber(rhs):null;
   return n==null?build(rhs,bindings,new Set(),budget):['SliderValue',index,n];
  }
+ function curveCoordinates(node){
+  // Raw Compute Engine MathJSON distinguishes (a,b,c) from a list or a
+  // bare comma sequence. Ignore redundant grouping around the whole tuple.
+  while(node?.[0]==='Delimiter' && node.length===2)node=node[1];
+  if(node?.[0]==='Delimiter' && node[2]==="'(,)'" && node[1]?.[0]==='Sequence')return node[1].slice(1);
+  if(node?.[0]==='Tuple')return node.slice(1);
+  return null;
+ }
  return nodes.map((node,index)=>{
   if(!node)return null;
+  const coords=surfaceMode && curveCoordinates(node);
+  if(coords){
+   const parameterError='Use t as the parameter for a 3D curve.';
+   if(coords.length!==3)return {kind:'curve',error:'Enter three coordinates as (x(t), y(t), z(t)).'};
+   if(coords.some(part=>uses(part,'x') || uses(part,'y')))return {kind:'curve',error:parameterError};
+   const budget={remaining:500}, scope=new Map([['t',{expr:'t',cost:0}]]);
+   try{
+    const parts=coords.map(part=>build(part,scope,new Set(),budget));
+    if(parts.some(part=>uses(part,'x') || uses(part,'y')))throw Error(parameterError);
+    return {kind:'curve',...pack(['Curve3D',...parts]),angle,cost:501-budget.remaining};
+   }catch(error){return {kind:'curve',error:error.message};}
+  }
   const op=Array.isArray(node)?node[0]:null, rel=comparisons.has(op) && node.length===3;
   const lhs=rel?node[1]:null, rhs=rel?node[2]:node, fn=signature(lhs);
   if(onScalarPreview && !fn && (!rel || (op==='Equal' && typeof lhs==='string'))){
@@ -2127,9 +2169,13 @@ function graphEvaluator(tree,angle) {
  }
  function compile(node) {
   if(typeof node==='number')return ()=>node;
-  if(node==='x')return x=>x;
+  if(node==='x' || node==='t')return x=>x;
   if(node==='y')return (x,y)=>y;
   const [op,...children]=node, args=children.map(compile);
+  if(op==='Curve3D'){
+   const [x,y,z]=args;
+   return t=>[x(t),y(t),z(t)];
+  }
   if(op==='Power'){
    const rational=oddDenominatorPower(children[1]);
    if(rational)return (x,y)=>rational(args[0](x,y));
@@ -2140,6 +2186,104 @@ function graphEvaluator(tree,angle) {
   return (x,y)=>{let value=args[0](x,y);for(let i=1;i<args.length;i++)value=f(value,args[i](x,y));return value;};
  }
  return compile(tree);
+}
+
+// Bounds and probe values are short, plain-text arithmetic expressions.
+function parseCurveParameter(input) {
+ const source=String(input ?? '').trim().replace(/\\pi\b|π/gi,'pi').replace(/−/g,'-').replace(/[×·]/g,'*').replace(/÷/g,'/');
+ if(!source || source.length>256)return NaN;
+ const token=/\s+|(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?|[a-z]+|[()+*/^-]/iy;
+ const tokens=[];
+ while(token.lastIndex<source.length){
+  const match=token.exec(source);
+  if(!match || tokens.length>=128)return NaN;
+  if(!/^\s+$/.test(match[0]))tokens.push(match[0].toLowerCase());
+ }
+ let at=0;
+ function factor(){
+  const term=tokens[at++];
+  if(term==='('){
+   const value=sum();
+   return tokens[at++]===')'?value:NaN;
+  }
+  if(term==='pi')return Math.PI;
+  if(term==='e')return Math.E;
+  if(typeof term==='string' && /^[\d.]/.test(term))return Number(term);
+  return NaN;
+ }
+ function signedPower(){
+  if(tokens[at]==='+' || tokens[at]==='-'){
+   const sign=tokens[at++];
+   const value=signedPower();
+   return sign==='-'?-value:value;
+  }
+  const value=factor();
+  if(tokens[at]!=='^')return value;
+  at++;
+  return value**signedPower();
+ }
+ function product(){
+  let value=signedPower();
+  while(at<tokens.length){
+   const op=tokens[at];
+   if(op==='*'||op==='/')at++;
+   else if(op!=='(' && op!=='pi' && op!=='e')break;
+   const rhs=signedPower();
+   value=op==='/'?value/rhs:value*rhs;
+  }
+  return value;
+ }
+ function sum(){
+  let value=product();
+  while(tokens[at]==='+' || tokens[at]==='-'){
+   const op=tokens[at++];
+   const rhs=product();
+   value=op==='+'?value+rhs:value-rhs;
+  }
+  return value;
+ }
+ const value=sum();
+ return at===tokens.length && Number.isFinite(value)?value:NaN;
+}
+
+const curveSampleCache=new WeakMap();
+function sampleParametricCurve(run,min,max,segments=384){
+ if(!Number.isFinite(min) || !Number.isFinite(max) || !(min<max))return [];
+ const count=Math.max(8,Math.min(4096,Math.round(segments)||384));
+ const cached=curveSampleCache.get(run);
+ if(cached && cached.min===min && cached.max===max && cached.count===count)return cached.points;
+ const points=[];
+ function point(t){
+  const p=run(t);
+  return p.every(Number.isFinite)?p:null;
+ }
+ function append(p){
+  if(p || (points.length && points[points.length-1]!==null))points.push(p);
+ }
+ function link(t0,a,t1,b,depth){
+  const tm=t0*.5+t1*.5,m=point(tm);
+  // Check deviation for each coordinate: a straight component must not mask
+  // a jump or a pole in another. Subdivide difficult intervals before drawing.
+  const smooth=a && b && m && m.every((v,i)=>{
+   const chordMid=a[i]*.5+b[i]*.5;
+   const tolerance=.32*Math.abs(b[i]-a[i])+1e-10*Math.max(1,Math.abs(a[i]),Math.abs(b[i]));
+   return Math.abs(v-chordMid)<=tolerance;
+  });
+  if(smooth){append(b);return;}
+  if(depth<3 && (a || b || m) && tm>t0 && tm<t1){
+   link(t0,a,tm,m,depth+1);
+   link(tm,m,t1,b,depth+1);
+  }else{append(null);append(b);}
+ }
+ let previousT=min,previous=point(min);
+ append(previous);
+ for(let i=1;i<=count;i++){
+  const ratio=i/count,t=min*(1-ratio)+max*ratio,p=point(t);
+  link(previousT,previous,t,p,0);
+  previousT=t;previous=p;
+ }
+ curveSampleCache.set(run,{min,max,count,points});
+ return points;
 }
 
 const graphCanvas=document.querySelector('#graphCanvas');
@@ -2506,9 +2650,10 @@ function setGraphResults(results) {
   const series={...graph,run:graphEvaluator(graph.expr,graph.angle),line,row};
   specs.push(series);
   const toggle=document.createElement('button');toggle.type='button';
-  toggle.textContent='Line '+line;toggle.title=title;
+  const seriesName=graph.kind==='curve'?'Curve ':graph.kind==='surface'?'Surface ':'Line ';
+  toggle.textContent=seriesName+line;toggle.title=title;
   series.legendButton=toggle;
-  toggle.setAttribute('aria-label','Show line '+line+' on graph');
+  toggle.setAttribute('aria-label','Show '+seriesName.toLowerCase()+line+' on graph');
   const syncVisibility=()=>{
    row.dataset.graphVisible=String(!row.plotHidden);
    toggle.setAttribute('aria-pressed',row.dataset.graphVisible);
@@ -2521,6 +2666,9 @@ function setGraphResults(results) {
   controls.append(toggle);
  }
  graphSeries=specs;
+ graphPanel.dataset.curves=String(inSurface() && specs.some(s=>s.kind==='curve'));
+ list.forEach((row,index)=>syncCurveRangeControls(row,inSurface() && results[index]?.graph?.kind==='curve'));
+ if(isCalculatorMode() && traceWorkspace!==workspaceMode)updateGraphTrace();
  prepareSliderLinks(results,list);
  legend.replaceChildren(controls);
  graphErrorCount=unsupported;emptySurfaceWindow=false;
@@ -2542,15 +2690,18 @@ function onSeriesStyleChanged(){
 }
 function describeGraph(){
  const count=graphSeries.filter(s=>!s.row.plotHidden).length;
+ const heat=inSurface() && surfaceView.heatmap;
+ const displayed=heat ? graphSeries.filter(s=>s.kind==='surface' && !s.row.plotHidden).length : count;
  let message;
- $('#graphFit').disabled=count===0;
+ $('#graphFit').disabled=displayed===0;
  if(graphSeries.length && !count)message='All plots are hidden. Select a line in the graph legend to show it.';
  else if(!count && graphErrorCount)message='Check the marked expressions.';
- else if(inSurface() && count && emptySurfaceWindow)message='No surface is visible in this window. Choose Fit to bring it into view.';
+ else if(heat && count && !displayed)message='Heat maps show surface heights. Choose Surface to see your curves.';
+ else if(inSurface() && count && emptySurfaceWindow)message='No plot is visible in this window. Choose Fit to bring it into view.';
  else message=inSurface()?surfaceStatus():count?'Drag to pan · Scroll or pinch to zoom':'Enter y = x² or x² + y² = 9 on an expression line.';
  $('#graphStatus').textContent=message;
- const kind=inSurface()?(surfaceView.heatmap?'Height map':'3D surface graph'):'Coordinate plane';
- graphCanvas.setAttribute('aria-label',kind+' with '+count+' plotted '+(count===1?'expression':'expressions'));
+ const kind=inSurface()?(surfaceView.heatmap?'Height map':'3D graph'):'Coordinate plane';
+ graphCanvas.setAttribute('aria-label',kind+' with '+displayed+' plotted '+(displayed===1?'expression':'expressions'));
 }
 function graphNumber(value) {
  if(Math.abs(value)<1e-12)return '0';
@@ -2685,14 +2836,16 @@ function paintGraph({canvas=graphCanvas,pixelRatio=Math.min(3,window.devicePixel
   const palette={ramp:surfaceRamps[surfaceView.palette]};
   for(const key of ['paper','grid','axis','label'])palette[key]=style.getPropertyValue('--graph-'+key).trim();
   const moving=!fullDetail && (isSliderPreview()?'slider':graphTouches.size>0 || spinFrame!==0);
-  const surfaces=shown.map(s=>({run:s.run,cost:s.cost,color:s.look.color,ramp:s.look.ramp,finish:s.look.finish,grid:s.look.grid,opacity:s.look.opacity}));
+  const surfaces=shown.map(s=>({kind:s.kind,run:s.run,cost:s.cost,color:s.look.color,ramp:s.look.ramp,finish:s.look.finish,grid:s.look.grid,opacity:s.look.opacity,
+   range:s.kind==='curve'?graphCurveRange(s):null}));
   const drawn=paintSurfacePlot(ctx,w,h,surfaces,surfaceView,palette,moving,sampleScale);
   if(surfaceView.slicing){
    if(canvas===graphCanvas)rememberSliceBackdrop(canvas);
    paintLinkedSlice(ctx,w,h,shown,palette,canvas===graphCanvas);
   }
   if(canvas===graphCanvas){
-   const empty=surfaces.length>0 && !drawn;
+   updateGraphTrace();
+   const empty=!drawn&&surfaces.some(s=>!surfaceView.heatmap||s.kind!=='curve');
    if(empty!==emptySurfaceWindow){emptySurfaceWindow=empty;describeGraph();}
   }
   return;
@@ -2811,20 +2964,136 @@ graphCanvas.addEventListener('keydown',e=>{
  }
  e.preventDefault();redrawGraph();
 });
+const defaultCurveRange = Object.freeze({min:'-2π', max:'2π'});
+const defaultCurveInterval = Object.freeze([-2 * Math.PI, 2 * Math.PI]);
+const curveIntervalCache = new WeakMap();
+let curveRangeId = 0;
+
+// A row owns its input strings. Samples, Fit and Trace share the same interval.
+function graphCurveRange(series) {
+ const range = series.row.curveRange;
+ if (!range) return defaultCurveInterval;
+ if (!curveIntervalCache.has(range)) {
+  const min = parseCurveParameter(range.min), max = parseCurveParameter(range.max);
+  curveIntervalCache.set(range, Number.isFinite(min) && Number.isFinite(max) && min < max ? [min,max] : null);
+ }
+ return curveIntervalCache.get(range);
+}
+
+function validSavedCurveRange(range) {
+ return range && ['min','max'].every(key => typeof range[key] === 'string' && range[key].length <= 160);
+}
+
+function syncCurveRangeControls(row, isCurve) {
+ let controls = row.querySelector('.curve-domain');
+ if (!isCurve) { controls?.remove(); return; }
+ if (controls) return;
+ controls = document.createElement('div');
+ controls.className = 'curve-domain';
+ controls.setAttribute('role','group');
+ controls.setAttribute('aria-label','Curve parameter range');
+ const min = document.createElement('input'), max = document.createElement('input');
+ const bounds = row.curveRange || defaultCurveRange;
+ const separator = document.createElement('span');
+ separator.textContent = '≤ t ≤';
+ separator.setAttribute('aria-hidden','true');
+ const error = document.createElement('span');
+ error.className = 'curve-range-error';
+ error.id = 'curve-range-error-' + (++curveRangeId);
+ error.setAttribute('role','status');
+ for (const [key,input,label] of [['min',min,'Minimum t'],['max',max,'Maximum t']]) {
+  input.type = 'text';
+  input.dataset.curveBound = key;
+  input.setAttribute('aria-label',label);
+  input.setAttribute('aria-describedby',error.id);
+  input.autocomplete = 'off'; input.spellcheck = false;
+  input.setAttribute('autocapitalize','off');
+  input.maxLength = 160; input.value = bounds[key];
+ }
+ controls.append(min,separator,max,error);
+ row.append(controls);
+
+ function showValidation() {
+  const valid = !!graphCurveRange({row});
+  for (const input of [min,max]) input.setAttribute('aria-invalid', String(!valid));
+  error.textContent = valid ? '' : 'Enter two finite bounds with minimum t smaller than maximum t.';
+  return valid;
+ }
+ showValidation();
+ controls.addEventListener('input', () => {
+  row.curveRange = {min:min.value, max:max.value};
+  const valid = showValidation();
+  if (row.calcResult?.plotOnly) {
+   const output = row.querySelector('.calc-result');
+   output.textContent = valid ? 'Plotted' : 'Check t range';
+   output.setAttribute('aria-label',output.textContent);
+  }
+  queueHistory(); persist(); redrawGraph();
+ });
+}
+
 const traceBox=$('#graphTrace'),traceLine=$('#traceLine'),traceInput=$('#traceCoordinate');
 let traceRun=null,traceKey='',traceList='';
+const traceValues={calculator:'0',surface:'0'};
+let traceWorkspace='calculator';
+
+function traceCurvePoint(curve,t,w,h) {
+ const marker=$('#traceMarkers');
+ const range=curve && graphCurveRange(curve);
+ let point, reading;
+ if (!curve) reading='Show a 3D curve to read its coordinates.';
+ else if (!range) reading='Check the t range for this curve.';
+ else if (!Number.isFinite(t)) reading='Enter a finite value for t.';
+ else if (t<range[0] || t>range[1]) reading='Enter t between '+graphNumber(range[0])+' and '+graphNumber(range[1])+'.';
+ else {
+  point=curve.run(t);
+  if (point?.every(Number.isFinite)) {
+   reading=point.map((value,index)=>'xyz'[index]+' = '+graphNumber(value)).join(', ');
+  } else {
+   point=null; reading='Undefined at t = '+graphNumber(t)+'.';
+  }
+ }
+ const output=$('#traceStatus');
+ if (output.textContent!==reading) output.textContent=reading;
+ if (point && w && h && !surfaceView.heatmap) {
+  const half=surfaceView.span/2;
+  const normalized=point.map((value,index)=>(value-[surfaceView.cx,surfaceView.cy,surfaceView.cz][index])/half);
+  if (normalized.every(value=>Math.abs(value)<=1)) {
+   const screen=surfaceProjection(w,h,surfaceView).project(...normalized);
+   let dot=marker.firstElementChild;
+   if (!dot || marker.childElementCount!==1) {dot=document.createElement('i'); marker.replaceChildren(dot);}
+   dot.style.left=screen.u+'px'; dot.style.top=screen.v+'px'; dot.style.borderColor=curve.look?.color || '';
+   return;
+  }
+ }
+ if (marker.childElementCount) marker.replaceChildren();
+}
+
 function updateGraphTrace(){
- if(!traceBox.open||workspaceMode!=='calculator')return;
- const curves=graphSeries.filter(s=>!s.row.plotHidden && s.kind!=='region');
- const list=curves.map(s=>s.line).join(',');
+ if(!isCalculatorMode())return;
+ const space=inSurface();
+ if (workspaceMode!==traceWorkspace) {
+  traceValues[traceWorkspace]=traceInput.value;
+  traceWorkspace=workspaceMode;
+  traceInput.type=space?'text':'number';
+  traceInput.value=traceValues[workspaceMode];
+  $('#traceAxis').textContent=space?'t =':'x =';
+  traceInput.setAttribute('aria-label',space?'t parameter':'x coordinate');
+  traceRun=null; traceKey='';
+ }
+ if (!traceBox.open) return;
+ const curves=graphSeries.filter(s=>!s.row.plotHidden && (space?s.kind==='curve':s.kind!=='region'));
+ const list=workspaceMode+':'+curves.map(s=>s.line).join(',');
  if(list!==traceList || !traceLine.options.length){
   const old=traceLine.value;
   traceLine.replaceChildren(...curves.map(s=>new Option('Line '+s.line,s.line)));
   if(curves.some(s=>s.line===old))traceLine.value=old;
   traceList=list;
  }
- const curve=curves.find(s=>s.line===traceLine.value),v=traceInput.valueAsNumber;
+ const curve=curves.find(s=>s.line===traceLine.value);
  const h=graphCanvas.clientHeight,w=graphCanvas.clientWidth;
+ if (space) {traceCurvePoint(curve,parseCurveParameter(traceInput.value),w,h);return;}
+ const v=traceInput.valueAsNumber;
  const key=[curve?.line,v,graphView.x,graphView.y,graphView.span,w,h].join('|');
  if(traceRun===curve?.run && traceKey===key)return;
  traceKey=key;traceRun=curve?.run;
@@ -2886,10 +3155,13 @@ traceBox.ontoggle=()=>{
 };
 traceInput.onkeydown=event=>{
  const sign={ArrowLeft:-1,ArrowDown:-1,ArrowRight:1,ArrowUp:1}[event.key];if(!sign)return;
- event.preventDefault();traceInput.value=Number(((traceInput.valueAsNumber||0)+sign*(event.shiftKey?.1:1)).toPrecision(12));updateGraphTrace();
+ if (inSurface() && ['ArrowLeft','ArrowRight'].includes(event.key)) return;
+ const current=inSurface()?parseCurveParameter(traceInput.value):traceInput.valueAsNumber;
+ event.preventDefault();traceInput.value=Number(((Number.isFinite(current)?current:0)+sign*(event.shiftKey?.1:1)).toPrecision(12));updateGraphTrace();
 };
 graphCanvas.addEventListener('keydown',event=>{
- if(workspaceMode!=='calculator'||event.key.toLowerCase()!=='t'||event.ctrlKey||event.metaKey||event.altKey)return;
+ if(!isCalculatorMode()||event.key.toLowerCase()!=='t'||event.ctrlKey||event.metaKey||event.altKey)return;
+ if(inSurface() && (surfaceView.heatmap || !graphSeries.some(s=>s.kind==='curve' && !s.row.plotHidden)))return;
  event.preventDefault();traceBox.open=true;updateGraphTrace();traceInput.focus();traceInput.select();
 });
 
@@ -2902,7 +3174,7 @@ function estimateGraphFrame(plots, camera, aspect, surface) {
  const xLimits=[Infinity,-Infinity], yLimits=[Infinity,-Infinity], zLimits=[Infinity,-Infinity];
  const include=(range,n)=>{range[0]=Math.min(range[0],n);range[1]=Math.max(range[1],n);};
  const radius=6, maxSpan=1e7;
- const cost=plots.reduce((total,s)=>total+Math.max(1,s.cost||1),0);
+ const cost=plots.reduce((total,s)=>s.kind==='curve'?total:total+Math.max(1,s.cost||1),0);
  const gridSteps=2*Math.max(4,Math.min(16,Math.floor(Math.sqrt(140000/Math.max(1,cost))/2)));
  // Plain numbers in a shifted coordinate often locate the interesting part
  // of the graph, even when the user has panned far from it.
@@ -2987,6 +3259,17 @@ function estimateGraphFrame(plots, camera, aspect, surface) {
  const sampleAt=[1,4,16,64,256,1024];
  let fitted=0;
  for(const s of plots){
+  if(surface&&s.kind==='curve'){
+   const range=graphCurveRange(s);
+   if(!range)continue;
+   let hasPoint=false;
+   for(const p of sampleParametricCurve(s.run,...range)){
+    if(!p)continue;
+    include(xLimits,p[0]);include(yLimits,p[1]);include(zLimits,p[2]);hasPoint=true;
+   }
+   if(hasPoint)fitted++;
+   continue;
+  }
   const xd=domain(s.expr,'x'),yd=domain(s.expr,'y');
   const currentX=surface?camera.cx:camera.x,currentY=surface?camera.cy:camera.y;
   const nearbyX=[currentX-radius,currentX+radius],nearbyY=[currentY-radius,currentY+radius];
@@ -3018,7 +3301,8 @@ function estimateGraphFrame(plots, camera, aspect, surface) {
  return {x:centers[0],y:centers[1],z:centers[2],span,fitted};
 }
 function fitGraphView(){
- const plots=graphSeries.filter(s=>!s.row.plotHidden);
+ const heatmap=inSurface()&&surfaceView.heatmap;
+ const plots=graphSeries.filter(s=>!s.row.plotHidden&&(!heatmap||s.kind!=='curve'));
  if(!plots.length){describeGraph();return;}
  const surface=inSurface(),frame=estimateGraphFrame(plots,surface?surfaceView:graphView,graphCanvas.clientWidth/Math.max(1,graphCanvas.clientHeight),surface);
  if(frame.error){$('#graphStatus').textContent=frame.error;return;}
@@ -3405,13 +3689,64 @@ function prepareSurfaceMesh(surface,view,count,ramp){
  return geometry;
 }
 
+// Clip a world-space segment to the same cube used by the surface mesh.
+// Returning the parameter interval keeps a crossing even if both ends are outside.
+function clipCurveSegment(a,b,center,half) {
+ let enter=0,exit=1;
+ for(let axis=0;axis<3;axis++){
+  const lo=center[axis]-half,hi=center[axis]+half,delta=b[axis]-a[axis];
+  if(!Number.isFinite(delta))return null;
+  if(delta===0){
+   if(a[axis]<lo||a[axis]>hi)return null;
+   continue;
+  }
+  const near=(lo-a[axis])/delta,far=(hi-a[axis])/delta;
+  enter=Math.max(enter,Math.min(near,far));
+  exit=Math.min(exit,Math.max(near,far));
+  if(enter>exit)return null;
+ }
+ return [enter,exit];
+}
+
+function paintParametricCurve(ctx,series,view,camera,palette,count) {
+ if(!series.range)return false;
+ const samples=sampleParametricCurve(series.run,...series.range,count);
+ const center=[view.cx,view.cy,view.cz],half=view.span/2;
+ function projectAt(a,b,f){
+  return camera.project(
+   ((a[0]-center[0])+(b[0]-a[0])*f)/half,
+   ((a[1]-center[1])+(b[1]-a[1])*f)/half,
+   ((a[2]-center[2])+(b[2]-a[2])*f)/half
+  );
+ }
+ ctx.beginPath();
+ let connected=false,drawn=false;
+ for(let i=1;i<samples.length;i++){
+  const a=samples[i-1],b=samples[i];
+  const interval=a&&b&&clipCurveSegment(a,b,center,half);
+  if(!interval){connected=false;continue;}
+  const [enter,exit]=interval;
+  if(!connected||enter>0){const p=projectAt(a,b,enter);ctx.moveTo(p.u,p.v);}
+  const q=projectAt(a,b,exit);ctx.lineTo(q.u,q.v);
+  connected=exit===1;drawn=true;
+ }
+ if(drawn){
+  ctx.lineCap=ctx.lineJoin='round';
+  // A paper-colored casing separates the path from similarly colored faces.
+  ctx.lineWidth=4.5;ctx.strokeStyle=palette.paper;ctx.globalAlpha=.85;ctx.stroke();
+  ctx.lineWidth=2.5;ctx.strokeStyle=series.color;ctx.globalAlpha=1;ctx.stroke();
+ }
+ return drawn;
+}
+
 // Coordinates for faces are normalized around the view center in [-1,1]³.
 function paintSurfacePlot(ctx,w,h,series,view,palette,moving=false,sampleScale=1) {
  if(!(w>0 && h>0 && view.span>0))return;
  ctx.save();
  try{
   ctx.fillStyle=palette.paper;ctx.fillRect(0,0,w,h);
-  if(view.heatmap)return paintSurfaceHeat(ctx,w,h,series,view,palette,sampleScale,moving);
+  const surfaces=series.filter(s=>s.kind!=='curve');
+  if(view.heatmap)return paintSurfaceHeat(ctx,w,h,surfaces,view,palette,sampleScale,moving);
   const camera=surfaceProjection(w,h,view), project=camera.project, half=view.span/2;
   const floor=Math.sin(view.pitch)>=0?-1:1;
   const nearX=Math.sin(view.yaw)>=0?1:-1, nearY=Math.cos(view.yaw)>=0?1:-1;
@@ -3432,8 +3767,8 @@ function paintSurfacePlot(ctx,w,h,series,view,palette,moving=false,sampleScale=1
    const a=origin.slice(),b=origin.slice();a[axis]=-1;b[axis]=1;line(a,b);
   }
   ctx.stroke();ctx.globalAlpha=1;
-  const count=surfaceGridSize(w,h,series,moving,sampleScale),faces=[];
-  for(const surface of series){
+  const count=surfaceGridSize(w,h,surfaces,moving,sampleScale),faces=[];
+  for(const surface of surfaces){
    const ramp=surface.ramp||palette.ramp;
    const geometry=prepareSurfaceMesh(surface,view,count,ramp);
    for(const vertex of geometry.vertices)camera.projectVertex(vertex);
@@ -3460,6 +3795,11 @@ function paintSurfacePlot(ctx,w,h,series,view,palette,moving=false,sampleScale=1
    }
   }
   ctx.globalAlpha=1;
+  let drawn=faces.length>0;
+  const curveCount=moving==='slider'?192:Math.round(384*Math.min(3,sampleScale));
+  for(const curve of series){
+   if(curve.kind==='curve'&&paintParametricCurve(ctx,curve,view,camera,palette,curveCount))drawn=true;
+  }
   const occupied=[];
   function label(text,x,y,axis=false){
    const width=ctx.measureText(text).width, height=axis?16:12;
@@ -3493,7 +3833,7 @@ function paintSurfacePlot(ctx,w,h,series,view,palette,moving=false,sampleScale=1
     label(surfaceTickText(tick.value),p.u+axis.nx*10,p.v+axis.ny*10);
    }
   }
-  return faces.length>0;
+  return drawn;
  }finally{ctx.restore();}
 }
 const surfaceRamps={
@@ -3527,6 +3867,7 @@ const surfaceExamples={
  ripple:String.raw`\cos\left(\sqrt{x^2+y^2}\right)`,
  saddle:String.raw`\frac{x^2-y^2}{5}`,
  waves:String.raw`\sin(x)\cos(y)`,
+ helix:String.raw`\left(t,\sin\left(t\right),\cos\left(t\right)\right)`,
  peaks:String.raw`2e^{-\frac{(x-2)^2+y^2}{4}}+2e^{-\frac{(x+2)^2+(y-1)^2}{3}}-1`
 };
 let spinFrame=0, spinLast=0, surfaceSaveTimer=0;
@@ -3556,7 +3897,7 @@ function applyGraphWorkspace(previousMode,data){
   $('#calcAngle').value=saved.angle==='deg'?'deg':'rad';
   $('#calcDigits').value=[6,10,15].includes(saved.digits)?saved.digits:10;
  }
- $('#graphHeading').textContent=inSurface()?'Surface explorer':'Graph';
+ $('#graphHeading').textContent=inSurface()?'3D graph':'Graph';
  $('#graphExample').textContent=inSurface()?'Add example':'Plot example';
  $('#surfaceProbe').hidden=$('#graphCoordinates').hidden=true;
  $('#graphKeys').textContent=inSurface()?'Drag or use arrow keys to rotate the surface or pan the heat map. Shift-drag pans the surface. Scroll, pinch, or use plus and minus to zoom. Home resets the view.':'Drag or use the arrow keys to pan. Scroll, pinch, or press plus and minus to zoom. Press Home to reset. Press T to trace coordinates.';
@@ -3576,7 +3917,8 @@ function syncSurfaceControls(){
 function updateSurfaceKeys(){
  if(!inSurface())return;
  const box=$('#surfaceKeys');
- const visible=graphSeries.filter(s=>s.look && !s.row.plotHidden);
+ $('#surfaceViewX').hidden=surfaceView.heatmap || !graphSeries.some(s=>s.kind==='curve' && !s.row.plotHidden);
+ const visible=graphSeries.filter(s=>s.kind==='surface' && s.look && !s.row.plotHidden);
  const minimum=graphNumber(surfaceView.cz-surfaceView.span/2);
  const maximum=graphNumber(surfaceView.cz+surfaceView.span/2);
  const signature=[minimum,maximum,...visible.map(s=>s.line+' '+s.look.rampName+' '+s.look.ramp.join(','))].join('|');
@@ -3598,7 +3940,7 @@ function saveSurfaceSoon(){
  surfaceSaveTimer=setTimeout(()=>{if(inSurface())persist()},200);
 }
 function surfaceStatus(){
- if(!graphSeries.length)return 'Enter z = x² + y² or add an example.';
+ if(!graphSeries.length)return 'Enter z = x² + y², a curve such as (t, sin(t), cos(t)), or add an example.';
  return surfaceView.heatmap?'Move over the map to read x, y and height. Drag to pan.':'Drag to rotate · Shift-drag to pan · Scroll or pinch to zoom';
 }
 function updateSurfaceMode(heatmap){
@@ -3615,6 +3957,11 @@ function spinSurface(t){
  spinLast=t;redrawGraph();spinFrame=requestAnimationFrame(spinSurface);
 }
 $('#surfaceOrbit').onclick=()=>updateSurfaceMode(false);
+$('#surfaceViewX').onclick=()=>{
+ stopSurfaceSpin();
+ surfaceView.yaw=Math.PI/2;surfaceView.pitch=0;
+ redrawGraph();saveSurfaceSoon();
+};
 $('#surfaceHeatmap').onclick=()=>updateSurfaceMode(true);
 $('#surfacePalette').onchange=e=>{surfaceView.palette=e.target.value;syncSurfaceControls();persist();onSeriesStyleChanged()};
 $('#surfaceMesh').onchange=e=>{surfaceView.mesh=e.target.checked;persist();redrawGraph()};
@@ -3645,7 +3992,7 @@ function inspectHeatmap(p){
  const x=g.x(p.x),y=g.y(p.y),minimum=surfaceView.cz-surfaceView.span/2,maximum=surfaceView.cz+surfaceView.span/2;
  let highest=-Infinity,topLine=null;
  for(const series of graphSeries){
-  if(series.row.plotHidden)continue;
+  if(series.kind!=='surface' || series.row.plotHidden)continue;
   const z=series.run(x,y);
   if(Number.isFinite(z)&&z>=minimum&&z<=maximum&&z>highest){highest=z;topLine=series.line;}
  }
@@ -3768,7 +4115,8 @@ function positionSliceHandle(p,q){
  const angle=Math.atan2(dy,dx);
  sliceHandle.firstElementChild.style.transform='rotate('+angle+'rad)';
 }
-function paintLinkedSlice(ctx,w,h,shown,palette,onscreen){
+function paintLinkedSlice(ctx,w,h,series,palette,onscreen){
+ const shown=series.filter(s=>s.kind!=='curve');
  const f=sliceFrame(surfaceView);
  const cost=shown.reduce((sum,s)=>sum+Math.max(1,s.cost||1),0);
  const count=Math.max(32,Math.min(420,Math.ceil(w),Math.floor(100000/Math.max(cost,1))));
@@ -3911,11 +4259,16 @@ function initialSurfaceEntries(){
  return [{type:'math',value:'z=a'+surfaceExamples.ripple},{type:'math',value:'a=2'}];
 }
 function addSurfaceExample(){
- const expression=surfaceExamples[$('#surfacePreset').value];
- const value='z='+(['ripple','waves'].includes($('#surfacePreset').value)?'2':'')+expression;
+ const preset=$('#surfacePreset').value, expression=surfaceExamples[preset];
+ const value=preset==='helix' ? expression : 'z='+(['ripple','waves'].includes(preset)?'2':'')+expression;
  if(entries().every(entry=>!hasContent(entry.value)))replaceEntries([{type:'math',value}]);
  else addRow(value,true,'math');
  schedule();resetGraph();
+ if(preset==='helix'){
+  surfaceView.span=4*Math.PI*1.12;
+  if(surfaceView.heatmap)updateSurfaceMode(false);
+  else {syncSurfaceControls();saveSurfaceSoon();}
+ }
 }
 
 // Appearance is stored on the expression row alongside its slider settings.
@@ -3948,7 +4301,7 @@ function seriesAppearance(series,index,style,is3d){
  let color=style.getPropertyValue(colorVar).trim();
  const rampKeys=seriesRampOrder,start=Math.max(0,rampKeys.indexOf(surfaceView.palette));
  const rampKey=saved.ramp||rampKeys[((is3d?start:0)+sequence)%rampKeys.length];
- const mode=saved.mode||(is3d?'gradient':'solid');
+ const mode=series.kind==='curve'?'solid':saved.mode||(is3d?'gradient':'solid');
  let ramp=mode==='gradient'?(saved.colors||surfaceRamps[rampKey]).slice():[color,color];
  if(saved.reverse)ramp.reverse();
  if(mode==='gradient')color=ramp[Math.floor(ramp.length/2)];
@@ -3977,9 +4330,10 @@ function syncSeriesDialog(){
  const target=selectedSeriesStyle();
  if(!target||!seriesStyleDialog.open)return;
  const {series,index}=target,look=seriesAppearance(series,index,getComputedStyle(graphPanel),inSurface());
- document.querySelector('#seriesStyleHeading').textContent=(inSurface()?'Surface ':'Line ')+series.line+' style';
+ document.querySelector('#seriesStyleHeading').textContent=(series.kind==='curve'?'Curve ':inSurface()?'Surface ':'Line ')+series.line+' style';
  syncSurfaceStyleEditor(target,look);
  document.querySelector('#seriesStrokeOptions').hidden=inSurface();
+ document.querySelector('#seriesMorePalettes').hidden=series.kind==='curve';
  document.querySelector('#seriesResetStyle').disabled=!series.row.appearance;
  document.querySelectorAll('[data-series-hue]').forEach(button=>button.setAttribute('aria-pressed',String(look.mode==='solid'&&Number(button.dataset.seriesHue)===look.hue)));
  document.querySelectorAll('[data-series-ramp]').forEach(button=>button.setAttribute('aria-pressed',String(look.mode==='gradient'&&!series.row.appearance?.colors&&button.dataset.seriesRamp===look.rampKey)));
@@ -3993,7 +4347,7 @@ function openSeriesStyle(series){
  seriesStyleDialog.style.removeProperty('--picker-left');seriesStyleDialog.style.removeProperty('--picker-top');
  if(!seriesStyleDialog.open)seriesStyleDialog.showModal();
  syncSeriesDialog();
- if(inSurface())renderSurfaceLookThumbnails();
+ if(series.kind==='surface')renderSurfaceLookThumbnails();
  if(!inSurface() && innerWidth>900){
   const anchor=series.row.querySelector('.plot-style-trigger')?.getBoundingClientRect();
   const box=seriesStyleDialog.getBoundingClientRect();
@@ -4105,20 +4459,21 @@ function scheduleSurfaceStylePreview() {
 }
 
 function syncSurfaceStyleEditor(target,look) {
- const surface=inSurface();
+ const surface=target.series.kind==='surface';
  seriesStyleDialog.classList.toggle('surface-style-dialog',surface);
  $('#surfaceStyleEditor').hidden=!surface;
  $('#seriesHues').closest('fieldset').hidden=surface;
  $('#seriesRamps').closest('fieldset').classList.toggle('extra-surface-colors',surface);
  if(!surface)return;
  const select=$('#surfaceStyleTarget');
- const signature=graphSeries.map(series=>series.line).join(',');
+ const surfaces=graphSeries.filter(series=>series.kind==='surface');
+ const signature=surfaces.map(series=>series.line).join(',');
  if(select.dataset.lines!==signature) {
-  select.replaceChildren(...graphSeries.map(series=>new Option('Surface '+series.line,series.line)));
+  select.replaceChildren(...surfaces.map(series=>new Option('Surface '+series.line,series.line)));
   select.dataset.lines=signature;
  }
  select.value=target.series.line;
- $('#separateSurfaceColors').disabled=graphSeries.length<2;
+ $('#separateSurfaceColors').disabled=surfaces.length<2;
  const colors=target.series.row.appearance?.colors;
  const source=look.ramp;
  const samples=[source[0],source[Math.floor(source.length/2)],source.at(-1)];
@@ -4208,7 +4563,7 @@ $('#separateSurfaceColors').onclick=()=>{
  beforeEdit();
  const first=['coast','peach','lilac','citrus','dusk','mint'];
  const palettes=[...first,...seriesRampOrder.filter(key=>!first.includes(key))];
- graphSeries.forEach((series,index)=>{
+ graphSeries.filter(series=>series.kind==='surface').forEach((series,index)=>{
   series.row.appearance=normalizeSeriesAppearance({
    ...series.row.appearance,mode:'gradient',colors:null,reverse:false,
    ramp:palettes[index%palettes.length]
@@ -4323,7 +4678,16 @@ function normalizeCalculationLatex(value) {
   try{
    const math=normalizeCalculationLatex(value);
    if(!math.trim())return {empty:true};
-   const expr=ce.parse(math,{form:'raw'});if(!expr.isValid)return {error:'Finish or check this expression.'};
+   let expr=ce.parse(math,{form:'raw'});
+   if(dimension==='3d' && math.includes(',')){
+    let shape=expr.json;
+    while(shape?.[0]==='Delimiter' && shape.length===2)shape=shape[1];
+    if(shape?.[0]==='Delimiter' && shape[2]==="'(,)'"){
+     const tex=math.replace(/(?<![\\A-Za-z])(sin|cos|tan|sinh|cosh|tanh|exp|ln|log)(?=\s*(?:\\left\s*)?\()/g,'\\$1');
+     if(tex!==math)expr=ce.parse(tex,{form:'raw'});
+    }
+   }
+   if(!expr.isValid)return {error:'Finish or check this expression.'};
    const json=expr.json;graphNodes[index]=json;
    if(Array.isArray(json)&&json[0]==='Equal'&&json.length===3&&typeof json[1]==='string'){
     const symbol=json[1];if(ce.expr(symbol).isConstant)return {error:symbol+' is a built-in constant.'};
@@ -4444,6 +4808,7 @@ function namedDerivative(body,parameter,order) {
   if(scalarPreviews[index] && Number.isFinite(result.number))result.scalarPreview=scalarPreviews[index];
   const graph=specs[index];
   if(!graph)return result;
+  if(graph.kind==='curve')return graph.error?{error:graph.error,graph}:{graph,plotOnly:true,latex:values[index]};
   if(graph.error)return result.error || (dimension==='3d' && !result.symbol && !result.matrix)?{error:graph.error,graph}:result;
   if(result.error || (!result.symbol && !result.matrix && Array.isArray(graphNodes[index]) && ['Equal','Less','LessEqual','Greater','GreaterEqual'].includes(graphNodes[index][0])))return {graph,plotOnly:true,latex:values[index]};
   return {...result,graph};
@@ -4694,7 +5059,7 @@ async function renderCalculatorResults(results,id){
   }
   if(data.plotOnly || (data.matrix && data.matrix[0]*data.matrix[1]>64)){
    output.dataset.display='summary';
-   const label=data.plotOnly?'Plotted':(data.approx?'Approximate ':'')+data.matrix.join(' × ')+' matrix';
+   const label=data.plotOnly?(data.graph?.kind==='curve' && !graphCurveRange({row})?'Check t range':'Plotted'):(data.approx?'Approximate ':'')+data.matrix.join(' × ')+' matrix';
    output.textContent=label;output.setAttribute('aria-label',label);continue;
   }
   if(data.error||data.empty){output.textContent=data.error||'Enter an expression';output.setAttribute('aria-label','Result');continue}
@@ -4948,6 +5313,7 @@ let historyReady = false, historyRestoring = false, historyQueued = false;
 let historyGroup = null, historyLastGroup = null, historyLastTime = 0;
 function historyCursor() {
  const focused = document.activeElement;
+ if(focused?.dataset.curveBound)return {row:rows().indexOf(focused.closest('.row')),curveBound:focused.dataset.curveBound,start:focused.selectionStart,end:focused.selectionEnd};
  if (['title', 'statement', 'latex', 'leanSource'].includes(focused?.id)) {
   return {id:focused.id, start:focused.selectionStart, end:focused.selectionEnd, row:rows().indexOf(active?.closest('.row'))};
  }
@@ -5003,6 +5369,13 @@ function beforeEdit(group=null) {
 }
 function restoreHistoryCursor(cursor) {
  if (!cursor) return;
+ if(cursor.curveBound && inSurface()){
+  const row=rows()[cursor.row];if(!row)return;
+  syncCurveRangeControls(row,true);
+  const input=row.querySelector('[data-curve-bound="'+cursor.curveBound+'"]');
+  if(input){input.focus({preventScroll:true});input.setSelectionRange(cursor.start,cursor.end);}
+  return;
+ }
  if (cursor.id==='leanSource') {
   $('#leanPanel').open=true;
   const editor=$('#leanSource');
@@ -5252,6 +5625,7 @@ function validateDraftFile(file) {
  const draft=file.draft;
  if(!draft||!Array.isArray(draft.entries)||draft.entries.length>500)throw new Error('The draft must contain at most 500 blocks.');
  if(draft.entries.some(e=>!e||!['math','text'].includes(e.type)||typeof e.value!=='string'||e.value.length>500000))throw new Error('The draft contains an invalid block.');
+ if (draft.entries.some(e=>e.curveRange!=null && !validSavedCurveRange(e.curveRange)))throw new Error('The draft contains an invalid curve range.');
  for(const key of ['title','statement'])if(draft[key]!=null&&typeof draft[key]!=='string')throw new Error('The draft contains an invalid '+key+'.');
  if (Object.hasOwn(draft,'leanSource')) validateLeanSource(draft.leanSource);
  return {workspace:file.workspace,draft};

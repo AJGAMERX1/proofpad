@@ -1,6 +1,6 @@
 <section id="graphPanel" class="card graph-panel" aria-labelledby="graphHeading">
  <div class="cardtop graph-header"><h2 id="graphHeading">Graph</h2>
-  <div class="graph-actions"><select class="only-3d" id="surfacePreset" aria-label="Example surface"><option value="ripple">Ripple</option><option value="saddle">Saddle</option><option value="waves">Crossed waves</option><option value="peaks">Twin peaks</option></select><button class="quiet" id="graphExample" type="button">Plot example</button><button class="quiet" id="graphSave" type="button">Save graph PNG</button></div>
+  <div class="graph-actions"><select class="only-3d" id="surfacePreset" aria-label="3D graph example"><option value="ripple">Ripple</option><option value="saddle">Saddle</option><option value="waves">Crossed waves</option><option value="peaks">Twin peaks</option><option value="helix">Helix</option></select><button class="quiet" id="graphExample" type="button">Plot example</button><button class="quiet" id="graphSave" type="button">Save graph PNG</button></div>
  </div>
 <div class="surface-controls only-3d">
  <div class="surface-control-row">
@@ -12,6 +12,7 @@
   <label class="surface-palette">Gradient <select id="surfacePalette"><option value="aurora">Aurora</option><option value="ember">Ember</option><option value="glacier">Glacier</option><option value="prism">Prism</option><option value="rose">Rose</option><option value="meadow">Meadow</option><option value="twilight">Twilight</option><option value="lava">Lava</option><option value="lagoon">Lagoon</option><option value="copper">Copper</option><option value="orchid">Orchid</option><option value="cividis">Cividis</option></select></label>
   <label class="surface-mesh"><input type="checkbox" id="surfaceMesh" checked><span id="surfaceMeshLabel">Mesh</span></label>
   <button type="button" class="surface-spin" id="surfaceSpin" aria-pressed="false">Spin</button>
+  <button type="button" id="surfaceViewX" title="Look straight down the x-axis" hidden>View along x</button>
  </div>
 </div>
  <div class="graph-surface">

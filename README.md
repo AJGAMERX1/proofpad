@@ -6,6 +6,8 @@ Write proofs, collect formulas, and explore equations in 2D or 3D. Select an int
 
 Proofpad runs in the browser. Use **Save draft** to download an editable backup and **Open draft** to restore it in another browser or on another device. Export finished work as a PNG or printable PDF.
 
+In **3D Graph**, enter a curve as three coordinates in `t`, or select **Helix → Add example** for `(t, sin(t), cos(t))`. Each curve has its own editable parameter range, initially −2π to 2π. In radians, **View along x** shows the helix’s unit-circle projection. Open **Trace coordinates** to read a point at a particular `t`.
+
 To check algebra you already wrote, open **Proofs → Use written proof…** below the title. Choose your conclusion, mark the equations you were given, and click **Check with Lean**. Proofpad prepares a Lean 4 file from supported real-number equations and inequalities. It preserves paragraphs and unsupported expressions as comments. For a prose proof, **Open editable outline** brings the writing into the Lean editor, where you can formalize the argument.
 
 The **Lean proof** panel also accepts handwritten code and `.lean` files. The official online playground shows goals, errors, and warnings. If you edit there, copy the full edited source and choose **Keep edits** to save it back to the draft. After revising the written proof, reopen **Use written proof…** to generate a fresh check.

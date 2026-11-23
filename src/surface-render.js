@@ -312,13 +312,64 @@ function prepareSurfaceMesh(surface,view,count,ramp){
  return geometry;
 }
 
+// Clip a world-space segment to the same cube used by the surface mesh.
+// Returning the parameter interval keeps a crossing even if both ends are outside.
+function clipCurveSegment(a,b,center,half) {
+ let enter=0,exit=1;
+ for(let axis=0;axis<3;axis++){
+  const lo=center[axis]-half,hi=center[axis]+half,delta=b[axis]-a[axis];
+  if(!Number.isFinite(delta))return null;
+  if(delta===0){
+   if(a[axis]<lo||a[axis]>hi)return null;
+   continue;
+  }
+  const near=(lo-a[axis])/delta,far=(hi-a[axis])/delta;
+  enter=Math.max(enter,Math.min(near,far));
+  exit=Math.min(exit,Math.max(near,far));
+  if(enter>exit)return null;
+ }
+ return [enter,exit];
+}
+
+function paintParametricCurve(ctx,series,view,camera,palette,count) {
+ if(!series.range)return false;
+ const samples=sampleParametricCurve(series.run,...series.range,count);
+ const center=[view.cx,view.cy,view.cz],half=view.span/2;
+ function projectAt(a,b,f){
+  return camera.project(
+   ((a[0]-center[0])+(b[0]-a[0])*f)/half,
+   ((a[1]-center[1])+(b[1]-a[1])*f)/half,
+   ((a[2]-center[2])+(b[2]-a[2])*f)/half
+  );
+ }
+ ctx.beginPath();
+ let connected=false,drawn=false;
+ for(let i=1;i<samples.length;i++){
+  const a=samples[i-1],b=samples[i];
+  const interval=a&&b&&clipCurveSegment(a,b,center,half);
+  if(!interval){connected=false;continue;}
+  const [enter,exit]=interval;
+  if(!connected||enter>0){const p=projectAt(a,b,enter);ctx.moveTo(p.u,p.v);}
+  const q=projectAt(a,b,exit);ctx.lineTo(q.u,q.v);
+  connected=exit===1;drawn=true;
+ }
+ if(drawn){
+  ctx.lineCap=ctx.lineJoin='round';
+  // A paper-colored casing separates the path from similarly colored faces.
+  ctx.lineWidth=4.5;ctx.strokeStyle=palette.paper;ctx.globalAlpha=.85;ctx.stroke();
+  ctx.lineWidth=2.5;ctx.strokeStyle=series.color;ctx.globalAlpha=1;ctx.stroke();
+ }
+ return drawn;
+}
+
 // Coordinates for faces are normalized around the view center in [-1,1]³.
 function paintSurfacePlot(ctx,w,h,series,view,palette,moving=false,sampleScale=1) {
  if(!(w>0 && h>0 && view.span>0))return;
  ctx.save();
  try{
   ctx.fillStyle=palette.paper;ctx.fillRect(0,0,w,h);
-  if(view.heatmap)return paintSurfaceHeat(ctx,w,h,series,view,palette,sampleScale,moving);
+  const surfaces=series.filter(s=>s.kind!=='curve');
+  if(view.heatmap)return paintSurfaceHeat(ctx,w,h,surfaces,view,palette,sampleScale,moving);
   const camera=surfaceProjection(w,h,view), project=camera.project, half=view.span/2;
   const floor=Math.sin(view.pitch)>=0?-1:1;
   const nearX=Math.sin(view.yaw)>=0?1:-1, nearY=Math.cos(view.yaw)>=0?1:-1;
@@ -339,8 +390,8 @@ function paintSurfacePlot(ctx,w,h,series,view,palette,moving=false,sampleScale=1
    const a=origin.slice(),b=origin.slice();a[axis]=-1;b[axis]=1;line(a,b);
   }
   ctx.stroke();ctx.globalAlpha=1;
-  const count=surfaceGridSize(w,h,series,moving,sampleScale),faces=[];
-  for(const surface of series){
+  const count=surfaceGridSize(w,h,surfaces,moving,sampleScale),faces=[];
+  for(const surface of surfaces){
    const ramp=surface.ramp||palette.ramp;
    const geometry=prepareSurfaceMesh(surface,view,count,ramp);
    for(const vertex of geometry.vertices)camera.projectVertex(vertex);
@@ -367,6 +418,11 @@ function paintSurfacePlot(ctx,w,h,series,view,palette,moving=false,sampleScale=1
    }
   }
   ctx.globalAlpha=1;
+  let drawn=faces.length>0;
+  const curveCount=moving==='slider'?192:Math.round(384*Math.min(3,sampleScale));
+  for(const curve of series){
+   if(curve.kind==='curve'&&paintParametricCurve(ctx,curve,view,camera,palette,curveCount))drawn=true;
+  }
   const occupied=[];
   function label(text,x,y,axis=false){
    const width=ctx.measureText(text).width, height=axis?16:12;
@@ -400,6 +456,6 @@ function paintSurfacePlot(ctx,w,h,series,view,palette,moving=false,sampleScale=1
     label(surfaceTickText(tick.value),p.u+axis.nx*10,p.v+axis.ny*10);
    }
   }
-  return faces.length>0;
+  return drawn;
  }finally{ctx.restore();}
 }

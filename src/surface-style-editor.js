@@ -49,20 +49,21 @@ function scheduleSurfaceStylePreview() {
 }
 
 function syncSurfaceStyleEditor(target,look) {
- const surface=inSurface();
+ const surface=target.series.kind==='surface';
  seriesStyleDialog.classList.toggle('surface-style-dialog',surface);
  $('#surfaceStyleEditor').hidden=!surface;
  $('#seriesHues').closest('fieldset').hidden=surface;
  $('#seriesRamps').closest('fieldset').classList.toggle('extra-surface-colors',surface);
  if(!surface)return;
  const select=$('#surfaceStyleTarget');
- const signature=graphSeries.map(series=>series.line).join(',');
+ const surfaces=graphSeries.filter(series=>series.kind==='surface');
+ const signature=surfaces.map(series=>series.line).join(',');
  if(select.dataset.lines!==signature) {
-  select.replaceChildren(...graphSeries.map(series=>new Option('Surface '+series.line,series.line)));
+  select.replaceChildren(...surfaces.map(series=>new Option('Surface '+series.line,series.line)));
   select.dataset.lines=signature;
  }
  select.value=target.series.line;
- $('#separateSurfaceColors').disabled=graphSeries.length<2;
+ $('#separateSurfaceColors').disabled=surfaces.length<2;
  const colors=target.series.row.appearance?.colors;
  const source=look.ramp;
  const samples=[source[0],source[Math.floor(source.length/2)],source.at(-1)];
@@ -152,7 +153,7 @@ $('#separateSurfaceColors').onclick=()=>{
  beforeEdit();
  const first=['coast','peach','lilac','citrus','dusk','mint'];
  const palettes=[...first,...seriesRampOrder.filter(key=>!first.includes(key))];
- graphSeries.forEach((series,index)=>{
+ graphSeries.filter(series=>series.kind==='surface').forEach((series,index)=>{
   series.row.appearance=normalizeSeriesAppearance({
    ...series.row.appearance,mode:'gradient',colors:null,reverse:false,
    ramp:palettes[index%palettes.length]

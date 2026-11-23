@@ -29,6 +29,7 @@ const surfaceExamples={
  ripple:String.raw`\cos\left(\sqrt{x^2+y^2}\right)`,
  saddle:String.raw`\frac{x^2-y^2}{5}`,
  waves:String.raw`\sin(x)\cos(y)`,
+ helix:String.raw`\left(t,\sin\left(t\right),\cos\left(t\right)\right)`,
  peaks:String.raw`2e^{-\frac{(x-2)^2+y^2}{4}}+2e^{-\frac{(x+2)^2+(y-1)^2}{3}}-1`
 };
 let spinFrame=0, spinLast=0, surfaceSaveTimer=0;
@@ -56,7 +57,7 @@ function applyGraphWorkspace(previousMode,data){
   $('#calcAngle').value=saved.angle==='deg'?'deg':'rad';
   $('#calcDigits').value=[6,10,15].includes(saved.digits)?saved.digits:10;
  }
- $('#graphHeading').textContent=inSurface()?'Surface explorer':'Graph';
+ $('#graphHeading').textContent=inSurface()?'3D graph':'Graph';
  $('#graphExample').textContent=inSurface()?'Add example':'Plot example';
  $('#surfaceProbe').hidden=$('#graphCoordinates').hidden=true;
  $('#graphKeys').textContent=inSurface()?'Drag or use arrow keys to rotate the surface or pan the heat map. Shift-drag pans the surface. Scroll, pinch, or use plus and minus to zoom. Home resets the view.':'Drag or use the arrow keys to pan. Scroll, pinch, or press plus and minus to zoom. Press Home to reset.';
@@ -75,7 +76,8 @@ function syncSurfaceControls(){
 function updateSurfaceKeys(){
  if(!inSurface())return;
  const box=$('#surfaceKeys');
- const visible=graphSeries.filter(s=>s.look && !s.row.plotHidden);
+ $('#surfaceViewX').hidden=surfaceView.heatmap || !graphSeries.some(s=>s.kind==='curve' && !s.row.plotHidden);
+ const visible=graphSeries.filter(s=>s.kind==='surface' && s.look && !s.row.plotHidden);
  const minimum=graphNumber(surfaceView.cz-surfaceView.span/2);
  const maximum=graphNumber(surfaceView.cz+surfaceView.span/2);
  const signature=[minimum,maximum,...visible.map(s=>s.line+' '+s.look.rampName+' '+s.look.ramp.join(','))].join('|');
@@ -97,7 +99,7 @@ function saveSurfaceSoon(){
  surfaceSaveTimer=setTimeout(()=>{if(inSurface())persist()},200);
 }
 function surfaceStatus(){
- if(!graphSeries.length)return 'Enter z = x² + y² or add an example.';
+ if(!graphSeries.length)return 'Enter z = x² + y², a curve such as (t, sin(t), cos(t)), or add an example.';
  return surfaceView.heatmap?'Move over the map to read x, y and height. Drag to pan.':'Drag to rotate · Shift-drag to pan · Scroll or pinch to zoom';
 }
 function updateSurfaceMode(heatmap){
@@ -114,6 +116,11 @@ function spinSurface(t){
  spinLast=t;redrawGraph();spinFrame=requestAnimationFrame(spinSurface);
 }
 $('#surfaceOrbit').onclick=()=>updateSurfaceMode(false);
+$('#surfaceViewX').onclick=()=>{
+ stopSurfaceSpin();
+ surfaceView.yaw=Math.PI/2;surfaceView.pitch=0;
+ redrawGraph();saveSurfaceSoon();
+};
 $('#surfaceHeatmap').onclick=()=>updateSurfaceMode(true);
 $('#surfacePalette').onchange=e=>{surfaceView.palette=e.target.value;syncSurfaceControls();persist();onSeriesStyleChanged()};
 $('#surfaceMesh').onchange=e=>{surfaceView.mesh=e.target.checked;persist();redrawGraph()};
@@ -144,7 +151,7 @@ function inspectHeatmap(p){
  const x=g.x(p.x),y=g.y(p.y),minimum=surfaceView.cz-surfaceView.span/2,maximum=surfaceView.cz+surfaceView.span/2;
  let highest=-Infinity,topLine=null;
  for(const series of graphSeries){
-  if(series.row.plotHidden)continue;
+  if(series.kind!=='surface' || series.row.plotHidden)continue;
   const z=series.run(x,y);
   if(Number.isFinite(z)&&z>=minimum&&z<=maximum&&z>highest){highest=z;topLine=series.line;}
  }
@@ -156,9 +163,14 @@ function initialSurfaceEntries(){
  return [{type:'math',value:'z=a'+surfaceExamples.ripple},{type:'math',value:'a=2'}];
 }
 function addSurfaceExample(){
- const expression=surfaceExamples[$('#surfacePreset').value];
- const value='z='+(['ripple','waves'].includes($('#surfacePreset').value)?'2':'')+expression;
+ const preset=$('#surfacePreset').value, expression=surfaceExamples[preset];
+ const value=preset==='helix' ? expression : 'z='+(['ripple','waves'].includes(preset)?'2':'')+expression;
  if(entries().every(entry=>!hasContent(entry.value)))replaceEntries([{type:'math',value}]);
  else addRow(value,true,'math');
  schedule();resetGraph();
+ if(preset==='helix'){
+  surfaceView.span=4*Math.PI*1.12;
+  if(surfaceView.heatmap)updateSurfaceMode(false);
+  else {syncSurfaceControls();saveSurfaceSoon();}
+ }
 }

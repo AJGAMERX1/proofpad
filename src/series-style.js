@@ -28,7 +28,7 @@ function seriesAppearance(series,index,style,is3d){
  let color=style.getPropertyValue(colorVar).trim();
  const rampKeys=seriesRampOrder,start=Math.max(0,rampKeys.indexOf(surfaceView.palette));
  const rampKey=saved.ramp||rampKeys[((is3d?start:0)+sequence)%rampKeys.length];
- const mode=saved.mode||(is3d?'gradient':'solid');
+ const mode=series.kind==='curve'?'solid':saved.mode||(is3d?'gradient':'solid');
  let ramp=mode==='gradient'?(saved.colors||surfaceRamps[rampKey]).slice():[color,color];
  if(saved.reverse)ramp.reverse();
  if(mode==='gradient')color=ramp[Math.floor(ramp.length/2)];
@@ -57,9 +57,10 @@ function syncSeriesDialog(){
  const target=selectedSeriesStyle();
  if(!target||!seriesStyleDialog.open)return;
  const {series,index}=target,look=seriesAppearance(series,index,getComputedStyle(graphPanel),inSurface());
- document.querySelector('#seriesStyleHeading').textContent=(inSurface()?'Surface ':'Line ')+series.line+' style';
+ document.querySelector('#seriesStyleHeading').textContent=(series.kind==='curve'?'Curve ':inSurface()?'Surface ':'Line ')+series.line+' style';
  syncSurfaceStyleEditor(target,look);
  document.querySelector('#seriesStrokeOptions').hidden=inSurface();
+ document.querySelector('#seriesMorePalettes').hidden=series.kind==='curve';
  document.querySelector('#seriesResetStyle').disabled=!series.row.appearance;
  document.querySelectorAll('[data-series-hue]').forEach(button=>button.setAttribute('aria-pressed',String(look.mode==='solid'&&Number(button.dataset.seriesHue)===look.hue)));
  document.querySelectorAll('[data-series-ramp]').forEach(button=>button.setAttribute('aria-pressed',String(look.mode==='gradient'&&!series.row.appearance?.colors&&button.dataset.seriesRamp===look.rampKey)));
@@ -73,7 +74,7 @@ function openSeriesStyle(series){
  seriesStyleDialog.style.removeProperty('--picker-left');seriesStyleDialog.style.removeProperty('--picker-top');
  if(!seriesStyleDialog.open)seriesStyleDialog.showModal();
  syncSeriesDialog();
- if(inSurface())renderSurfaceLookThumbnails();
+ if(series.kind==='surface')renderSurfaceLookThumbnails();
  if(!inSurface() && innerWidth>900){
   const anchor=series.row.querySelector('.plot-style-trigger')?.getBoundingClientRect();
   const box=seriesStyleDialog.getBoundingClientRect();

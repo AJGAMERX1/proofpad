@@ -1,17 +1,65 @@
 const traceBox=$('#graphTrace'),traceLine=$('#traceLine'),traceInput=$('#traceCoordinate');
 let traceRun=null,traceKey='',traceList='';
+const traceValues={calculator:'0',surface:'0'};
+let traceWorkspace='calculator';
+
+function traceCurvePoint(curve,t,w,h) {
+ const marker=$('#traceMarkers');
+ const range=curve && graphCurveRange(curve);
+ let point, reading;
+ if (!curve) reading='Show a 3D curve to read its coordinates.';
+ else if (!range) reading='Check the t range for this curve.';
+ else if (!Number.isFinite(t)) reading='Enter a finite value for t.';
+ else if (t<range[0] || t>range[1]) reading='Enter t between '+graphNumber(range[0])+' and '+graphNumber(range[1])+'.';
+ else {
+  point=curve.run(t);
+  if (point?.every(Number.isFinite)) {
+   reading=point.map((value,index)=>'xyz'[index]+' = '+graphNumber(value)).join(', ');
+  } else {
+   point=null; reading='Undefined at t = '+graphNumber(t)+'.';
+  }
+ }
+ const output=$('#traceStatus');
+ if (output.textContent!==reading) output.textContent=reading;
+ if (point && w && h && !surfaceView.heatmap) {
+  const half=surfaceView.span/2;
+  const normalized=point.map((value,index)=>(value-[surfaceView.cx,surfaceView.cy,surfaceView.cz][index])/half);
+  if (normalized.every(value=>Math.abs(value)<=1)) {
+   const screen=surfaceProjection(w,h,surfaceView).project(...normalized);
+   let dot=marker.firstElementChild;
+   if (!dot || marker.childElementCount!==1) {dot=document.createElement('i'); marker.replaceChildren(dot);}
+   dot.style.left=screen.u+'px'; dot.style.top=screen.v+'px'; dot.style.borderColor=curve.look?.color || '';
+   return;
+  }
+ }
+ if (marker.childElementCount) marker.replaceChildren();
+}
+
 function updateGraphTrace(){
- if(!traceBox.open||workspaceMode!=='calculator')return;
- const curves=graphSeries.filter(s=>!s.row.plotHidden && s.kind!=='region');
- const list=curves.map(s=>s.line).join(',');
+ if(!isCalculatorMode())return;
+ const space=inSurface();
+ if (workspaceMode!==traceWorkspace) {
+  traceValues[traceWorkspace]=traceInput.value;
+  traceWorkspace=workspaceMode;
+  traceInput.type=space?'text':'number';
+  traceInput.value=traceValues[workspaceMode];
+  $('#traceAxis').textContent=space?'t =':'x =';
+  traceInput.setAttribute('aria-label',space?'t parameter':'x coordinate');
+  traceRun=null; traceKey='';
+ }
+ if (!traceBox.open) return;
+ const curves=graphSeries.filter(s=>!s.row.plotHidden && (space?s.kind==='curve':s.kind!=='region'));
+ const list=workspaceMode+':'+curves.map(s=>s.line).join(',');
  if(list!==traceList || !traceLine.options.length){
   const old=traceLine.value;
   traceLine.replaceChildren(...curves.map(s=>new Option('Line '+s.line,s.line)));
   if(curves.some(s=>s.line===old))traceLine.value=old;
   traceList=list;
  }
- const curve=curves.find(s=>s.line===traceLine.value),v=traceInput.valueAsNumber;
+ const curve=curves.find(s=>s.line===traceLine.value);
  const h=graphCanvas.clientHeight,w=graphCanvas.clientWidth;
+ if (space) {traceCurvePoint(curve,parseCurveParameter(traceInput.value),w,h);return;}
+ const v=traceInput.valueAsNumber;
  const key=[curve?.line,v,graphView.x,graphView.y,graphView.span,w,h].join('|');
  if(traceRun===curve?.run && traceKey===key)return;
  traceKey=key;traceRun=curve?.run;
@@ -73,9 +121,12 @@ traceBox.ontoggle=()=>{
 };
 traceInput.onkeydown=event=>{
  const sign={ArrowLeft:-1,ArrowDown:-1,ArrowRight:1,ArrowUp:1}[event.key];if(!sign)return;
- event.preventDefault();traceInput.value=Number(((traceInput.valueAsNumber||0)+sign*(event.shiftKey?.1:1)).toPrecision(12));updateGraphTrace();
+ if (inSurface() && ['ArrowLeft','ArrowRight'].includes(event.key)) return;
+ const current=inSurface()?parseCurveParameter(traceInput.value):traceInput.valueAsNumber;
+ event.preventDefault();traceInput.value=Number(((Number.isFinite(current)?current:0)+sign*(event.shiftKey?.1:1)).toPrecision(12));updateGraphTrace();
 };
 graphCanvas.addEventListener('keydown',event=>{
- if(workspaceMode!=='calculator'||event.key.toLowerCase()!=='t'||event.ctrlKey||event.metaKey||event.altKey)return;
+ if(!isCalculatorMode()||event.key.toLowerCase()!=='t'||event.ctrlKey||event.metaKey||event.altKey)return;
+ if(inSurface() && (surfaceView.heatmap || !graphSeries.some(s=>s.kind==='curve' && !s.row.plotHidden)))return;
  event.preventDefault();traceBox.open=true;updateGraphTrace();traceInput.focus();traceInput.select();
 });

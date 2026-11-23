@@ -1,0 +1,18 @@
+.curve-domain {
+ display:flex; flex-wrap:wrap; align-items:center; gap:6px;
+ margin-top:10px; padding-top:10px; border-top:1px solid var(--pad-line);
+ color:var(--pad-muted); font:italic 15px/1.4 Georgia,serif;
+}
+.curve-domain input {
+ min-width:0; width:6.25em; max-width:32%; min-height:30px; padding:5px 8px;
+ background:var(--pad-field); color:var(--pad-ink); border:1px solid var(--pad-line);
+ border-radius:5px; font:13px/1.4 system-ui,sans-serif;
+}
+.curve-domain input[aria-invalid=true] {border-color:var(--error,#c05a50)}
+.curve-range-error {font:12px/1.45 system-ui,sans-serif; color:var(--error,#b24a42)}
+.curve-range-error:not(:empty) {flex-basis:100%}
+html[data-theme=dark] .curve-range-error {color:#ffad9e}
+main[data-workspace=surface] #graphPanel[data-curves=true][data-heat=false] :is(#graphTrace,#traceMarkers) {display:block}
+@media (max-width:650px) {
+ .curve-domain input, #graphTrace #traceCoordinate {font-size:16px; min-height:40px}
+}

@@ -141,8 +141,28 @@ function compileGraphRows(nodes, angle='rad', dimension='2d', onNumericCall=null
   const n=typeof lhs==='string'?sliderNumber(rhs):null;
   return n==null?build(rhs,bindings,new Set(),budget):['SliderValue',index,n];
  }
+ function curveCoordinates(node){
+  // Raw Compute Engine MathJSON distinguishes (a,b,c) from a list or a
+  // bare comma sequence. Ignore redundant grouping around the whole tuple.
+  while(node?.[0]==='Delimiter' && node.length===2)node=node[1];
+  if(node?.[0]==='Delimiter' && node[2]==="'(,)'" && node[1]?.[0]==='Sequence')return node[1].slice(1);
+  if(node?.[0]==='Tuple')return node.slice(1);
+  return null;
+ }
  return nodes.map((node,index)=>{
   if(!node)return null;
+  const coords=surfaceMode && curveCoordinates(node);
+  if(coords){
+   const parameterError='Use t as the parameter for a 3D curve.';
+   if(coords.length!==3)return {kind:'curve',error:'Enter three coordinates as (x(t), y(t), z(t)).'};
+   if(coords.some(part=>uses(part,'x') || uses(part,'y')))return {kind:'curve',error:parameterError};
+   const budget={remaining:500}, scope=new Map([['t',{expr:'t',cost:0}]]);
+   try{
+    const parts=coords.map(part=>build(part,scope,new Set(),budget));
+    if(parts.some(part=>uses(part,'x') || uses(part,'y')))throw Error(parameterError);
+    return {kind:'curve',...pack(['Curve3D',...parts]),angle,cost:501-budget.remaining};
+   }catch(error){return {kind:'curve',error:error.message};}
+  }
   const op=Array.isArray(node)?node[0]:null, rel=comparisons.has(op) && node.length===3;
   const lhs=rel?node[1]:null, rhs=rel?node[2]:node, fn=signature(lhs);
   if(onScalarPreview && !fn && (!rel || (op==='Equal' && typeof lhs==='string'))){
@@ -218,9 +238,13 @@ function graphEvaluator(tree,angle) {
  }
  function compile(node) {
   if(typeof node==='number')return ()=>node;
-  if(node==='x')return x=>x;
+  if(node==='x' || node==='t')return x=>x;
   if(node==='y')return (x,y)=>y;
   const [op,...children]=node, args=children.map(compile);
+  if(op==='Curve3D'){
+   const [x,y,z]=args;
+   return t=>[x(t),y(t),z(t)];
+  }
   if(op==='Power'){
    const rational=oddDenominatorPower(children[1]);
    if(rational)return (x,y)=>rational(args[0](x,y));
@@ -231,6 +255,104 @@ function graphEvaluator(tree,angle) {
   return (x,y)=>{let value=args[0](x,y);for(let i=1;i<args.length;i++)value=f(value,args[i](x,y));return value;};
  }
  return compile(tree);
+}
+
+// Bounds and probe values are short, plain-text arithmetic expressions.
+function parseCurveParameter(input) {
+ const source=String(input ?? '').trim().replace(/\\pi\b|π/gi,'pi').replace(/−/g,'-').replace(/[×·]/g,'*').replace(/÷/g,'/');
+ if(!source || source.length>256)return NaN;
+ const token=/\s+|(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?|[a-z]+|[()+*/^-]/iy;
+ const tokens=[];
+ while(token.lastIndex<source.length){
+  const match=token.exec(source);
+  if(!match || tokens.length>=128)return NaN;
+  if(!/^\s+$/.test(match[0]))tokens.push(match[0].toLowerCase());
+ }
+ let at=0;
+ function factor(){
+  const term=tokens[at++];
+  if(term==='('){
+   const value=sum();
+   return tokens[at++]===')'?value:NaN;
+  }
+  if(term==='pi')return Math.PI;
+  if(term==='e')return Math.E;
+  if(typeof term==='string' && /^[\d.]/.test(term))return Number(term);
+  return NaN;
+ }
+ function signedPower(){
+  if(tokens[at]==='+' || tokens[at]==='-'){
+   const sign=tokens[at++];
+   const value=signedPower();
+   return sign==='-'?-value:value;
+  }
+  const value=factor();
+  if(tokens[at]!=='^')return value;
+  at++;
+  return value**signedPower();
+ }
+ function product(){
+  let value=signedPower();
+  while(at<tokens.length){
+   const op=tokens[at];
+   if(op==='*'||op==='/')at++;
+   else if(op!=='(' && op!=='pi' && op!=='e')break;
+   const rhs=signedPower();
+   value=op==='/'?value/rhs:value*rhs;
+  }
+  return value;
+ }
+ function sum(){
+  let value=product();
+  while(tokens[at]==='+' || tokens[at]==='-'){
+   const op=tokens[at++];
+   const rhs=product();
+   value=op==='+'?value+rhs:value-rhs;
+  }
+  return value;
+ }
+ const value=sum();
+ return at===tokens.length && Number.isFinite(value)?value:NaN;
+}
+
+const curveSampleCache=new WeakMap();
+function sampleParametricCurve(run,min,max,segments=384){
+ if(!Number.isFinite(min) || !Number.isFinite(max) || !(min<max))return [];
+ const count=Math.max(8,Math.min(4096,Math.round(segments)||384));
+ const cached=curveSampleCache.get(run);
+ if(cached && cached.min===min && cached.max===max && cached.count===count)return cached.points;
+ const points=[];
+ function point(t){
+  const p=run(t);
+  return p.every(Number.isFinite)?p:null;
+ }
+ function append(p){
+  if(p || (points.length && points[points.length-1]!==null))points.push(p);
+ }
+ function link(t0,a,t1,b,depth){
+  const tm=t0*.5+t1*.5,m=point(tm);
+  // Check deviation for each coordinate: a straight component must not mask
+  // a jump or a pole in another. Subdivide difficult intervals before drawing.
+  const smooth=a && b && m && m.every((v,i)=>{
+   const chordMid=a[i]*.5+b[i]*.5;
+   const tolerance=.32*Math.abs(b[i]-a[i])+1e-10*Math.max(1,Math.abs(a[i]),Math.abs(b[i]));
+   return Math.abs(v-chordMid)<=tolerance;
+  });
+  if(smooth){append(b);return;}
+  if(depth<3 && (a || b || m) && tm>t0 && tm<t1){
+   link(t0,a,tm,m,depth+1);
+   link(tm,m,t1,b,depth+1);
+  }else{append(null);append(b);}
+ }
+ let previousT=min,previous=point(min);
+ append(previous);
+ for(let i=1;i<=count;i++){
+  const ratio=i/count,t=min*(1-ratio)+max*ratio,p=point(t);
+  link(previousT,previous,t,p,0);
+  previousT=t;previous=p;
+ }
+ curveSampleCache.set(run,{min,max,count,points});
+ return points;
 }
 
 const graphCanvas=document.querySelector('#graphCanvas');
@@ -263,9 +385,10 @@ function setGraphResults(results) {
   const series={...graph,run:graphEvaluator(graph.expr,graph.angle),line,row};
   specs.push(series);
   const toggle=document.createElement('button');toggle.type='button';
-  toggle.textContent='Line '+line;toggle.title=title;
+  const seriesName=graph.kind==='curve'?'Curve ':graph.kind==='surface'?'Surface ':'Line ';
+  toggle.textContent=seriesName+line;toggle.title=title;
   series.legendButton=toggle;
-  toggle.setAttribute('aria-label','Show line '+line+' on graph');
+  toggle.setAttribute('aria-label','Show '+seriesName.toLowerCase()+line+' on graph');
   const syncVisibility=()=>{
    row.dataset.graphVisible=String(!row.plotHidden);
    toggle.setAttribute('aria-pressed',row.dataset.graphVisible);
@@ -298,14 +421,17 @@ function onSeriesStyleChanged(){
 }
 function describeGraph(){
  const count=graphSeries.filter(s=>!s.row.plotHidden).length;
+ const heat=inSurface() && surfaceView.heatmap;
+ const displayed=heat ? graphSeries.filter(s=>s.kind==='surface' && !s.row.plotHidden).length : count;
  let message;
  if(graphSeries.length && !count)message='All plots are hidden. Select a line in the graph legend to show it.';
  else if(!count && graphErrorCount)message='Check the marked expressions.';
- else if(inSurface() && count && emptySurfaceWindow)message='No surface is visible in this window. Try Reset or zoom out.';
+ else if(heat && count && !displayed)message='Heat maps show surface heights. Choose Surface to see your curves.';
+ else if(inSurface() && count && emptySurfaceWindow)message='No plot is visible in this window. Try Reset or zoom out.';
  else message=inSurface()?surfaceStatus():count?'Drag to pan · Scroll or pinch to zoom':'Enter y = x² or x² + y² = 9 on an expression line.';
  $('#graphStatus').textContent=message;
- const kind=inSurface()?(surfaceView.heatmap?'Height map':'3D surface graph'):'Coordinate plane';
- graphCanvas.setAttribute('aria-label',kind+' with '+count+' plotted '+(count===1?'expression':'expressions'));
+ const kind=inSurface()?(surfaceView.heatmap?'Height map':'3D graph'):'Coordinate plane';
+ graphCanvas.setAttribute('aria-label',kind+' with '+displayed+' plotted '+(displayed===1?'expression':'expressions'));
 }
 function graphNumber(value) {
  if(Math.abs(value)<1e-12)return '0';
@@ -440,10 +566,12 @@ function paintGraph({canvas=graphCanvas,pixelRatio=Math.min(3,window.devicePixel
   const palette={ramp:surfaceRamps[surfaceView.palette]};
   for(const key of ['paper','grid','axis','label'])palette[key]=style.getPropertyValue('--graph-'+key).trim();
   const moving=!fullDetail && (graphTouches.size>0 || spinFrame!==0);
-  const surfaces=shown.map(s=>({run:s.run,cost:s.cost,color:s.look.color,ramp:s.look.ramp,finish:s.look.finish,grid:s.look.grid,opacity:s.look.opacity}));
+  const surfaces=shown.map(s=>({kind:s.kind,run:s.run,cost:s.cost,color:s.look.color,ramp:s.look.ramp,finish:s.look.finish,grid:s.look.grid,opacity:s.look.opacity,
+   range:s.kind==='curve'?graphCurveRange(s):null}));
   const drawn=paintSurfacePlot(ctx,w,h,surfaces,surfaceView,palette,moving,sampleScale);
   if(canvas===graphCanvas){
-   const empty=surfaces.length>0 && !drawn;
+   updateGraphTrace();
+   const empty=!drawn&&surfaces.some(s=>!surfaceView.heatmap||s.kind!=='curve');
    if(empty!==emptySurfaceWindow){emptySurfaceWindow=empty;describeGraph();}
   }
   return;

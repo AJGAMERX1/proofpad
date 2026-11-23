@@ -113,7 +113,8 @@ function positionSliceHandle(p,q){
  const angle=Math.atan2(dy,dx);
  sliceHandle.firstElementChild.style.transform='rotate('+angle+'rad)';
 }
-function paintLinkedSlice(ctx,w,h,shown,palette,onscreen){
+function paintLinkedSlice(ctx,w,h,series,palette,onscreen){
+ const shown=series.filter(s=>s.kind!=='curve');
  const f=sliceFrame(surfaceView);
  const cost=shown.reduce((sum,s)=>sum+Math.max(1,s.cost||1),0);
  const count=Math.max(32,Math.min(420,Math.ceil(w),Math.floor(100000/Math.max(cost,1))));
