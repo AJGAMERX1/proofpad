@@ -11,11 +11,11 @@ function namedDerivative(body,parameter,order) {
   const integerPower=Number.isSafeInteger(exponent) && exponent>=0;
   const constantDivisor=typeof exponent==='number' && Number.isFinite(exponent) && exponent!==0;
   if (!supported.has(op) || (op==='Power' && !integerPower) || (op==='Divide' && !constantDivisor))
-   throw Error('Prime notation supports polynomials, sin, cos and exp. For other functions, enter the derivative formula with its domain.');
+   throw Error('Symbolic differentiation supports polynomials, sin, cos and exp. For other functions, enter the derivative formula with its domain.');
   if (angle!=='rad' && (node[0]==='Sin' || node[0]==='Cos')) throw Error('Choose Radians to differentiate a trigonometric function.');
   return 1+node.slice(1).reduce((n,child)=>n+size(child),0);
  }
- const key=JSON.stringify([body,order]);
+ const key=JSON.stringify([body,parameter,order]);
  if (derivatives.has(key)) return derivatives.get(key);
  let result=body;
  for (let i=0;i<order;i++) {

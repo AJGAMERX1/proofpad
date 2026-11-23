@@ -57,7 +57,7 @@ function syncSeriesDialog(){
  const target=selectedSeriesStyle();
  if(!target||!seriesStyleDialog.open)return;
  const {series,index}=target,look=seriesAppearance(series,index,getComputedStyle(graphPanel),inSurface());
- document.querySelector('#seriesStyleHeading').textContent=(series.kind==='curve'?'Curve ':inSurface()?'Surface ':'Line ')+series.line+' style';
+ document.querySelector('#seriesStyleHeading').textContent=graphSeriesLabel(series.kind,series.line)+' style';
  syncSurfaceStyleEditor(target,look);
  document.querySelector('#seriesStrokeOptions').hidden=inSurface();
  document.querySelector('#seriesMorePalettes').hidden=series.kind==='curve';

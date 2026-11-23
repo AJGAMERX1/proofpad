@@ -137,7 +137,7 @@ function fitGraphView(){
  const surface=inSurface(),frame=estimateGraphFrame(plots,surface?surfaceView:graphView,graphCanvas.clientWidth/Math.max(1,graphCanvas.clientHeight),surface);
  if(frame.error){$('#graphStatus').textContent=frame.error;return;}
  if(surface){
-  stopSurfaceSpin();Object.assign(surfaceView,{cx:frame.x,cy:frame.y,cz:frame.z,span:frame.span});
+  stopSurfaceSpin();Object.assign(surfaceView,{cx:frame.x,cy:frame.y,cz:frame.z,span:frame.span,magnification:1});
   syncSurfaceControls();saveSurfaceSoon();
  }else{
   const crossing=linearSystem(plots);

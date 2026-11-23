@@ -19,6 +19,11 @@ from install_draft_safety import install_draft_safety
 from install_lean_drafts import install_lean_drafts
 from install_mobile_keyboard import install_mobile_keyboard
 from install_touch_controls import install_touch_controls
+from install_audit_calculator import install_audit_calculator
+from install_audit_editor import install_audit_editor
+from install_safe_math import install_safe_math
+from install_audit_export import install_audit_export
+from install_external_audit import install_external_audit
 from install_curve_controls import install_curve_controls
 
 root = Path(__file__).resolve().parent
@@ -140,6 +145,11 @@ change("if(importDialog.open||$('main').inert)return;", "if(importDialog.open||$
 change('const looksLikeTexDocument=', "const eventInLeanEditor=event=>['leanSource','leanReturnSource'].includes(event.target?.id);\nconst looksLikeTexDocument=")
 s = install_lean_drafts(s)
 s = install_curve_controls(s)
+s = install_audit_calculator(s)
+s = install_audit_export(s)
+s = install_audit_editor(s)
+s = install_external_audit(s)
+s = install_safe_math(s)
 
 change('Type beautiful math and export compact PNGs. A visual formula editor with a math keyboard.',
        'Write mathematical proofs, explore equations in 2D and 3D, calculate with matrices, and export your work as images or a printable PDF.')

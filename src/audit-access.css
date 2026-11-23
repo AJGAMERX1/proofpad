@@ -1,0 +1,17 @@
+html:not([data-theme=dark]) :is(button.copy,.toolbar .tool,.toolbar .tool .symbol,.clipboardtools button,#showKeyboard,#matrixTool,.slider-bounds input,kbd){
+ color:#435f7c;
+}
+html:not([data-theme=dark]) :is(.tabs button[aria-selected=true],.tabs button.active,.seg button.active,[data-bg][aria-pressed=true],#textMode[aria-pressed=true],#textMode[aria-pressed=true] .symbol){
+ color:#275a88;
+}
+html #placeholder{color:#4b6178}
+.row:focus-within{outline:2px solid #356a97;outline-offset:2px}
+html[data-theme=dark] .row:focus-within{outline-color:#9dcfff}
+@media(pointer:coarse){
+ .surface-mesh{min-height:36px;gap:8px}
+ .surface-mesh input{width:24px;height:24px}
+ .shortcutsetting .switch{min-height:36px}
+ .shortcutsetting .switch input{width:40px;height:24px}
+ .shortcutsetting .switch input:before{top:4px;left:4px;width:14px;height:14px}
+ .shortcutsetting .switch input:checked:before{transform:translateX(16px)}
+}

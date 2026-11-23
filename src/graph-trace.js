@@ -52,7 +52,7 @@ function updateGraphTrace(){
  const list=workspaceMode+':'+curves.map(s=>s.line).join(',');
  if(list!==traceList || !traceLine.options.length){
   const old=traceLine.value;
-  traceLine.replaceChildren(...curves.map(s=>new Option('Line '+s.line,s.line)));
+  traceLine.replaceChildren(...curves.map(s=>new Option(graphSeriesLabel(s.kind,s.line),s.line)));
   if(curves.some(s=>s.line===old))traceLine.value=old;
   traceList=list;
  }

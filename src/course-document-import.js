@@ -26,7 +26,7 @@ $('#texConfirm').onclick=()=>{
    if(workspaceMode!==target)switchWorkspace(target);
    beforeEdit();applyDraft(target,next);commitHistory();schedule();
   }
-  importDialog.close();status((isNew?'Opened ':'Appended ')+(imported.title||'LaTeX document')+'.');
+  importDialog.close();status((isNew?'Opened ':'Appended ')+(imported.title||'LaTeX document')+'.'+(imported.warning?' '+imported.warning:''));
  }catch(error){
   importInfo.textContent='Import could not finish. '+error.message;
  }

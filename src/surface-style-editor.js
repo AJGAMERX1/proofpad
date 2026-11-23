@@ -59,7 +59,7 @@ function syncSurfaceStyleEditor(target,look) {
  const surfaces=graphSeries.filter(series=>series.kind==='surface');
  const signature=surfaces.map(series=>series.line).join(',');
  if(select.dataset.lines!==signature) {
-  select.replaceChildren(...surfaces.map(series=>new Option('Surface '+series.line,series.line)));
+  select.replaceChildren(...surfaces.map(series=>new Option(graphSeriesLabel(series.kind,series.line),series.line)));
   select.dataset.lines=signature;
  }
  select.value=target.series.line;

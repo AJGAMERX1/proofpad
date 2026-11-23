@@ -48,9 +48,12 @@ function syncCurveRangeControls(row, isCurve) {
  row.append(controls);
 
  function showValidation() {
-  const valid = !!graphCurveRange({row});
+  const interval = graphCurveRange({row});
+  const valid = !!interval;
   for (const input of [min,max]) input.setAttribute('aria-invalid', String(!valid));
-  error.textContent = valid ? '' : 'Enter two finite bounds with minimum t smaller than maximum t.';
+  const wide = valid && interval[1]-interval[0] > 1024*Math.PI;
+  error.textContent = !valid ? 'Enter two finite bounds with minimum t smaller than maximum t.'
+   : wide ? 'This wide t range may hide turns or gaps. Narrow the range to see more detail.' : '';
   return valid;
  }
  showValidation();

@@ -1,8 +1,11 @@
 // Keep an exact expression alongside its numeric value for definitions that
 // are substituted into another row (including scalar factors in a matrix).
 function evaluate(expr) {
+ const calculus=prepareCalculus(expr);
+ if(calculus)expr=calculus.value;
  const substitutions={};
  for (const symbol of expr.unknowns) {
+  if (!definitions.has(symbol) && calculus?.symbolic.has(symbol)) continue;
   if (!definitions.has(symbol)) throw Error('Define '+ce.expr(symbol).latex+' on another line.');
   substitutions[symbol]=resolve(symbol).exact.json;
  }
@@ -21,6 +24,7 @@ function evaluate(expr) {
   }
   throw Error('Incompatible matrix dimensions. Addition needs equal sizes. For a product, the first column count must equal the second row count.');
  }
+ if (calculus && exact.unknowns.length && exact.unknowns.every(name=>calculus.symbolic.has(name))) return {exact,value:exact};
  const value=isNumericMatrix(exact)?exact:exact.N();
  if (value.json==='True' || value.json==='False' || isNumericMatrix(value)) return {exact,value};
  if (!Number.isFinite(value.re) || !Number.isFinite(value.im))

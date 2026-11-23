@@ -4,7 +4,7 @@ function surfaceProjection(w, h, view) {
  const rise = Math.sin(view.pitch), level = Math.cos(view.pitch);
  // Fit the rotating cube's largest projected extents once per viewport.
  // A fixed camera scale keeps orbit from looking like a simultaneous zoom.
- const unit = Math.max(1, Math.min((w - 70) / (2 * Math.SQRT2),
+ const unit = (view.magnification || 1) * Math.max(1, Math.min((w - 70) / (2 * Math.SQRT2),
   (h - 54) / (2 * Math.sqrt(3))));
  return {
   scale: 2 * unit / view.span,
@@ -371,17 +371,20 @@ function paintSurfacePlot(ctx,w,h,series,view,palette,moving=false,sampleScale=1
   const surfaces=series.filter(s=>s.kind!=='curve');
   if(view.heatmap)return paintSurfaceHeat(ctx,w,h,surfaces,view,palette,sampleScale,moving);
   const camera=surfaceProjection(w,h,view), project=camera.project, half=view.span/2;
-  const floor=Math.sin(view.pitch)>=0?-1:1;
+  // The helix camera frames an elongated region around x. Draw its axes beside
+  // the curve even though the sampling cube still includes both endpoints.
+  const side=1/(view.magnification||1), axisExtent=[1,side,side];
+  const floor=(Math.sin(view.pitch)>=0?-1:1)*side;
   const nearX=Math.sin(view.yaw)>=0?1:-1, nearY=Math.cos(view.yaw)>=0?1:-1;
   const leftX=Math.cos(view.yaw)>=0?-1:1, leftY=Math.sin(view.yaw)>=0?1:-1;
-  const ticks=[view.cx,view.cy,view.cz].map(n=>surfaceTicks(n-half,n+half,5).map(v=>({value:v,t:(v-n)/half})));
+  const ticks=[view.cx,view.cy,view.cz].map((n,i)=>surfaceTicks(n-half*axisExtent[i],n+half*axisExtent[i],5).map(v=>({value:v,t:(v-n)/half})));
   function line(a,b){
    const p=project(...a),q=project(...b);ctx.moveTo(p.u,p.v);ctx.lineTo(q.u,q.v);
   }
   ctx.beginPath();ctx.strokeStyle=palette.grid;ctx.lineWidth=.9;
-  for(const {t} of ticks[0])line([t,-1,floor],[t,1,floor]);
+  for(const {t} of ticks[0])line([t,-side,floor],[t,side,floor]);
   for(const {t} of ticks[1])line([-1,t,floor],[1,t,floor]);
-  line([-1,-nearY,floor],[1,-nearY,floor]);line([-nearX,-1,floor],[-nearX,1,floor]);ctx.stroke();
+  line([-1,-nearY*side,floor],[1,-nearY*side,floor]);line([-nearX,-side,floor],[-nearX,side,floor]);ctx.stroke();
   ctx.beginPath();ctx.strokeStyle=palette.axis;ctx.globalAlpha=.44;
   const origin=[-view.cx/half,-view.cy/half,-view.cz/half];
   // Draw the true coordinate axes when the visible volume intersects them.
@@ -433,17 +436,18 @@ function paintSurfacePlot(ctx,w,h,series,view,palette,moving=false,sampleScale=1
    ctx.fillStyle=palette.label;ctx.fillText(text,x,y);
   }
   const axes=[
-   {name:'x',point:t=>[t,nearY,floor]}, {name:'y',point:t=>[nearX,t,floor]},
-   {name:'z',point:t=>[leftX,leftY,t]}
+   {name:'x',point:t=>[t,nearY*side,floor]}, {name:'y',point:t=>[nearX,t,floor]},
+   {name:'z',point:t=>[leftX,leftY*side,t]}
   ];
   ctx.textAlign='center';ctx.textBaseline='middle';ctx.lineCap='round';
-  for(const axis of axes){
-   const a=project(...axis.point(-1)), b=project(...axis.point(1)),dx=b.u-a.u,dy=b.v-a.v;
+  for(const [i,axis] of axes.entries()){
+   const extent=axisExtent[i];
+   const a=project(...axis.point(-extent)), b=project(...axis.point(extent)),dx=b.u-a.u,dy=b.v-a.v;
    const len=Math.hypot(dx,dy), sign=(dy*((a.u+b.u)/2-w/2)-dx*((a.v+b.v)/2-h/2))>0?1:-1;
    axis.nx=sign*dy/(len||1);axis.ny=-sign*dx/(len||1);axis.len=len;
    ctx.beginPath();ctx.moveTo(a.u,a.v);ctx.lineTo(b.u,b.v);ctx.lineWidth=1.05;ctx.strokeStyle=palette.axis;ctx.stroke();
    if(len>=14){
-    const p=project(...axis.point(axis.name==='z'?.93:.05));
+    const p=project(...axis.point(extent*(axis.name==='z'?.93:.05)));
     ctx.font='italic bold 15px Georgia,serif';label(axis.name,p.u+axis.nx*22,p.v+axis.ny*22,true);
    }
   }

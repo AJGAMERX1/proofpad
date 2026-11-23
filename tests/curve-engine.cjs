@@ -47,7 +47,8 @@ close(evaluator(surface.graph)(Math.PI/2,0), 1);
 for(const tuple of ['(x,t,0)','(1,x,y)','(t,cos(y),2)']){
  assert.equal(notebook([tuple])[0].error, 'Use t as the parameter for a 3D curve.');
 }
-assert(!notebook(['(t,sin(t),cos(t))'],'2d')[0].graph);
+for(const rows of [['(t,sin(t),cos(t))'],['(t,sin(t),cos(t))','t=5']])
+ assert.equal(notebook(rows,'2d')[0].error,'3D curves go in the 3D graph.');
 assert.equal(notebook([raw`\begin{bmatrix}1&2\\3&4\end{bmatrix}`])[0].matrix.join(','),'2,2');
 assert.equal(notebook(['(1,2,3)'])[0].graph.kind,'curve');
 const withT = notebook(['(t,2t,0)','t=10']);

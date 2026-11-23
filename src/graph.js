@@ -151,8 +151,9 @@ function compileGraphRows(nodes, angle='rad', dimension='2d', onNumericCall=null
  }
  return nodes.map((node,index)=>{
   if(!node)return null;
-  const coords=surfaceMode && curveCoordinates(node);
-  if(coords){
+  const coords=curveCoordinates(node);
+  if(!surfaceMode && coords?.length===3)return {kind:'curve',error:'3D curves go in the 3D graph.'};
+  if(surfaceMode && coords){
    const parameterError='Use t as the parameter for a 3D curve.';
    if(coords.length!==3)return {kind:'curve',error:'Enter three coordinates as (x(t), y(t), z(t)).'};
    if(coords.some(part=>uses(part,'x') || uses(part,'y')))return {kind:'curve',error:parameterError};
@@ -369,6 +370,10 @@ function redrawGraph() {
  if(graphFrame || workspaceMode!=='calculator')return;
  graphFrame=requestAnimationFrame(()=>{graphFrame=0;paintGraph();});
 }
+function graphSeriesLabel(kind,line) {
+ return (kind==='curve'?'Curve ':kind==='surface'?'Surface ':'Line ')+line;
+}
+function graphTouchInput(){return matchMedia('(pointer: coarse)').matches}
 function setGraphResults(results) {
  const list=calculatorRows(), legend=document.querySelector('#graphLegend'), specs=[];
  const controls=document.createDocumentFragment();
@@ -385,10 +390,10 @@ function setGraphResults(results) {
   const series={...graph,run:graphEvaluator(graph.expr,graph.angle),line,row};
   specs.push(series);
   const toggle=document.createElement('button');toggle.type='button';
-  const seriesName=graph.kind==='curve'?'Curve ':graph.kind==='surface'?'Surface ':'Line ';
-  toggle.textContent=seriesName+line;toggle.title=title;
+  const seriesName=graphSeriesLabel(graph.kind,line);
+  toggle.textContent=seriesName;toggle.title=title;
   series.legendButton=toggle;
-  toggle.setAttribute('aria-label','Show '+seriesName.toLowerCase()+line+' on graph');
+  toggle.setAttribute('aria-label',seriesName+' · Show on graph');
   const syncVisibility=()=>{
    row.dataset.graphVisible=String(!row.plotHidden);
    toggle.setAttribute('aria-pressed',row.dataset.graphVisible);
@@ -428,7 +433,7 @@ function describeGraph(){
  else if(!count && graphErrorCount)message='Check the marked expressions.';
  else if(heat && count && !displayed)message='Heat maps show surface heights. Choose Surface to see your curves.';
  else if(inSurface() && count && emptySurfaceWindow)message='No plot is visible in this window. Try Reset or zoom out.';
- else message=inSurface()?surfaceStatus():count?'Drag to pan · Scroll or pinch to zoom':'Enter y = x² or x² + y² = 9 on an expression line.';
+ else message=inSurface()?surfaceStatus():count?(graphTouchInput()?'Drag to pan · Pinch to zoom':'Drag to pan · Scroll or pinch to zoom'):'Enter y = x² or x² + y² = 9 on an expression line.';
  $('#graphStatus').textContent=message;
  const kind=inSurface()?(surfaceView.heatmap?'Height map':'3D graph'):'Coordinate plane';
  graphCanvas.setAttribute('aria-label',kind+' with '+displayed+' plotted '+(displayed===1?'expression':'expressions'));
@@ -636,7 +641,7 @@ function graphReadout(p) {
  for(const s of graphSeries){
   if(s.row.plotHidden || (s.kind!=='x'&&s.kind!=='y'))continue;
   const sideways=s.kind==='x',sample=s.run(x,y),dist=Math.abs((sideways?g.screenX(sample)-p.x:g.screenY(sample)-p.y));
-  if(dist<nearest){nearest=dist;value='Line '+s.line+'   ('+graphNumber(sideways?sample:x)+', '+graphNumber(sideways?y:sample)+')';}
+  if(dist<nearest){nearest=dist;value=graphSeriesLabel(s.kind,s.line)+'   ('+graphNumber(sideways?sample:x)+', '+graphNumber(sideways?y:sample)+')';}
  }
  readout.textContent=value;readout.hidden=false;
 }

@@ -1,7 +1,7 @@
 """Build the Proofpad website in docs/ for GitHub Pages."""
 import hashlib,json,re
 from pathlib import Path
-from bundle_offline import VENDOR, PACKAGES, CDN, verify, replace_once, local_worker, local_math
+from bundle_offline import VENDOR, PACKAGES, CDN, verify, replace_once, local_worker, local_math, lazy_dictionary
 HERE=Path(__file__).resolve().parent
 OUTPUT=HERE.parent/'docs'
 def website(source):
@@ -22,21 +22,7 @@ def website(source):
     h=replace_once(h,pdf_hook,"if(!window.jspdf?.jsPDF)await new Promise((resolve,reject)=>{const script=document.createElement('script');script.src="+json.dumps(urls['jspdf'])+";script.onload=resolve;script.onerror=()=>{script.remove();reject(new Error('Could not load PDF tools. Retry or use Print / Save PDF.'));};document.head.append(script);});\n  "+pdf_hook)
     word=re.search(r'<script type="text/plain" id="spellingWords">([\s\S]*?)</script>',h)
     path=asset('dictionary.txt',word[1]);h=h[:word.start()]+h[word.end():]
-    h=replace_once(h,r"new Set(document.getElementById('spellingWords').textContent.trim().split(/\s+/))","new Set()")
-    h=replace_once(h,'const mathWords =',"""let dictionaryReady=false,dictionaryPending=null;
-function loadWordList(){
- if(!dictionaryPending)dictionaryPending=fetch("""+json.dumps(path)+r""").then(r=>{if(!r.ok)throw Error('Dictionary unavailable');return r.text()}).then(text=>{for(const word of text.trim().split(/\s+/))spellingWords.add(word);dictionaryReady=true;return true}).catch(()=>{dictionaryPending=null;return false});
- return dictionaryPending;
-}
-const mathWords =""")
-    h=replace_once(h,'spellingTimer=setTimeout(()=>{\n  const issues=spellingIssues();',"""spellingTimer=setTimeout(async()=>{
-  if(!dictionaryReady){
-   if(!spellingSources().some(s=>s.element.value && proseRanges(s.element.value,s.latex).some(([a,b])=>/[A-Za-z]{2}/.test(s.element.value.slice(a,b)))))return;
-   if(!await loadWordList()){$('#spellReview').textContent='Check spelling · retry';return;}
-  }
-  if(!$('#spellEnabled').checked)return;
-  const issues=spellingIssues();""")
-    h=replace_once(h,"$('#spellReview').onclick=showSpelling;","$('#spellReview').onclick=async()=>{if(dictionaryReady||await loadWordList())showSpelling();else status('Could not load the spelling dictionary. Try again.',true);};")
+    h=lazy_dictionary(h,'fetch('+json.dumps(path)+").then(r=>{if(!r.ok)throw Error('Dictionary unavailable');return r.text()})")
     files['THIRD-PARTY-NOTICES.txt']=(VENDOR/'NOTICES.txt').read_bytes()
     files['index.html']=h.encode()
     return files

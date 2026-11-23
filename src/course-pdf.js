@@ -1,19 +1,32 @@
-// Preserve the visual MathJax page and its real positions while giving PDF readers
-// a searchable text run for each line. Print pagination clones these alongside the ink.
+// MathLive's speech rules describe nested expressions, including individual matrix cells.
+function proofpadSpokenMath(latex){
+ const source=String(latex??'').trim();
+ if(!source)return '';
+ try{
+  const spoken=window.MathLive?.convertLatexToSpeakableText(source.replace(/\\imaginaryI\b/g,'\\text{ the imaginary unit i }'));
+  if(spoken?.trim())return spoken.replace(/'([A-Za-z])'/g,'$1').replace(/\s+/g,' ').trim();
+ }catch{/* Keep the equation readable when speech conversion is unavailable. */}
+ return source.replace(/\\([A-Za-z]+)/g,' $1 ').replace(/_/g,' subscript ').replace(/\^/g,' to the power of ')
+  .replace(/[{}]/g,' ').replace(/&/g,', ').replace(/\s+/g,' ').trim();
+}
+// Print pagination clones each alternative with the ink at its original position.
+function markPrintAlternative(parent,text,x,y,width,fontSize){
+ if(!text||!(width>0))return;
+ const label=svgElement('text',{x,y,'font-family':'Georgia,serif','font-size':fontSize,
+  opacity:0,'aria-hidden':'true','data-pdf-line':'',textLength:width,lengthAdjust:'spacingAndGlyphs'});
+ label.textContent=text;
+ parent.append(label);
+}
 function markPrintLine(lineNode,line,x,y,fontSize){
  if(!line.runs.length)return;
- const text=line.runs.map(run=>run.pdfText??' ').join('').trimEnd();
+ const text=line.runs.map(run=>run.pdfText??' ').join('').replace(/\s+([,.!?;:])/g,'$1').replace(/\s+/g,' ').trim();
  let end=line.runs.length;while(end&&!line.runs[end-1].svg)end--;
  const last=line.runs[end-1];
- if(!text||!last)return;
- const label=svgElement('text',{x,y,'font-family':'Georgia,serif','font-size':fontSize,
-  opacity:0,'aria-hidden':'true','data-pdf-line':'',textLength:last.x+last.w,lengthAdjust:'spacingAndGlyphs'});
- label.textContent=text;
- lineNode.append(label);
+ if(last)markPrintAlternative(lineNode,text,x,y,last.x+last.w,fontSize);
 }
 function readablePrintRun(latex){
  const prose=/^\\text\{([\s\S]*)\}$/.exec(latex);
- if(!prose)return latex;
+ if(!prose)return ' '+proofpadSpokenMath(latex)+' ';
  return prose[1].replace(/\\textbackslash\{\}/g,'\\').replace(/\\textasciitilde\{\}/g,'~')
   .replace(/\\textasciicircum\{\}/g,'^').replace(/\\([{}%$#&_])/g,'$1');
 }

@@ -191,7 +191,7 @@ function paintSliceChart(){
   s.look.ramp.forEach((color,i,colors)=>gradient.addColorStop(i/(colors.length-1),color));
   ctx.lineWidth=2.5;ctx.strokeStyle=gradient;ctx.stroke();
   const z=f.onY?s.run(free,f.at):s.run(f.at,free);
-  const text='Line '+s.line+' · z = '+(Number.isFinite(z)?graphNumber(z):'undefined');
+  const text=graphSeriesLabel(s.kind,s.line)+' · z = '+(Number.isFinite(z)?graphNumber(z):'undefined');
   values.push({text,color:s.look.color});
   if(Number.isFinite(z)&&Math.abs(z-f.cz)<=f.half){
    ctx.beginPath();ctx.arc(cursorX,py((z-f.cz)/f.half),3.5,0,Math.PI*2);

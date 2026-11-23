@@ -19,4 +19,5 @@
  }else if(first?.env.replace(/\*$/,'')==='proof'&&!first.caption&&first.end===imported.length){
   proofSetup={statement:'',proofStyle:'paper',qed:true,entries:imported.slice(1)};
  }
- return {title,entries:imported,proofSetup};
+ const warning = preserved.size ? 'Preserved unsupported LaTeX as editable text: '+[...preserved].join(', ')+'.' : '';
+ return {title,entries:imported,proofSetup,warning};

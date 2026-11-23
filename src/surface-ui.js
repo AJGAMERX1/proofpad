@@ -23,7 +23,7 @@ const surfaceRamps={
 function surfaceRampLabel(key){
  return Object.hasOwn(surfaceRamps,key)?key[0].toUpperCase()+key.slice(1):'Aurora';
 }
-const surfaceHome={yaw:.72,pitch:.52,span:12,cx:0,cy:0,cz:0};
+const surfaceHome={yaw:.72,pitch:.52,span:12,magnification:1,cx:0,cy:0,cz:0};
 const surfaceView={...surfaceHome,heatmap:false,mesh:true,palette:'aurora'};
 const surfaceExamples={
  ripple:String.raw`\cos\left(\sqrt{x^2+y^2}\right)`,
@@ -41,6 +41,7 @@ function restoreSurfaceSettings(saved={}){
  if(!saved||typeof saved!=='object')saved={};
  Object.assign(surfaceView,surfaceHome,{
   yaw:bounded(saved.yaw,-Math.PI*2,Math.PI*2,surfaceHome.yaw),pitch:bounded(saved.pitch,-1.48,1.48,surfaceHome.pitch),
+  magnification:bounded(saved.magnification,1,2.5,1),
   span:bounded(saved.span,1e-5,1e7,surfaceHome.span),mesh:saved.mesh!==false,heatmap:saved.heatmap===true,
   palette:Object.hasOwn(surfaceRamps,saved.palette)?saved.palette:'aurora'
  });
@@ -60,7 +61,7 @@ function applyGraphWorkspace(previousMode,data){
  $('#graphHeading').textContent=inSurface()?'3D graph':'Graph';
  $('#graphExample').textContent=inSurface()?'Add example':'Plot example';
  $('#surfaceProbe').hidden=$('#graphCoordinates').hidden=true;
- $('#graphKeys').textContent=inSurface()?'Drag or use arrow keys to rotate the surface or pan the heat map. Shift-drag pans the surface. Scroll, pinch, or use plus and minus to zoom. Home resets the view.':'Drag or use the arrow keys to pan. Scroll, pinch, or press plus and minus to zoom. Press Home to reset.';
+ $('#graphKeys').textContent=graphTouchInput()?(inSurface()?'Drag to rotate. Drag with two fingers to pan. Pinch to zoom.':'Drag to pan. Pinch to zoom.'):inSurface()?'Drag or use arrow keys to rotate the surface or pan the heat map. Shift-drag pans the surface. Scroll, pinch, or use plus and minus to zoom. Home resets the view.':'Drag or use the arrow keys to pan. Scroll, pinch, or press plus and minus to zoom. Press Home to reset.';
  syncSurfaceControls();
 }
 function syncSurfaceControls(){
@@ -86,7 +87,7 @@ function updateSurfaceKeys(){
  const keys=document.createDocumentFragment();
  for(const series of visible){
   const key=document.createElement('div');key.className='surface-key';
-  const name=document.createElement('span');name.textContent='Line '+series.line+' · '+series.look.rampName;
+  const name=document.createElement('span');name.textContent=graphSeriesLabel(series.kind,series.line)+' · '+series.look.rampName;
   const low=document.createElement('span');low.textContent=minimum;
   const bar=document.createElement('i');bar.style.background='linear-gradient(90deg,'+series.look.ramp.join(',')+')';
   const high=document.createElement('span');high.textContent=maximum;
@@ -100,6 +101,7 @@ function saveSurfaceSoon(){
 }
 function surfaceStatus(){
  if(!graphSeries.length)return 'Enter z = x² + y², a curve such as (t, sin(t), cos(t)), or add an example.';
+ if(graphTouchInput())return surfaceView.heatmap?'Tap to read the height · Drag to pan · Pinch to zoom':'Drag to rotate · Two fingers to pan · Pinch to zoom';
  return surfaceView.heatmap?'Move over the map to read x, y and height. Drag to pan.':'Drag to rotate · Shift-drag to pan · Scroll or pinch to zoom';
 }
 function updateSurfaceMode(heatmap){
@@ -155,7 +157,7 @@ function inspectHeatmap(p){
   const z=series.run(x,y);
   if(Number.isFinite(z)&&z>=minimum&&z<=maximum&&z>highest){highest=z;topLine=series.line;}
  }
- output.textContent=(topLine && graphSeries.length>1?'Line '+topLine+'   ':'')+'x '+graphNumber(x)+'   y '+graphNumber(y)+(Number.isFinite(highest)?'   z '+graphNumber(highest):'   z —');
+ output.textContent=(topLine && graphSeries.length>1?graphSeriesLabel('surface',topLine)+'   ':'')+'x '+graphNumber(x)+'   y '+graphNumber(y)+(Number.isFinite(highest)?'   z '+graphNumber(highest):'   z —');
  probe.style.left=p.x+'px';probe.style.top=p.y+'px';probe.hidden=false;
  output.hidden=false;
 }
@@ -169,7 +171,8 @@ function addSurfaceExample(){
  else addRow(value,true,'math');
  schedule();resetGraph();
  if(preset==='helix'){
-  surfaceView.span=4*Math.PI*1.12;
+  // Keep both ends in the sampling volume while bringing the turns closer to the camera.
+  Object.assign(surfaceView,{span:4*Math.PI*1.06,yaw:1.17,pitch:.16,magnification:2.35});
   if(surfaceView.heatmap)updateSurfaceMode(false);
   else {syncSurfaceControls();saveSurfaceSoon();}
  }

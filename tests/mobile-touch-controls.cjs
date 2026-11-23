@@ -34,7 +34,7 @@ const [engine='webkit',url='http://127.0.0.1:9221/']=process.argv.slice(2);
   await tap('#showKeyboard');await hidden();
   await tap('#showKeyboard');await visible();
   // Tapping the symbol palette must insert exactly once and retain prose mode.
-  await tap('[data-tab="greek"]');await tap('#keys button[aria-label="Sigma"]');
+  await tap('[data-tab="greek"]');await tap('#keys button[title="Sigma"]');
   assert((await value()).includes('\\sigma'));assert.equal(await page.evaluate(()=>active.mode),'text');
   const withSigma=await value();await tap('#undoEdit');
   await page.waitForFunction(value=>active.value!==value,withSigma);

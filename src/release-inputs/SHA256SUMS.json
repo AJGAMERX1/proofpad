@@ -1,7 +1,9 @@
 {
   "base.html": "2e41943e7fc0c957b4c98612e1f691f4bb16ecdf3ef2eedc1092f1ebc4f39918",
-  "vendor/NOTICES.txt": "48b9010bd29300878d9bc75a01fab386611151d96560c98118dc4820aa44ed79",
+  "vendor/NOTICES.txt": "c9125cb6630a62cef5bf7ec77896ddafcfc73c027edba183317f5f45c5061ccd",
   "vendor/compute-engine.js": "49557727ca6f479fccb898cf7e704a93dd5e60374c62d251b15d96bba87f06b6",
+  "vendor/fflate.js": "462ef8041fc970e3615a20a9dd2b2e3047a073b2da729ef4f02b634bba8b7b83",
+  "vendor/fonts.css": "4fd7eb386f3fc1f9a13beb10123be5fbba01a8fa2fc9f1f4be979f1da86ca255",
   "vendor/fonts/KaTeX_AMS-Regular.woff2": "0cdd387c9590a1a9f9794560022dbb59654a7d86f187aa0c81495ad42d3a7308",
   "vendor/fonts/KaTeX_Caligraphic-Bold.woff2": "de7701e42cf1f4cf0b766c03fb27977207eee2f4fd5d76fa82188406da43ea4c",
   "vendor/fonts/KaTeX_Caligraphic-Regular.woff2": "5d53e70ad607c2352162dec9e0923fb54ecdafaccbf604cd8dcf7d00facb989b",
@@ -22,8 +24,7 @@
   "vendor/fonts/KaTeX_Size3-Regular.woff2": "73d591271b1604960cb10bb90fee021670af7297017e0e98480b332d11f51995",
   "vendor/fonts/KaTeX_Size4-Regular.woff2": "a4af7d414440a1c1790825cfb700cf9cf43b0f2c4b04f0ebc523011ad9853ec0",
   "vendor/fonts/KaTeX_Typewriter-Regular.woff2": "71d517d67827787cfabdf186914cc3358eda539e37931941f2b2fd4a21f68c0b",
-  "vendor/fonts.css": "4fd7eb386f3fc1f9a13beb10123be5fbba01a8fa2fc9f1f4be979f1da86ca255",
-  "vendor/jspdf.js": "85ba2cc3ff858a20fa49fe6e457bec863ea40b55a9f3725e58a940e62f6f61a4",
+  "vendor/jspdf.js": "e6551fcdc32f09d6853b2c5126d18d01d9447e0da618a41a11ebeee0f6c20d54",
   "vendor/mathjax.js": "a4354ff94fd868aea0cc6eaaa79a57fda0588646fc46ee3700a349ee0a11cbe6",
   "vendor/mathlive.js": "51e9ab5c4739209a2951a550042dcecb99ad3047269c1d791d09d7d613226eae"
 }
