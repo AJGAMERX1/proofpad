@@ -16,6 +16,7 @@ from install_graph_access import install_graph_access
 from install_math_accuracy import install_math_accuracy
 from install_course_paper import install_course_paper
 from install_draft_safety import install_draft_safety
+from install_lean_drafts import install_lean_drafts
 from install_mobile_keyboard import install_mobile_keyboard
 from install_touch_controls import install_touch_controls
 
@@ -128,6 +129,14 @@ s = install_course_paper(s)
 s = install_draft_safety(s)
 s = install_mobile_keyboard(s)
 s = install_touch_controls(s)
+change('<div id="proofSetup"', fragment('lean-panel.html') + '<div id="proofSetup"')
+change('<dialog id="copiesDialog"', fragment('lean-dialog.html') + '<dialog id="copiesDialog"')
+change('</head>', '<style>\n' + fragment('lean-panel.css') + '</style>\n</head>')
+change("showKeys('proof');\nwindow.addEventListener('load'", fragment('lean-examples.js') + fragment('lean-checker.js') + fragment('lean-panel.js') + "showKeys('proof');\nwindow.addEventListener('load'")
+change("if(importDialog.open||$('main').inert)return;", "if(importDialog.open||$('main').inert||eventInLeanEditor(e))return;")
+change('const looksLikeTexDocument=', "const eventInLeanEditor=event=>['leanSource','leanReturnSource'].includes(event.target?.id);\nconst looksLikeTexDocument=")
+s = install_lean_drafts(s)
+
 change('Type beautiful math and export compact PNGs. A visual formula editor with a math keyboard.',
        'Write mathematical proofs, explore equations in 2D and 3D, calculate with matrices, and export your work as images or a printable PDF.')
 change('id="saveDraft">Save draft','id="saveDraft" title="Download an editable backup of this workspace">Save draft')

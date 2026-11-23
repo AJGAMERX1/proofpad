@@ -1,0 +1,47 @@
+main:not([data-mode="proofs"]) #leanPanel {display:none}
+#leanPanel, #leanDialog {
+  --lean-ink:#243d58; --lean-muted:#556d84; --lean-paper:#fbfdff; --lean-tint:#eff5fb;
+  color:var(--lean-ink);
+}
+html[data-theme=dark] :is(#leanPanel,#leanDialog) {
+  --lean-ink:#ddeafa; --lean-muted:#acbfd5; --lean-paper:#101d2f; --lean-tint:#1a2c42;
+}
+#leanPanel {margin:4px 22px 16px; border:1px solid var(--border); border-radius:8px; background:var(--lean-tint)}
+#leanPanel summary {cursor:pointer; padding:11px 13px; font:600 15px/1.3 Georgia,serif}
+.lean-mark {margin:0 6px; color:var(--green); font:600 17px/1 Georgia,serif}
+.lean-body {padding:0 13px 14px}
+.lean-source-head, .lean-actions, .lean-dialog-head, .lean-dialog-actions {display:flex; gap:8px; align-items:center; flex-wrap:wrap}
+.lean-source-head {justify-content:space-between; padding:9px 0; border-top:1px solid var(--border)}
+.lean-source-head label, #leanReturnPanel label {font:600 12px/1.4 system-ui,sans-serif}
+#leanExample {width:auto; max-width:100%; padding:6px; font-size:13px}
+#leanSource, #leanReturnSource {
+  display:block; box-sizing:border-box; width:100%; max-width:100%; min-height:6em; resize:vertical;
+  border:1px solid var(--border); border-radius:6px; padding:11px 12px; background:var(--lean-paper);
+  color:var(--lean-ink); font:14px/1.6 ui-monospace,SFMono-Regular,Consolas,monospace; tab-size:2;
+}
+#leanHint, #leanStatus, #leanDialog p, #leanReturnMessage {color:var(--lean-muted);font:12px/1.55 system-ui,sans-serif}
+#leanHint, #leanStatus:not(:empty) {margin:8px 0}
+#leanStatus:empty {display:none}
+#leanCheck {flex:none; min-height:38px; padding:9px 14px}
+#leanDialog {box-sizing:border-box; width:min(1260px,96vw); max-width:none; height:90vh; height:90dvh; max-height:none;
+  background:var(--lean-paper); padding:0; border:1px solid var(--border); border-radius:12px; overflow:hidden}
+#leanDialog[open] {display:flex; flex-direction:column}
+#leanDialog::backdrop {background:rgb(11 23 40 / 65%)}
+.lean-dialog-head {padding:14px 18px; justify-content:space-between; border-bottom:1px solid var(--border)}
+.lean-dialog-head>div:first-child {flex:1 1 300px}
+.lean-dialog-head h2 {font:600 20px/1.3 Georgia,serif; margin:0 0 4px}
+.lean-dialog-actions a {display:inline-flex; align-items:center; text-decoration:none}
+#leanLoading:not([hidden]), #leanReturnPanel {padding:8px 18px}
+#leanReturnPanel {background:var(--lean-tint); overflow:auto; max-height:42%}
+#leanReturnSource {margin:5px 0}
+#leanFrameHost {flex:1; min-height:0}
+#leanFrameHost iframe {display:block; height:100%; width:100%; border:none}
+@media (max-width:600px) {
+  #leanPanel {margin:5px 14px 14px}
+  #leanSource, #leanReturnSource, #leanExample {font-size:16px}
+  #leanDialog {width:100%; height:100dvh; border:0; border-radius:0}
+  .lean-dialog-head {padding:10px 12px; gap:5px}
+  .lean-dialog-actions {gap:6px}
+  #leanPanel :is(button,select), .lean-dialog-actions :is(button,a) {min-height:44px}
+}
+@media print {#leanPanel,#leanDialog {display:none!important}}

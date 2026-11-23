@@ -6,7 +6,9 @@ Write proofs, collect formulas, and explore equations in 2D or 3D. Select an int
 
 Proofpad runs in the browser. Use **Save draft** to download an editable backup and **Open draft** to restore it in another browser or on another device. Export finished work as a PNG or printable PDF.
 
-Run `python3 -B src/build_release.py` to rebuild the website from source. All dependencies are included.
+Under **Proofs → Lean proof**, enter Lean 4 code or choose an example. **Check with Lean** opens the online Lean playground and shows proof goals, errors, and warnings. Proofpad saves your source with the draft and can import or download a `.lean` file. If you edit in the checker, copy the full edited source and choose **Keep edits** to save it back to your proof.
+
+Run `python3 -B src/build_release.py` to rebuild the website from source. The notebook assets are bundled. Formal proof checking requires an internet connection.
 
 GitHub Pages serves the `docs/` directory on the `main` branch. To preview the published files locally, run `python3 -m http.server --directory docs` and open [localhost:8000](http://localhost:8000/).
 

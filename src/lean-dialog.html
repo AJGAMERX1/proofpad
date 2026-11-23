@@ -1,0 +1,19 @@
+<dialog id="leanDialog" aria-labelledby="leanDialogTitle">
+  <div class="lean-dialog-head">
+    <div><h2 id="leanDialogTitle">Lean checker</h2><p>Open <strong>All Messages</strong> for errors and warnings. To save changes to your proof, copy the full edited code and choose <strong>Keep edits</strong>.</p></div>
+    <div class="lean-dialog-actions">
+      <button id="leanReturnOpen" type="button" class="copy" aria-expanded="false" aria-controls="leanReturnPanel">Keep edits…</button>
+      <a id="leanExternal" class="copy" target="_blank" rel="noopener noreferrer">Open submitted source in new tab ↗</a>
+      <button id="leanClose" type="button" class="copy">Close</button>
+    </div>
+  </div>
+  <div id="leanReturnPanel" hidden>
+    <label for="leanReturnSource">Paste the full edited file from the Lean checker</label>
+    <textarea id="leanReturnSource" rows="3" dir="ltr" spellcheck="false" autocapitalize="off" autocorrect="off"></textarea>
+    <button type="button" class="copy" id="leanReturnApply" disabled>Save to proof</button>
+    <button type="button" class="quiet" id="leanReturnCancel">Cancel</button>
+    <span id="leanReturnMessage" role="status"></span>
+  </div>
+  <p id="leanLoading" role="status" aria-live="polite"></p>
+  <div id="leanFrameHost"></div>
+</dialog>

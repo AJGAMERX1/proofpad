@@ -572,7 +572,56 @@ html[data-theme="dark"] body {
   #matrixDialog .matrix-fields > label:nth-child(n+3) { grid-column:1 / -1; }
 }
 
-</style><link rel="stylesheet" href="assets/fonts.77f0e774f13d.css"></head><body>
+</style><style>
+main:not([data-mode="proofs"]) #leanPanel {display:none}
+#leanPanel, #leanDialog {
+  --lean-ink:#243d58; --lean-muted:#556d84; --lean-paper:#fbfdff; --lean-tint:#eff5fb;
+  color:var(--lean-ink);
+}
+html[data-theme=dark] :is(#leanPanel,#leanDialog) {
+  --lean-ink:#ddeafa; --lean-muted:#acbfd5; --lean-paper:#101d2f; --lean-tint:#1a2c42;
+}
+#leanPanel {margin:4px 22px 16px; border:1px solid var(--border); border-radius:8px; background:var(--lean-tint)}
+#leanPanel summary {cursor:pointer; padding:11px 13px; font:600 15px/1.3 Georgia,serif}
+.lean-mark {margin:0 6px; color:var(--green); font:600 17px/1 Georgia,serif}
+.lean-body {padding:0 13px 14px}
+.lean-source-head, .lean-actions, .lean-dialog-head, .lean-dialog-actions {display:flex; gap:8px; align-items:center; flex-wrap:wrap}
+.lean-source-head {justify-content:space-between; padding:9px 0; border-top:1px solid var(--border)}
+.lean-source-head label, #leanReturnPanel label {font:600 12px/1.4 system-ui,sans-serif}
+#leanExample {width:auto; max-width:100%; padding:6px; font-size:13px}
+#leanSource, #leanReturnSource {
+  display:block; box-sizing:border-box; width:100%; max-width:100%; min-height:6em; resize:vertical;
+  border:1px solid var(--border); border-radius:6px; padding:11px 12px; background:var(--lean-paper);
+  color:var(--lean-ink); font:14px/1.6 ui-monospace,SFMono-Regular,Consolas,monospace; tab-size:2;
+}
+#leanHint, #leanStatus, #leanDialog p, #leanReturnMessage {color:var(--lean-muted);font:12px/1.55 system-ui,sans-serif}
+#leanHint, #leanStatus:not(:empty) {margin:8px 0}
+#leanStatus:empty {display:none}
+#leanCheck {flex:none; min-height:38px; padding:9px 14px}
+#leanDialog {box-sizing:border-box; width:min(1260px,96vw); max-width:none; height:90vh; height:90dvh; max-height:none;
+  background:var(--lean-paper); padding:0; border:1px solid var(--border); border-radius:12px; overflow:hidden}
+#leanDialog[open] {display:flex; flex-direction:column}
+#leanDialog::backdrop {background:rgb(11 23 40 / 65%)}
+.lean-dialog-head {padding:14px 18px; justify-content:space-between; border-bottom:1px solid var(--border)}
+.lean-dialog-head>div:first-child {flex:1 1 300px}
+.lean-dialog-head h2 {font:600 20px/1.3 Georgia,serif; margin:0 0 4px}
+.lean-dialog-actions a {display:inline-flex; align-items:center; text-decoration:none}
+#leanLoading:not([hidden]), #leanReturnPanel {padding:8px 18px}
+#leanReturnPanel {background:var(--lean-tint); overflow:auto; max-height:42%}
+#leanReturnSource {margin:5px 0}
+#leanFrameHost {flex:1; min-height:0}
+#leanFrameHost iframe {display:block; height:100%; width:100%; border:none}
+@media (max-width:600px) {
+  #leanPanel {margin:5px 14px 14px}
+  #leanSource, #leanReturnSource, #leanExample {font-size:16px}
+  #leanDialog {width:100%; height:100dvh; border:0; border-radius:0}
+  .lean-dialog-head {padding:10px 12px; gap:5px}
+  .lean-dialog-actions {gap:6px}
+  #leanPanel :is(button,select), .lean-dialog-actions :is(button,a) {min-height:44px}
+}
+@media print {#leanPanel,#leanDialog {display:none!important}}
+</style>
+<link rel="stylesheet" href="assets/fonts.77f0e774f13d.css"></head><body>
 <header><div class="brand"><div class="logo">∴</div>proofpad</div><div class="header-actions"><div class="local"><span class="dot"></span><span id="saveState" role="status">Saved on this device</span></div>
 <button type="button" id="themeSwitch" aria-pressed="false"><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M20 14A8.4 8.4 0 0 1 10 4a8.6 8.6 0 1 0 10 10Z"/></svg>Dark mode</button></div></header>
 <script>
@@ -583,6 +632,25 @@ document.getElementById('themeSwitch').addEventListener('click', () => {
   applyTheme();
 });
 </script>
+<dialog id="leanDialog" aria-labelledby="leanDialogTitle">
+  <div class="lean-dialog-head">
+    <div><h2 id="leanDialogTitle">Lean checker</h2><p>Open <strong>All Messages</strong> for errors and warnings. To save changes to your proof, copy the full edited code and choose <strong>Keep edits</strong>.</p></div>
+    <div class="lean-dialog-actions">
+      <button id="leanReturnOpen" type="button" class="copy" aria-expanded="false" aria-controls="leanReturnPanel">Keep edits…</button>
+      <a id="leanExternal" class="copy" target="_blank" rel="noopener noreferrer">Open submitted source in new tab ↗</a>
+      <button id="leanClose" type="button" class="copy">Close</button>
+    </div>
+  </div>
+  <div id="leanReturnPanel" hidden>
+    <label for="leanReturnSource">Paste the full edited file from the Lean checker</label>
+    <textarea id="leanReturnSource" rows="3" dir="ltr" spellcheck="false" autocapitalize="off" autocorrect="off"></textarea>
+    <button type="button" class="copy" id="leanReturnApply" disabled>Save to proof</button>
+    <button type="button" class="quiet" id="leanReturnCancel">Cancel</button>
+    <span id="leanReturnMessage" role="status"></span>
+  </div>
+  <p id="leanLoading" role="status" aria-live="polite"></p>
+  <div id="leanFrameHost"></div>
+</dialog>
 <dialog id="copiesDialog" aria-labelledby="copiesTitle"><h2 id="copiesTitle">Saved copies</h2><ul id="copyList"></ul><button type="button" class="copy" id="closeCopies">Close</button></dialog>
 <main inert>
 <section class="intro"><div class="hero-copy"><div class="eyebrow">THE MATHEMATICAL NOTEBOOK</div><h1>Proofpad<span class="brand-stop">.</span></h1><p>Give your reasoning room to unfold.</p><div class="hero-caption" id="modeCaption">PROOFS · WRITTEN WITH CARE</div></div><div class="workspace-nav" aria-label="Workspace"><button class="mode-tab" data-mode="proofs" aria-label="Proofs workspace" aria-pressed="true"><span aria-hidden="true">□</span><b>Proofs</b><small>Develop an argument</small></button><button class="mode-tab" data-mode="formulas" aria-label="Formulas workspace" aria-pressed="false"><span aria-hidden="true">=</span><b>Formulas</b><small>Collect your equations</small></button><button class="mode-tab" id="graph2D" data-mode="calculator" aria-label="Calculator workspace" aria-pressed="false"><span aria-hidden="true">±</span><b>Calculator</b><small>2D graphs &amp; values</small></button><button class="mode-tab" id="graph3D" data-mode="surface" aria-label="3D Graph workspace" aria-pressed="false"><span aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"><path d="m12 2 9 5v10l-9 5-9-5V7Zm0 10L3 7m9 5 9-5m-9 5v10"/></svg></span><b>3D Graph</b><small>Surfaces &amp; heat maps</small></button><p>Separate drafts, saved as you write.</p></div></section>
@@ -590,6 +658,28 @@ document.getElementById('themeSwitch').addEventListener('click', () => {
 <div class="document-tools" aria-label="Document tools"><div><button class="copy" id="undoEdit" disabled title="Undo · Cmd/Ctrl+Z">↶ Undo</button><button class="copy" id="redoEdit" disabled title="Redo · Shift+Cmd/Ctrl+Z">↷ Redo</button></div><div><button class="copy" id="saveDraft" title="Download an editable backup of this workspace">Save draft</button><button class="copy" type="button" id="storedCopies" hidden>Saved copies</button><button class="copy" id="openDraft" title="Restore a saved Proofpad draft from a file">Open draft</button><input type="file" id="draftFile" accept=".json,.proofpad" hidden></div></div>
 <div class="spelling-toolbar"><label><input type="checkbox" id="spellEnabled" checked> Spelling checks</label><button class="copy" id="spellReview">Check spelling</button><span>English · checked on your device</span></div>
 <div class="paperheading"><label class="label" for="title">TITLE · OPTIONAL</label><input id="title" placeholder="What are you proving?" maxlength="160"></div>
+<details id="leanPanel" class="lean-panel">
+  <summary><span class="lean-mark" aria-hidden="true">⊢</span> Lean proof</summary>
+  <div class="lean-body">
+    <div class="lean-source-head">
+      <label for="leanSource">Lean 4 source</label>
+      <select id="leanExample" aria-label="Insert a Lean example">
+        <option value="">Insert example…</option>
+        <option value="substitution">Substitute an equality</option>
+        <option value="algebra">Solve for x</option>
+      </select>
+    </div>
+    <textarea id="leanSource" rows="7" dir="ltr" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off" aria-describedby="leanHint" placeholder="Write a theorem here, or start with an example."></textarea>
+    <p id="leanHint">Checking sends this source to the Lean playground. Lean checks the formal statement and proof you write here.</p>
+    <div class="lean-actions">
+      <button type="button" class="primary" id="leanCheck" disabled>Check with Lean</button>
+      <button type="button" class="copy" id="leanImport">Import .lean…</button>
+      <input type="file" id="leanFile" accept=".lean,text/plain" hidden>
+      <button type="button" class="copy" id="leanDownload" disabled>Download .lean</button>
+    </div>
+    <p id="leanStatus" role="status" aria-live="polite"></p>
+  </div>
+</details>
 <div id="proofSetup" class="proof-setup"><div class="proof-options"><label for="proofStyle">Proof format<select id="proofStyle"><option value="paper">Written proof · paper style</option><option value="steps">Step-by-step notes</option></select></label><label for="statementKind">Statement type<select id="statementKind"><option>Theorem</option><option>Proposition</option><option>Lemma</option><option>Claim</option><option>Corollary</option><option>Definition</option><option>Remark</option><option>Example</option><option>Exercise</option></select></label></div><label class="label" for="statement">Statement · assumptions and what you will prove</label><textarea id="statement" rows="2" placeholder="For every integer n, if n is even then n² is even."></textarea><small>Optional. Use $n^2$ for inline math in the statement.</small><div class="proof-body-label">Proof.<span>Write in paragraphs; display the equations that carry the argument.</span></div></div>
 <div class="toolbar" aria-label="Quick math tools"><button class="tool featured" data-command="moveToSubscript"><span class="symbol">xᵢ</span>Subscript</button><button class="tool" data-command="moveToSuperscript"><span class="symbol">xⁿ</span>Power</button><button class="tool" data-insert="\;" aria-label="Insert space"><span class="symbol" aria-hidden="true">↔</span>Space</button><button class="tool" id="textMode" aria-label="Toggle text entry" aria-pressed="false"><span class="symbol">Aa</span><span id="entryModeLabel">Text</span></button><button type="button" class="tool" id="showKeyboard" aria-label="Show on-screen keyboard" aria-pressed="false"><span class="symbol" aria-hidden="true">⌨</span>Keyboard</button><button type="button" class="tool" id="matrixTool" aria-haspopup="dialog" aria-controls="matrixDialog"><span class="symbol" aria-hidden="true">▦</span>Matrix…</button><button class="tool" data-command="moveAfterParent" aria-label="Return to baseline">Back to baseline →</button></div>
 <div class="shortcut">Type <kbd>x_i</kbd> for xᵢ · <kbd>theta</kbd> for θ · <kbd>Space</kbd> adds a gap.<br><kbd>/</kbd> makes a fraction after a variable or number. Use the mode button to switch between words and math.</div>
@@ -795,7 +885,9 @@ function updateSurfaceLabel() {
 document.querySelectorAll('input[name="exportStyle"]').forEach(input => {
  input.onchange = () => { updateSurfaceLabel(); schedule(); };
 });
-function snapshotDraft(){return {...(inSurface()?{surfaceView:surfaceDraftSettings()}:{}),entries:entries(),exportStyle:selectedExportStyle(),title:$('#title').value,proofStyle:$('#proofStyle').value,statement:$('#statement').value,statementKind:$('#statementKind').value,exportNumbering:$('#exportNumbering').value,qed:$('#qed').checked,numbered:$('#numbered').checked,dividers:$('#dividers').checked,background,quality:$('#quality').value,fontSize:$('#fontSize').value,align:$('#align').value,padding:$('#padding').value}}
+function snapshotDraft(){
+ const leanSource=workspaceMode==='proofs' ? $('#leanSource').value : '';
+ return {...(leanSource ? {leanSource} : {}),...(inSurface()?{surfaceView:surfaceDraftSettings()}:{}),entries:entries(),exportStyle:selectedExportStyle(),title:$('#title').value,proofStyle:$('#proofStyle').value,statement:$('#statement').value,statementKind:$('#statementKind').value,exportNumbering:$('#exportNumbering').value,qed:$('#qed').checked,numbered:$('#numbered').checked,dividers:$('#dividers').checked,background,quality:$('#quality').value,fontSize:$('#fontSize').value,align:$('#align').value,padding:$('#padding').value}}
 let draftsLoaded = false;
 // Each commit has its own storage key. Replacing a revision deletes only that
 // precise parent, so simultaneous writes from separate tabs survive as siblings.
@@ -906,7 +998,7 @@ function openStoredWorkspace(mode,choice=null){
 function startNewAssignment(mode,next){
  if(mode!==workspaceMode)switchWorkspace(mode);
  beforeEdit();const current=snapshotDraft();
- const occupied=current.title?.trim()||current.statement?.trim()||current.entries.some(e=>hasContent(e.value));
+ const occupied=current.leanSource?.trim()||current.title?.trim()||current.statement?.trim()||current.entries.some(e=>hasContent(e.value));
  if(occupied){
   if(!writeWorkspaceDraft(mode,current,!draftLocations.get(mode)?.key)){
    status('Use Save draft to keep your current assignment before starting another.',true);return false;
@@ -1002,6 +1094,7 @@ function applyDraft(mode,data){
  updateSurfaceLabel();
  background=d.background==='transparent'?'transparent':'white';$('#proofStyle').value=d.proofStyle==='steps'?'steps':'paper';$('#statement').value=d.statement||'';$('#statementKind').value=['Theorem','Proposition','Lemma','Claim','Corollary','Definition','Remark','Example','Exercise'].includes(d.statementKind)?d.statementKind:'Theorem';$('#exportNumbering').value=['none','equations','steps'].includes(d.exportNumbering)?d.exportNumbering:'none';
  for(const id of ['quality','fontSize','align','padding'])if([...$('#'+id).options].some(o=>o.value===d[id]))$('#'+id).value=d[id];
+ restoreLeanSource(mode==='proofs' && typeof d.leanSource==='string' ? d.leanSource : '');
  $('#title').value=typeof d.title==='string'?d.title:'';$('#qed').checked=mode==='proofs'&&!!d.qed;$('#numbered').checked=!!d.numbered;$('#dividers').checked=d.dividers!==false;
  document.querySelectorAll('[data-bg]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.bg===background));
  $('#pastePanel').hidden=true;$('#latexbox').hidden=true;$('#toggleLatex').setAttribute('aria-expanded','false');$('#latex').value='';
@@ -4759,7 +4852,7 @@ $('#texConfirm').onclick=()=>{
  const target=$('#texDestination').value;
  const isNew=$('#texAction').value==='new';
  const draft=isNew?blankDraft(target):target===workspaceMode?snapshotDraft():(latestWorkspaceDraft(target)||blankDraft(target));
- const occupied=!isNew&&(draft.entries.some(e=>hasContent(e.value))||draft.title?.trim()||draft.statement?.trim());
+ const occupied=!isNew&&(draft.leanSource?.trim()||draft.entries.some(e=>hasContent(e.value))||draft.title?.trim()||draft.statement?.trim());
  const imported=importCandidate;
  const proofSetup=target==='proofs'&&!occupied?imported.proofSetup:null;
  let content=proofSetup?proofSetup.entries.slice():imported.entries.slice();
@@ -4783,9 +4876,10 @@ $('#texConfirm').onclick=()=>{
   importInfo.textContent='Import could not finish. '+error.message;
  }
 };
+const eventInLeanEditor=event=>['leanSource','leanReturnSource'].includes(event.target?.id);
 const looksLikeTexDocument=value=>/\\(?:documentclass\b|begin\s*\{document\})/.test(value);
 document.addEventListener('paste',e=>{
- if(importDialog.open||$('main').inert)return;
+ if(importDialog.open||$('main').inert||eventInLeanEditor(e))return;
  const value=e.clipboardData?.getData('text/plain')||'';
  if(!looksLikeTexDocument(value))return;
  e.preventDefault();e.stopImmediatePropagation();openTexImport(value);
@@ -4797,7 +4891,7 @@ let historyReady = false, historyRestoring = false, historyQueued = false;
 let historyGroup = null, historyLastGroup = null, historyLastTime = 0;
 function historyCursor() {
  const focused = document.activeElement;
- if (['title', 'statement', 'latex'].includes(focused?.id)) {
+ if (['title', 'statement', 'latex', 'leanSource'].includes(focused?.id)) {
   return {id:focused.id, start:focused.selectionStart, end:focused.selectionEnd, row:rows().indexOf(active?.closest('.row'))};
  }
  if (active?.isConnected) return {row:rows().indexOf(active.closest('.row')), selection:structuredClone(active.selection), mode:active.mode};
@@ -4852,6 +4946,13 @@ function beforeEdit(group=null) {
 }
 function restoreHistoryCursor(cursor) {
  if (!cursor) return;
+ if (cursor.id==='leanSource') {
+  $('#leanPanel').open=true;
+  const editor=$('#leanSource');
+  editor.focus();
+  editor.setSelectionRange(cursor.start,cursor.end);
+  return;
+ }
  const field = rows()[cursor.row]?.querySelector('math-field');
  if (field) {
   choose(field); focusMathField(field);
@@ -5067,12 +5168,35 @@ function saveDownload(blob,filename) {
  link.href=url;link.download=filename;document.body.append(link);link.click();link.remove();
  setTimeout(()=>URL.revokeObjectURL(url),30000);
 }
+const maxLeanSourceLength=100000;
+const leanDraftEditor=$('#leanSource');
+leanDraftEditor.maxLength=maxLeanSourceLength;
+function validateLeanSource(source) {
+ if (typeof source!=='string') throw new Error('Lean source must be text.');
+ if (source.length>maxLeanSourceLength) throw new Error('Lean source exceeds the 100,000 character limit.');
+}
+function replaceLeanSource(source) {
+ validateLeanSource(source);
+ if (workspaceMode!=='proofs') return;
+ beforeEdit();
+ restoreLeanSource(source);
+ commitHistory();
+ persist();
+}
+leanDraftEditor.addEventListener('beforeinput',event=>{
+ if(!event.defaultPrevented) beforeEdit(leanDraftEditor);
+});
+leanDraftEditor.addEventListener('input',()=>{
+ queueHistory();
+ persist();
+});
 function validateDraftFile(file) {
  if(file?.app!=='proofpad'||file.version!==1||!['proofs','formulas','calculator','surface'].includes(file.workspace))throw new Error('Choose a Proofpad draft file saved with Save draft.');
  const draft=file.draft;
  if(!draft||!Array.isArray(draft.entries)||draft.entries.length>500)throw new Error('The draft must contain at most 500 blocks.');
  if(draft.entries.some(e=>!e||!['math','text'].includes(e.type)||typeof e.value!=='string'||e.value.length>500000))throw new Error('The draft contains an invalid block.');
  for(const key of ['title','statement'])if(draft[key]!=null&&typeof draft[key]!=='string')throw new Error('The draft contains an invalid '+key+'.');
+ if (Object.hasOwn(draft,'leanSource')) validateLeanSource(draft.leanSource);
  return {workspace:file.workspace,draft};
 }
 $('#saveDraft').onclick=()=>{
@@ -5215,6 +5339,197 @@ $('#matrixForm').addEventListener('submit',event=>{
  syncEntryMode();schedule();
 });
 
+const leanExamples = {
+  substitution: `-- If x = y + 1, replace x by y + 1 in the goal.
+theorem substitute_in_sum (x y : Nat) (h : x = y + 1) :
+    x + 2 = (y + 1) + 2 := by
+  rw [h]
+`,
+  algebra: `import Mathlib.Data.Real.Basic
+import Mathlib.Tactic.Linarith
+
+-- Rearrange a linear equation to solve for x over the real numbers.
+theorem isolate_x (x y : ℝ) (h : 2 * x - 3 * y = 6) :
+    x = 3 * y / 2 + 3 := by
+  linarith [h]
+`,
+};
+// Lean Web accepts a source file in the documented #code fragment. Its parser
+// uses decodeURIComponent, so spaces must be %20 rather than form-encoded '+'.
+function leanPlaygroundUrl(source) {
+  return 'https://live.lean-lang.org/#code=' + encodeURIComponent(source);
+}
+
+let leanFrame = null;
+let leanLoadTimer;
+let leanReturnFocus = null;
+
+function closeLeanChecker() {
+  const dialog = document.getElementById('leanDialog');
+  if (dialog.open) dialog.close();
+}
+
+function openLeanChecker(source) {
+  const dialog = document.getElementById('leanDialog');
+  if (dialog.open || !source.trim()) return;
+  const host = document.getElementById('leanFrameHost');
+  const external = document.getElementById('leanExternal');
+  const loading = document.getElementById('leanLoading');
+  const url = leanPlaygroundUrl(source);
+  leanReturnFocus = document.activeElement;
+  const frame = document.createElement('iframe');
+  leanFrame = frame;
+  frame.title = 'Lean 4 editor, proof goals, and diagnostics';
+  frame.referrerPolicy = 'no-referrer';
+  frame.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-downloads allow-popups allow-popups-to-escape-sandbox');
+  external.href = url;
+  external.target = '_blank';
+  external.rel = 'noopener noreferrer';
+  loading.hidden = false;
+  loading.textContent = 'Opening the Lean editor…';
+  const showFallback = () => {
+    if (leanFrame !== frame) return;
+    loading.hidden = false;
+    loading.textContent = 'If the editor hasn’t appeared, open it in a new tab.';
+  };
+  frame.addEventListener('error', showFallback, { once: true });
+  frame.addEventListener('load', () => {
+    if (leanFrame !== frame) return;
+    clearTimeout(leanLoadTimer);
+    // Loading the editor says nothing about the result of checking the proof.
+    loading.hidden = true;
+  });
+  leanLoadTimer = setTimeout(showFallback, 15000);
+  dialog.showModal();
+  document.getElementById('leanClose').focus();
+  frame.src = url;
+  host.replaceChildren(frame);
+}
+
+document.getElementById('leanClose').addEventListener('click', closeLeanChecker);
+document.getElementById('leanDialog').addEventListener('close', () => {
+  // A close event can be queued after a new modal session was opened.
+  if (document.getElementById('leanDialog').open) return;
+  clearTimeout(leanLoadTimer);
+  leanFrame?.remove();
+  leanFrame = null;
+  document.getElementById('leanExternal').removeAttribute('href');
+  document.getElementById('leanLoading').hidden = true;
+  if (leanReturnFocus?.isConnected) leanReturnFocus.focus();
+  leanReturnFocus = null;
+});
+const leanEditor = document.getElementById('leanSource');
+const leanStatus = document.getElementById('leanStatus');
+const leanReturnSource = document.getElementById('leanReturnSource');
+let leanSourceRevision = 0;
+
+function updateLeanEditor() {
+  leanSourceRevision++;
+  const empty = !leanEditor.value.trim();
+  $('#leanCheck').disabled = empty;
+  $('#leanDownload').disabled = !leanEditor.value;
+  leanStatus.textContent = '';
+}
+
+function restoreLeanSource(value) {
+  closeLeanChecker();
+  leanEditor.value = value;
+  updateLeanEditor();
+}
+
+function insertLeanFile(source) {
+  validateLeanSource(source);
+  if (leanEditor.value === source) return true;
+  if (leanEditor.value.trim() && !window.confirm('Replace the current Lean source? You can undo this change.')) return false;
+  replaceLeanSource(source);
+  leanEditor.focus();
+  leanEditor.setSelectionRange(0, 0);
+  return true;
+}
+
+leanEditor.addEventListener('input', updateLeanEditor);
+leanEditor.addEventListener('keydown', event => {
+  if (event.key === 'Enter' && (event.ctrlKey || event.metaKey)) {
+    event.preventDefault();
+    $('#leanCheck').click();
+  }
+});
+
+$('#leanExample').addEventListener('change', event => {
+  const sample = leanExamples[event.target.value];
+  event.target.value = '';
+  if (sample) insertLeanFile(sample);
+});
+
+$('#leanImport').addEventListener('click', () => $('#leanFile').click());
+$('#leanFile').addEventListener('change', async event => {
+  const file = event.target.files[0];
+  event.target.value = '';
+  if (!file) return;
+  const revision = ++leanSourceRevision;
+  try {
+    if (file.size > 4 * maxLeanSourceLength + 3) throw new Error('Choose a Lean file of up to 100,000 characters.');
+    const bytes = await file.arrayBuffer();
+    if (revision !== leanSourceRevision) return;
+    let source;
+    try {
+      source = new TextDecoder('utf-8', {fatal:true}).decode(bytes).replace(/\r\n?/g, '\n');
+    } catch {
+      throw new Error('Save the .lean file as UTF-8 text and try again.');
+    }
+    if (source.includes('\u0000')) throw new Error('Choose a plain-text .lean file.');
+    if (insertLeanFile(source)) leanStatus.textContent = 'Imported ' + file.name;
+  } catch (error) {
+    if (revision === leanSourceRevision) leanStatus.textContent = error.message;
+  }
+});
+
+$('#leanDownload').addEventListener('click', () => {
+  const name = $('#title').value.trim().replace(/[^\p{L}\p{N} _-]/gu, '').slice(0, 80) || 'Proof';
+  saveDownload(new Blob([leanEditor.value], {type:'text/plain;charset=utf-8'}), name + '.lean');
+});
+
+$('#leanCheck').addEventListener('click', () => {
+  if (workspaceMode !== 'proofs' || !leanEditor.value.trim()) return;
+  try {
+    openLeanChecker(leanEditor.value);
+  } catch {
+    leanStatus.textContent = 'Could not open the checker. Download the .lean file to check it in Lean.';
+  }
+});
+
+function showLeanReturn(open) {
+  $('#leanReturnPanel').hidden = !open;
+  $('#leanReturnOpen').setAttribute('aria-expanded', String(open));
+  if (open) leanReturnSource.focus();
+  else {
+    leanReturnSource.value = '';
+    $('#leanReturnApply').disabled = true;
+    $('#leanReturnMessage').textContent = '';
+  }
+}
+
+$('#leanReturnOpen').addEventListener('click', () => showLeanReturn($('#leanReturnPanel').hidden));
+$('#leanReturnCancel').addEventListener('click', () => {
+  showLeanReturn(false);
+  $('#leanReturnOpen').focus();
+});
+leanReturnSource.addEventListener('input', () => {
+  $('#leanReturnApply').disabled = !leanReturnSource.value.trim();
+  $('#leanReturnMessage').textContent = '';
+});
+$('#leanReturnApply').addEventListener('click', () => {
+  const source = leanReturnSource.value;
+  try {
+    replaceLeanSource(source);
+    leanStatus.textContent = 'Saved the edited Lean source to this proof.';
+  } catch (error) {
+    $('#leanReturnMessage').textContent = error.message;
+  }
+});
+$('#leanDialog').addEventListener('close', () => {
+  if (!$('#leanDialog').open) showLeanReturn(false);
+});
 showKeys('proof');
 window.addEventListener('load',async()=>{
  try{

@@ -1,0 +1,22 @@
+<details id="leanPanel" class="lean-panel">
+  <summary><span class="lean-mark" aria-hidden="true">⊢</span> Lean proof</summary>
+  <div class="lean-body">
+    <div class="lean-source-head">
+      <label for="leanSource">Lean 4 source</label>
+      <select id="leanExample" aria-label="Insert a Lean example">
+        <option value="">Insert example…</option>
+        <option value="substitution">Substitute an equality</option>
+        <option value="algebra">Solve for x</option>
+      </select>
+    </div>
+    <textarea id="leanSource" rows="7" dir="ltr" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off" aria-describedby="leanHint" placeholder="Write a theorem here, or start with an example."></textarea>
+    <p id="leanHint">Checking sends this source to the Lean playground. Lean checks the formal statement and proof you write here.</p>
+    <div class="lean-actions">
+      <button type="button" class="primary" id="leanCheck" disabled>Check with Lean</button>
+      <button type="button" class="copy" id="leanImport">Import .lean…</button>
+      <input type="file" id="leanFile" accept=".lean,text/plain" hidden>
+      <button type="button" class="copy" id="leanDownload" disabled>Download .lean</button>
+    </div>
+    <p id="leanStatus" role="status" aria-live="polite"></p>
+  </div>
+</details>
